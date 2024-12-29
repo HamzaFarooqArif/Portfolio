@@ -1,44 +1,166 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <style>
-    .table-container {
-        overflow-y: auto;
-        border: 1px solid #ccc;
-        max-height: 60vh;
-      }
-    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   </head>
+  <style>
+    .container {
+      display: none;
+    }
+    
+    .sticky {
+      position: sticky;
+      top: 0;
+      display: flex;
+      background-color: #FFF;
+      padding: 10px;
+    }
+
+    .buttons-container {
+      padding-right: 10px;
+    }
+
+    button {
+      font-size: 45px;
+    }
+
+    td {
+        font-size: 30px;
+        max-width: 400px; /* Set max width for cells */
+        word-wrap: break-word; /* Ensure long words break and wrap */
+        white-space: normal; /* Allow text to wrap normally */
+    }
+
+    input[type=checkbox]
+    {
+      /* Double-sized Checkboxes */
+      -ms-transform: scale(2); /* IE */
+      -moz-transform: scale(2); /* FF */
+      -webkit-transform: scale(2); /* Safari and Chrome */
+      -o-transform: scale(2); /* Opera */
+      transform: scale(2);
+      width: 25px;
+      height: 25px;
+    }
+
+    input[type=number]
+    {
+      width: 50px;
+    }
+
+    .checkbox-container {
+
+    }
+
+  </style>
   <body>
-    
-    <button id="playButton" onclick="readTexts()" disabled>Play</button>
-    <button id="pauseButton" onclick="pauseSpeech()" style="display: none;">Pause</button>
-    <button id="resumeButton" onclick="resumeSpeech()" style="display: none;">Resume</button>
-    <button id="stopButton" onclick="stopSpeech()" style="display: none;">Stop</button>
-    <br>
-    <br>
+    <div class="sticky">
+      <div class="buttons-container">
+        <button id="playButton" onclick="readTexts()" disabled>Play</button>
+        <button id="pauseButton" onclick="pauseSpeech()" style="display: none;">Pause</button>
+        <button id="resumeButton" onclick="resumeSpeech()" style="display: none;">Resume</button>
+        <button id="stopButton" onclick="stopSpeech()" style="display: none;">Stop</button>
+      </div>
+      <div>
+        <label for="rate">Speed:</label>
+        <input type="range" id="rate" min="0.5" max="1.5" value="1" step="0.1">
+        <br>
+        <label for="delay">In-between delay:</label>
+        <input type="range" id="delay" min="0" max="3000" value="0000" step="100">
+        <br>
+        <label for="startRow">Starting Row:</label>
+        <input type="number" id="startRow" min="1" value="1" disabled>
+        <label for="endRow">Ending Row:</label>
+        <input type="number" id="endRow" min="1" value="1" disabled>
+        <br>
+      </div>
+      <div class="checkbox-container">
+        <div style="display: inline-block; margin-left: 15px;">
+          <div>
+            <label for="repeat-checkbox">Repeat:</label>
+          </div>
+          <div style="margin-left: 5px; margin-top: 10px;">
+            <input type="checkbox" id="repeat-checkbox" name="repeat-checkbox" checked>
+          </div>
+        </div>
+        <div style="display: inline-block; margin-left: 15px;">
+          <div>
+            <label for="reverse-checkbox">Reverse:</label>
+          </div>
+          <div style="margin-left: 10px; margin-top: 10px;">
+            <input type="checkbox" id="reverse-checkbox" name="reverse-checkbox">
+          </div>
+        </div>
+        <div style="display: inline-block; margin-left: 15px;">
+          <div>
+            <label for="meaning-to-word-checkbox">Meaning-to-word:</label>
+          </div>
+          <div style="margin-left: 40px; margin-top: 10px;">
+            <input type="checkbox" id="meaning-to-word-checkbox" name="meaning-to-word-checkbox">
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <label for="rate">Speed:</label>
-    <input type="range" id="rate" min="0.5" max="1.5" value="1" step="0.1">
-    <br>
-    
-    <label for="delay">In-between delay (ms):</label>
-    <input type="range" id="delay" min="0" max="3000" value="0000" step="100">
-    <br>
+    <table id="wordsTable" border="1">
+    </table>
 
-    <label for="startRow">Starting Row:</label>
-    <input type="number" id="startRow" min="1" value="1">
-    <br>
-
-    <div class="table-container" id="tableContainer">
-      <table id="wordsTable" border="1">
-      </table>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 col-md-6 mt-3">
+          <div class="card border-light">
+            <div class="card-body">
+              <div class="card-title py-2 border-bottom clearfix">
+                <span class="fw-light text-uppercase float-start">Speaking</span>
+              </div>
+              <select id="lang-select" class="form-control mt-3">
+                <option>(Select language)</option>
+              </select>
+              <select id="voice-select" class="form-control my-2">
+                <option>(Select voice)</option>
+              </select>
+            </div>
+            <div class="card-body">
+              <span class="float-end volume-value">1</span>
+              <label for="volume-input" class="form-label">Volume</label>
+              <input type="range" class="form-range" min="0" max="1" step="0.1" id="volume-input" value="1">
+              <span class="float-end rate-value">1</span>
+              <label for="rate-input" class="form-label">Rate
+                (Speed)</label>
+              <input type="range" class="form-range" min="1" max="20" step="1" id="rate-input" value="10">
+              <span class="float-end pitch-value">1</span>
+              <label for="pitch-input" class="form-label">Pitch</label>
+              <input type="range" class="form-range" min="0" max="2" step="0.1" id="pitch-input" value="1">
+            </div>
+            <div class="card-body">
+              <textarea rows="3" class="form-control" id="text-input" placeholder="Enter text to speak..."
+                spellcheck="false"></textarea>
+            </div>
+            <div class="card-body">
+              <button id="speak-btn" class="btn btn-primary speak-btn w-100">
+                Speak now
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!--debug log-->
+        <div class="card-body log-body">
+        </div>
+      </div>
+      <hr>
     </div>
     
-    <script>
+    <script type="text/javascript">
+
+      let lang1 = "de";
+      let lang2 = "en";
+      let prefSpeakEngine = "google";
+      let startIndex = 1;
+      let wordIdentifier = 'word';
+      let meaningIdentifier = 'meaning';
+
       let voices = [];
-      let germanVoice;
-      let englishVoice;
       let wordsJson;
       let isStopped = false; // Flag to track if the speech should stop
       let isPaused = false; // Flag to track if the speech should stop
@@ -54,10 +176,19 @@
       }
 
       function fetchDataCallback(data) {
-        wordsJson = data.map(pair => ({
-          word: pair[0],
-          meaning: pair[1]
-        }));
+        wordsJson = [
+          {
+            word: data[0][0],
+            meaning: data[0][1]
+          },
+          ...data
+            .slice(1) // Exclude the first row for filtering
+            .filter((pair) => pair[2].toLowerCase() === 'y') // Filter rows where column 3 has "Y"
+            .map((pair) => ({
+              word: pair[0],
+              meaning: pair[1]
+            }))
+        ];
 
         document.getElementById('wordsTable').innerHTML = 
         wordsJson.map((text, index) => `
@@ -68,59 +199,113 @@
           </tr>
         `).join('');
         document.getElementById('playButton').disabled = false;
-      }
+        enableControls();
 
-      function loadVoices() {
-        voices = window.speechSynthesis.getVoices();
-        setDefaultVoice();
-      }
+        document.getElementById('endRow').value = wordsJson.length - 1;
 
-      function setDefaultVoice() {
-        // Find a German voice (Google Deutsch or any German voice)
-        germanVoice = voices.find(voice => voice.lang === 'de-DE' && voice.name.includes('Google Deutsch')) || 
-                            voices.find(voice => voice.lang === 'de-DE');
         
-        englishVoice = voices.find(voice => voice.lang === 'en-US' && voice.name.includes('Google US English')) || 
-                            voices.find(voice => voice.lang === 'en-US');
+        let reverseElem = document.getElementById('reverse-checkbox');
+        reverseElem.addEventListener("change", (event) => {
+          reverseChanged(reverseElem.checked);
+        });
+      }
+
+      function reverseChanged(checked) {
+        let startRowInputElem = document.getElementById('startRow');
+        let endRowInputElem = document.getElementById('endRow');
+        startIndex = parseInt(startRowInputElem.value, 10);
+        endIndex = parseInt(endRowInputElem.value, 10);
+
+        if(checked) {
+          if(startIndex <= endIndex) {
+            let temp = startRowInputElem.value;
+            startRowInputElem.value = endRowInputElem.value;
+            endRowInputElem.value = temp;
+          }
+        }
+        else {
+          if(startIndex >= endIndex) {
+            let temp = startRowInputElem.value;
+            startRowInputElem.value = endRowInputElem.value;
+            endRowInputElem.value = temp;
+          }
+        }
+        
+        startIndex = parseInt(startRowInputElem.value, 10);
+        endIndex = parseInt(endRowInputElem.value, 10);
       }
 
       function readTexts() {
-        const startRowInput = document.getElementById('startRow').value;
-        const startIndex = parseInt(startRowInput, 10);
+        let startRowInputElem = document.getElementById('startRow');
+        let endRowInputElem = document.getElementById('endRow');
+        let reverseElem = document.getElementById('reverse-checkbox');
+        let meaningToWordElem = document.getElementById('meaning-to-word-checkbox');
 
-        if (isNaN(startIndex) || startIndex < 0 || startIndex >= wordsJson.length) {
-          alert("Please enter a valid row number.");
+        disableControls();
+
+        const startRowInput = startRowInputElem.value;
+        const endRowInput = endRowInputElem.value;
+        startIndex = parseInt(startRowInput, 10);
+        endIndex = parseInt(endRowInput, 10);
+
+        if (isNaN(startIndex) || startIndex <= 0 || startIndex >= wordsJson.length) {
+          alert(`Please enter a number between 1 and ${(wordsJson.length - 1)} in 'Starting Row'`);
+          enableControls();
           return;
         }
 
+        if (isNaN(endIndex) || endIndex <= 0 || endIndex >= wordsJson.length) {
+          alert(`Please enter a number between 1 and ${(wordsJson.length - 1)} in 'Ending Row'`);
+          enableControls();
+          return;
+        }
+
+        if(reverseElem.checked && startIndex <= endIndex) {
+          alert(`'Starting Row' should be greater than 'Ending Row'`);
+          enableControls();
+          return;
+        }
+        else if (!reverseElem.checked && startIndex >= endIndex) {
+          alert(`'Starting Row' should be less than 'Ending Row'`);
+          enableControls();
+          return;
+        }
+
+        if(meaningToWordElem.checked) {
+          wordIdentifier = "meaning";
+          meaningIdentifier = "word";
+        }
+        else {
+          wordIdentifier = "word";
+          meaningIdentifier = "meaning";
+        }
+        
         removeAllHighlights();
         isStopped = false;
         playButton.style.display = 'none';
         pauseButton.style.display = 'inline';
         stopButton.style.display = 'inline';
 
-        playAllTexts("word", wordsJson, startIndex);
+        playAllTexts(wordIdentifier, startIndex);
       }
 
       function pauseSpeech() {
-        if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
-          window.speechSynthesis.pause();
-          pauseButton.style.display = 'none';
-          resumeButton.style.display = 'inline';
-        }
+        isPaused = true;
+        pauseButton.style.display = 'none';
+        resumeButton.style.display = 'inline';
       }
 
       function resumeSpeech() {
-        window.speechSynthesis.resume();
+        isPaused = false;
         resumeButton.style.display = 'none';
         pauseButton.style.display = 'inline';
       }
 
       function stopSpeech() {
+        enableControls();
         removeAllHighlights();
         isStopped = true;
-        resetButtons();
-        window.speechSynthesis.cancel();
+        window.EasySpeech.cancel();
       }
 
       function resetButtons() {
@@ -130,52 +315,130 @@
         stopButton.style.display = 'none';
       }
 
-      async function playAllTexts(textType, wordsJson, currentIndex) {
-        if (isStopped) {
-          return Promise.resolve(true);
-        };
-        if(currentIndex < wordsJson.length) {
-          let utterance = new SpeechSynthesisUtterance(wordsJson[currentIndex][textType]);
-          utterance.rate = parseFloat(document.getElementById('rate').value);
+      function enableControls() {
+        let startRowInputElem = document.getElementById('startRow');
+        let endRowInputElem = document.getElementById('endRow');
+        let meaningToWordElem = document.getElementById('meaning-to-word-checkbox');
+        startRowInputElem.readOnly = false;
+        startRowInputElem.disabled = false;
+        endRowInputElem.readOnly = false;
+        endRowInputElem.disabled = false;
+        meaningToWordElem.disabled = false;
+        meaningToWordElem.readOnly = false;
+        resetButtons();
+      }
 
+      function disableControls() {
+        let startRowInputElem = document.getElementById('startRow');
+        let endRowInputElem = document.getElementById('endRow');
+        let meaningToWordElem = document.getElementById('meaning-to-word-checkbox');
+        startRowInputElem.readOnly = true;
+        startRowInputElem.disabled = true;
+        endRowInputElem.readOnly = true;
+        endRowInputElem.disabled = true;
+        meaningToWordElem.disabled = true;
+        meaningToWordElem.readOnly = true;
+      }
+
+      async function playAllTexts(textType, currentIndex) {
+        if (isStopped) {
+          isPaused = false;
+          return true;
+        };
+
+        if(indexTerminationCriteria(currentIndex)) {
+          setSpeed(parseFloat(document.getElementById('rate').value) * 10);
+          let lang;
           if(textType == "word") {
-            utterance.voice = germanVoice;  
+            lang = lang1;  
           }
           else if (textType == "meaning") {
-            utterance.voice = englishVoice;
+            lang = lang2;
+          }
+          highlightWord(textType, currentIndex);
+          await speakNow(lang, prefSpeakEngine, wordsJson[currentIndex][textType]);
+          if(textType == wordIdentifier) {
+            const delay = parseInt(document.getElementById('delay').value, 10);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            await waitUntilNotPaused();
+            removeHighlight(textType, currentIndex);
+            return playAllTexts(meaningIdentifier, currentIndex);
           }
           else {
-            utterance.voice = window.defaultVoice;
-          }
-
-          window.speechSynthesis.speak(utterance);
-          highlightWord(textType, currentIndex);
-          
-          return new Promise(resolve => {
-            utterance.onend = resolve;
-          }).then(() => {
+            await waitUntilNotPaused();
             removeHighlight(textType, currentIndex);
-            if(textType == "word") {
-              const delay = parseInt(document.getElementById('delay').value, 10);
-              setTimeout(() => {
-                return playAllTexts("meaning", wordsJson, currentIndex);
-              }, delay); 
-            }
-            else {
-              return playAllTexts("word", wordsJson, currentIndex + 1);
-            }
-          });
+            return playAllTexts(wordIdentifier, nextIndex(currentIndex));
+          }
         }
         else {
-          resetButtons();
-          return Promise.resolve(true);
+          let repeat = document.getElementById('repeat-checkbox').checked;
+          if(repeat) {
+            let reverse = document.getElementById('reverse-checkbox').checked;
+            if(reverse) {
+              if(startIndex == 1) {
+                currentIndex = wordsJson.length - 1;
+              }
+              else {
+                currentIndex = startIndex;
+              }
+            }
+            else {
+              if(startIndex == wordsJson.length - 1) {
+                currentIndex = 1;
+              }
+              else {
+                currentIndex = startIndex;
+              }
+            }
+
+            return playAllTexts(wordIdentifier, currentIndex);
+          }
+          else {
+            enableControls();
+            return true;
+          }
         }
-      } 
+      }
+
+      function nextIndex(currentIndex) {
+        let reverse = document.getElementById('reverse-checkbox').checked;
+        if(reverse) {
+          currentIndex = currentIndex - 1;
+        }
+        else {
+          currentIndex = currentIndex + 1;
+        }
+        
+        return currentIndex;
+      }
+
+      function indexTerminationCriteria(currentIndex) {
+        let startRowInputVal = parseInt(document.getElementById('startRow').value, 10);
+        let endRowInputVal = parseInt(document.getElementById('endRow').value, 10);
+        let reverse = document.getElementById('reverse-checkbox').checked;
+        if(reverse) {
+          return currentIndex > 0 && (startRowInputVal > endRowInputVal && currentIndex >= endRowInputVal);
+        }
+        else {
+          return currentIndex < wordsJson.length && (startRowInputVal < endRowInputVal && currentIndex <= endRowInputVal);
+        }
+      }
+
+      function waitUntilNotPaused() {
+        return new Promise(resolve => {
+          const intervalForPause = setInterval(() => {
+            if(!isPaused || isStopped) {
+              clearInterval(intervalForPause);
+              resolve();
+            }
+          }, 10);
+        });
+      }
 
       function removeAllHighlights() {
         wordsJson.forEach((_, index) => {
-          removeHighlight('word', index);
-          removeHighlight('meaning', index);
+          removeHighlight(wordIdentifier, index);
+          removeHighlight(meaningIdentifier, index);
         });
       }
 
@@ -190,13 +453,1471 @@
         document.getElementById(textType + '-' + index).style.backgroundColor = '';
       }
 
-      // Load voices and set default when voices are ready
-      if (window.speechSynthesis.onvoiceschanged !== undefined) {
-        window.speechSynthesis.onvoiceschanged = loadVoices;
+      async function speakNow(lang, voice, text) {
+        return new Promise((resolve) => {
+          const speakBtn = document.getElementById('speak-btn');
+          setLang(lang);
+          setTimeout(() => {
+            setVoice(voice);
+            setText(text);
+            speakBtn.click();
+            let interval = setInterval(() => {
+              if(!speakBtn.disabled) {
+                clearInterval(interval);
+                resolve();
+              }
+            }, 10);
+          }, 1);
+        });
       }
 
-      loadVoices();
+      function setSpeed(valueToSet) { // between 1 and 20
+        const rateSlider = document.getElementById('rate-input');
+        rateSlider.value = valueToSet;
+        rateSlider.dispatchEvent(new Event('change'));
+      }
+
+      function setText(textToSet) {
+        const textarea = document.getElementById('text-input');
+        textarea.value = textToSet;
+        textarea.dispatchEvent(new Event('change'));
+      }
+
+      function setLang(valueToSelect) {
+        const dropdown = document.getElementById('lang-select');
+        let valueFound = false;
+        for (let option of dropdown.options) {
+          if (option.text.toLocaleLowerCase().includes(valueToSelect.toLowerCase())) {
+            option.selected = true;
+            dropdown.dispatchEvent(new Event('change'));
+            valueFound = true;
+            break;
+          }
+        }
+
+        if(!valueFound) {
+          for (let option of dropdown.options) {
+            if (!option.text.toLocaleLowerCase().includes("select")) {
+              option.selected = true;
+              dropdown.dispatchEvent(new Event('change'));
+              break;
+            }
+          } 
+        }
+      }
+
+      function setVoice(valueToSelect) {
+        const dropdown = document.getElementById('voice-select');
+        let valueFound = false;
+
+        for (let option of dropdown.options) {
+          if (option.text.toLocaleLowerCase().includes(valueToSelect.toLowerCase())) {
+            option.selected = true;
+            dropdown.dispatchEvent(new Event('change'));
+            valueFound = true;
+            break;
+          }
+        }
+
+        if(!valueFound) {
+          for (let option of dropdown.options) {
+            if (!option.text.toLocaleLowerCase().includes("select")) {
+              option.selected = true;
+              dropdown.dispatchEvent(new Event('change'));
+              break;
+            }
+          } 
+        }
+      }
+
       fetchData();
+
+      // keeping phone screen awake - start =============================================
+      let wakeLock = null;
+
+      // Function to request a wake lock
+      const requestWakeLock = async () => {
+        try {
+          wakeLock = await navigator.wakeLock.request('screen');
+          console.log('Wake lock is active');
+
+          // Re-apply wake lock if it’s released due to page visibility changes
+          wakeLock.addEventListener('release', () => {
+            console.log('Wake lock was released');
+          });
+        } catch (err) {
+          console.error(`${err.name}: ${err.message}`);
+        }
+      };
+
+      // Request wake lock when the page is fully loaded
+      document.addEventListener('DOMContentLoaded', () => {
+        if ('wakeLock' in navigator) {
+          requestWakeLock();
+        } else {
+          console.log('Wake Lock API not supported');
+        }
+      });
+
+
+      document.addEventListener('visibilitychange', async () => {
+        if (wakeLock !== null && document.visibilityState === 'visible') {
+          requestWakeLock();
+        }
+      });
+      // keeping phone screen awake - end ===============================================
+
+
+    </script>
+    <script type="text/javascript">
+      !function () {
+        "use strict";
+        function e(e, t) {
+          var n = Object.keys(e);
+          if (Object.getOwnPropertySymbols) {
+            var r = Object.getOwnPropertySymbols(e);
+            t && (r = r.filter((function (t) {
+              return Object.getOwnPropertyDescriptor(e, t).enumerable
+            }
+            ))),
+              n.push.apply(n, r)
+          }
+          return n
+        }
+        function t(t) {
+          for (var n = 1; n < arguments.length; n++) {
+            var r = null != arguments[n] ? arguments[n] : {};
+            n % 2 ? e(Object(r), !0).forEach((function (e) {
+              a(t, e, r[e])
+            }
+            )) : Object.getOwnPropertyDescriptors ? Object.defineProperties(t, Object.getOwnPropertyDescriptors(r)) : e(Object(r)).forEach((function (e) {
+              Object.defineProperty(t, e, Object.getOwnPropertyDescriptor(r, e))
+            }
+            ))
+          }
+          return t
+        }
+        function n() {
+          n = function () {
+            return t
+          }
+            ;
+          var e, t = {}, r = Object.prototype, o = r.hasOwnProperty, i = Object.defineProperty || function (e, t, n) {
+            e[t] = n.value
+          }
+            , a = "function" == typeof Symbol ? Symbol : {}, c = a.iterator || "@@iterator", u = a.asyncIterator || "@@asyncIterator", s = a.toStringTag || "@@toStringTag";
+          function l(e, t, n) {
+            return Object.defineProperty(e, t, {
+              value: n,
+              enumerable: !0,
+              configurable: !0,
+              writable: !0
+            }),
+              e[t]
+          }
+          try {
+            l({}, "")
+          } catch (e) {
+            l = function (e, t, n) {
+              return e[t] = n
+            }
+          }
+          function f(e, t, n, r) {
+            var o = t && t.prototype instanceof g ? t : g
+              , a = Object.create(o.prototype)
+              , c = new P(r || []);
+            return i(a, "_invoke", {
+              value: k(e, n, c)
+            }),
+              a
+          }
+          function d(e, t, n) {
+            try {
+              return {
+                type: "normal",
+                arg: e.call(t, n)
+              }
+            } catch (e) {
+              return {
+                type: "throw",
+                arg: e
+              }
+            }
+          }
+          t.wrap = f;
+          var v = "suspendedStart"
+            , h = "suspendedYield"
+            , p = "executing"
+            , y = "completed"
+            , m = {};
+          function g() { }
+          function b() { }
+          function w() { }
+          var S = {};
+          l(S, c, (function () {
+            return this
+          }
+          ));
+          var x = Object.getPrototypeOf
+            , E = x && x(x(A([])));
+          E && E !== r && o.call(E, c) && (S = E);
+          var L = w.prototype = g.prototype = Object.create(S);
+          function O(e) {
+            ["next", "throw", "return"].forEach((function (t) {
+              l(e, t, (function (e) {
+                return this._invoke(t, e)
+              }
+              ))
+            }
+            ))
+          }
+          function j(e, t) {
+            function n(r, i, a, c) {
+              var u = d(e[r], e, i);
+              if ("throw" !== u.type) {
+                var s = u.arg
+                  , l = s.value;
+                return l && "object" == typeof l && o.call(l, "__await") ? t.resolve(l.__await).then((function (e) {
+                  n("next", e, a, c)
+                }
+                ), (function (e) {
+                  n("throw", e, a, c)
+                }
+                )) : t.resolve(l).then((function (e) {
+                  s.value = e,
+                    a(s)
+                }
+                ), (function (e) {
+                  return n("throw", e, a, c)
+                }
+                ))
+              }
+              c(u.arg)
+            }
+            var r;
+            i(this, "_invoke", {
+              value: function (e, o) {
+                function i() {
+                  return new t((function (t, r) {
+                    n(e, o, t, r)
+                  }
+                  ))
+                }
+                return r = r ? r.then(i, i) : i()
+              }
+            })
+          }
+          function k(t, n, r) {
+            var o = v;
+            return function (i, a) {
+              if (o === p)
+                throw new Error("Generator is already running");
+              if (o === y) {
+                if ("throw" === i)
+                  throw a;
+                return {
+                  value: e,
+                  done: !0
+                }
+              }
+              for (r.method = i,
+                r.arg = a; ;) {
+                var c = r.delegate;
+                if (c) {
+                  var u = N(c, r);
+                  if (u) {
+                    if (u === m)
+                      continue;
+                    return u
+                  }
+                }
+                if ("next" === r.method)
+                  r.sent = r._sent = r.arg;
+                else if ("throw" === r.method) {
+                  if (o === v)
+                    throw o = y,
+                    r.arg;
+                  r.dispatchException(r.arg)
+                } else
+                  "return" === r.method && r.abrupt("return", r.arg);
+                o = p;
+                var s = d(t, n, r);
+                if ("normal" === s.type) {
+                  if (o = r.done ? y : h,
+                    s.arg === m)
+                    continue;
+                  return {
+                    value: s.arg,
+                    done: r.done
+                  }
+                }
+                "throw" === s.type && (o = y,
+                  r.method = "throw",
+                  r.arg = s.arg)
+              }
+            }
+          }
+          function N(t, n) {
+            var r = n.method
+              , o = t.iterator[r];
+            if (o === e)
+              return n.delegate = null,
+                "throw" === r && t.iterator.return && (n.method = "return",
+                  n.arg = e,
+                  N(t, n),
+                  "throw" === n.method) || "return" !== r && (n.method = "throw",
+                    n.arg = new TypeError("The iterator does not provide a '" + r + "' method")),
+                m;
+            var i = d(o, t.iterator, n.arg);
+            if ("throw" === i.type)
+              return n.method = "throw",
+                n.arg = i.arg,
+                n.delegate = null,
+                m;
+            var a = i.arg;
+            return a ? a.done ? (n[t.resultName] = a.value,
+              n.next = t.nextLoc,
+              "return" !== n.method && (n.method = "next",
+                n.arg = e),
+              n.delegate = null,
+              m) : a : (n.method = "throw",
+                n.arg = new TypeError("iterator result is not an object"),
+                n.delegate = null,
+                m)
+          }
+          function T(e) {
+            var t = {
+              tryLoc: e[0]
+            };
+            1 in e && (t.catchLoc = e[1]),
+              2 in e && (t.finallyLoc = e[2],
+                t.afterLoc = e[3]),
+              this.tryEntries.push(t)
+          }
+          function C(e) {
+            var t = e.completion || {};
+            t.type = "normal",
+              delete t.arg,
+              e.completion = t
+          }
+          function P(e) {
+            this.tryEntries = [{
+              tryLoc: "root"
+            }],
+              e.forEach(T, this),
+              this.reset(!0)
+          }
+          function A(t) {
+            if (t || "" === t) {
+              var n = t[c];
+              if (n)
+                return n.call(t);
+              if ("function" == typeof t.next)
+                return t;
+              if (!isNaN(t.length)) {
+                var r = -1
+                  , i = function n() {
+                    for (; ++r < t.length;)
+                      if (o.call(t, r))
+                        return n.value = t[r],
+                          n.done = !1,
+                          n;
+                    return n.value = e,
+                      n.done = !0,
+                      n
+                  };
+                return i.next = i
+              }
+            }
+            throw new TypeError(typeof t + " is not iterable")
+          }
+          return b.prototype = w,
+            i(L, "constructor", {
+              value: w,
+              configurable: !0
+            }),
+            i(w, "constructor", {
+              value: b,
+              configurable: !0
+            }),
+            b.displayName = l(w, s, "GeneratorFunction"),
+            t.isGeneratorFunction = function (e) {
+              var t = "function" == typeof e && e.constructor;
+              return !!t && (t === b || "GeneratorFunction" === (t.displayName || t.name))
+            }
+            ,
+            t.mark = function (e) {
+              return Object.setPrototypeOf ? Object.setPrototypeOf(e, w) : (e.__proto__ = w,
+                l(e, s, "GeneratorFunction")),
+                e.prototype = Object.create(L),
+                e
+            }
+            ,
+            t.awrap = function (e) {
+              return {
+                __await: e
+              }
+            }
+            ,
+            O(j.prototype),
+            l(j.prototype, u, (function () {
+              return this
+            }
+            )),
+            t.AsyncIterator = j,
+            t.async = function (e, n, r, o, i) {
+              void 0 === i && (i = Promise);
+              var a = new j(f(e, n, r, o), i);
+              return t.isGeneratorFunction(n) ? a : a.next().then((function (e) {
+                return e.done ? e.value : a.next()
+              }
+              ))
+            }
+            ,
+            O(L),
+            l(L, s, "Generator"),
+            l(L, c, (function () {
+              return this
+            }
+            )),
+            l(L, "toString", (function () {
+              return "[object Generator]"
+            }
+            )),
+            t.keys = function (e) {
+              var t = Object(e)
+                , n = [];
+              for (var r in t)
+                n.push(r);
+              return n.reverse(),
+                function e() {
+                  for (; n.length;) {
+                    var r = n.pop();
+                    if (r in t)
+                      return e.value = r,
+                        e.done = !1,
+                        e
+                  }
+                  return e.done = !0,
+                    e
+                }
+            }
+            ,
+            t.values = A,
+            P.prototype = {
+              constructor: P,
+              reset: function (t) {
+                if (this.prev = 0,
+                  this.next = 0,
+                  this.sent = this._sent = e,
+                  this.done = !1,
+                  this.delegate = null,
+                  this.method = "next",
+                  this.arg = e,
+                  this.tryEntries.forEach(C),
+                  !t)
+                  for (var n in this)
+                    "t" === n.charAt(0) && o.call(this, n) && !isNaN(+n.slice(1)) && (this[n] = e)
+              },
+              stop: function () {
+                this.done = !0;
+                var e = this.tryEntries[0].completion;
+                if ("throw" === e.type)
+                  throw e.arg;
+                return this.rval
+              },
+              dispatchException: function (t) {
+                if (this.done)
+                  throw t;
+                var n = this;
+                function r(r, o) {
+                  return c.type = "throw",
+                    c.arg = t,
+                    n.next = r,
+                    o && (n.method = "next",
+                      n.arg = e),
+                    !!o
+                }
+                for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+                  var a = this.tryEntries[i]
+                    , c = a.completion;
+                  if ("root" === a.tryLoc)
+                    return r("end");
+                  if (a.tryLoc <= this.prev) {
+                    var u = o.call(a, "catchLoc")
+                      , s = o.call(a, "finallyLoc");
+                    if (u && s) {
+                      if (this.prev < a.catchLoc)
+                        return r(a.catchLoc, !0);
+                      if (this.prev < a.finallyLoc)
+                        return r(a.finallyLoc)
+                    } else if (u) {
+                      if (this.prev < a.catchLoc)
+                        return r(a.catchLoc, !0)
+                    } else {
+                      if (!s)
+                        throw new Error("try statement without catch or finally");
+                      if (this.prev < a.finallyLoc)
+                        return r(a.finallyLoc)
+                    }
+                  }
+                }
+              },
+              abrupt: function (e, t) {
+                for (var n = this.tryEntries.length - 1; n >= 0; --n) {
+                  var r = this.tryEntries[n];
+                  if (r.tryLoc <= this.prev && o.call(r, "finallyLoc") && this.prev < r.finallyLoc) {
+                    var i = r;
+                    break
+                  }
+                }
+                i && ("break" === e || "continue" === e) && i.tryLoc <= t && t <= i.finallyLoc && (i = null);
+                var a = i ? i.completion : {};
+                return a.type = e,
+                  a.arg = t,
+                  i ? (this.method = "next",
+                    this.next = i.finallyLoc,
+                    m) : this.complete(a)
+              },
+              complete: function (e, t) {
+                if ("throw" === e.type)
+                  throw e.arg;
+                return "break" === e.type || "continue" === e.type ? this.next = e.arg : "return" === e.type ? (this.rval = this.arg = e.arg,
+                  this.method = "return",
+                  this.next = "end") : "normal" === e.type && t && (this.next = t),
+                  m
+              },
+              finish: function (e) {
+                for (var t = this.tryEntries.length - 1; t >= 0; --t) {
+                  var n = this.tryEntries[t];
+                  if (n.finallyLoc === e)
+                    return this.complete(n.completion, n.afterLoc),
+                      C(n),
+                      m
+                }
+              },
+              catch: function (e) {
+                for (var t = this.tryEntries.length - 1; t >= 0; --t) {
+                  var n = this.tryEntries[t];
+                  if (n.tryLoc === e) {
+                    var r = n.completion;
+                    if ("throw" === r.type) {
+                      var o = r.arg;
+                      C(n)
+                    }
+                    return o
+                  }
+                }
+                throw new Error("illegal catch attempt")
+              },
+              delegateYield: function (t, n, r) {
+                return this.delegate = {
+                  iterator: A(t),
+                  resultName: n,
+                  nextLoc: r
+                },
+                  "next" === this.method && (this.arg = e),
+                  m
+              }
+            },
+            t
+        }
+        function r(e) {
+          return r = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (e) {
+            return typeof e
+          }
+            : function (e) {
+              return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e
+            }
+            ,
+            r(e)
+        }
+        function o(e, t, n, r, o, i, a) {
+          try {
+            var c = e[i](a)
+              , u = c.value
+          } catch (e) {
+            return void n(e)
+          }
+          c.done ? t(u) : Promise.resolve(u).then(r, o)
+        }
+        function i(e) {
+          return function () {
+            var t = this
+              , n = arguments;
+            return new Promise((function (r, i) {
+              var a = e.apply(t, n);
+              function c(e) {
+                o(a, r, i, c, u, "next", e)
+              }
+              function u(e) {
+                o(a, r, i, c, u, "throw", e)
+              }
+              c(void 0)
+            }
+            ))
+          }
+        }
+        function a(e, t, n) {
+          return (t = function (e) {
+            var t = function (e, t) {
+              if ("object" != typeof e || null === e)
+                return e;
+              var n = e[Symbol.toPrimitive];
+              if (void 0 !== n) {
+                var r = n.call(e, t || "default");
+                if ("object" != typeof r)
+                  return r;
+                throw new TypeError("@@toPrimitive must return a primitive value.")
+              }
+              return ("string" === t ? String : Number)(e)
+            }(e, "string");
+            return "symbol" == typeof t ? t : String(t)
+          }(t)) in e ? Object.defineProperty(e, t, {
+            value: n,
+            enumerable: !0,
+            configurable: !0,
+            writable: !0
+          }) : e[t] = n,
+            e
+        }
+        function c(e, t) {
+          if (null == e)
+            return {};
+          var n, r, o = function (e, t) {
+            if (null == e)
+              return {};
+            var n, r, o = {}, i = Object.keys(e);
+            for (r = 0; r < i.length; r++)
+              n = i[r],
+                t.indexOf(n) >= 0 || (o[n] = e[n]);
+            return o
+          }(e, t);
+          if (Object.getOwnPropertySymbols) {
+            var i = Object.getOwnPropertySymbols(e);
+            for (r = 0; r < i.length; r++)
+              n = i[r],
+                t.indexOf(n) >= 0 || Object.prototype.propertyIsEnumerable.call(e, n) && (o[n] = e[n])
+          }
+          return o
+        }
+        function u(e, t) {
+          return function (e) {
+            if (Array.isArray(e))
+              return e
+          }(e) || function (e, t) {
+            var n = null == e ? null : "undefined" != typeof Symbol && e[Symbol.iterator] || e["@@iterator"];
+            if (null != n) {
+              var r, o, i, a, c = [], u = !0, s = !1;
+              try {
+                if (i = (n = n.call(e)).next,
+                  0 === t) {
+                  if (Object(n) !== n)
+                    return;
+                  u = !1
+                } else
+                  for (; !(u = (r = i.call(n)).done) && (c.push(r.value),
+                    c.length !== t); u = !0)
+                    ;
+              } catch (e) {
+                s = !0,
+                  o = e
+              } finally {
+                try {
+                  if (!u && null != n.return && (a = n.return(),
+                    Object(a) !== a))
+                    return
+                } finally {
+                  if (s)
+                    throw o
+                }
+              }
+              return c
+            }
+          }(e, t) || function (e, t) {
+            if (!e)
+              return;
+            if ("string" == typeof e)
+              return s(e, t);
+            var n = Object.prototype.toString.call(e).slice(8, -1);
+            "Object" === n && e.constructor && (n = e.constructor.name);
+            if ("Map" === n || "Set" === n)
+              return Array.from(e);
+            if ("Arguments" === n || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))
+              return s(e, t)
+          }(e, t) || function () {
+            throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")
+          }()
+        }
+        function s(e, t) {
+          (null == t || t > e.length) && (t = e.length);
+          for (var n = 0, r = new Array(t); n < t; n++)
+            r[n] = e[n];
+          return r
+        }
+        var l = ["text", "voice", "pitch", "rate", "volume", "force", "infiniteResume", "noStop"]
+          , f = {}
+          , d = "undefined" == typeof globalThis ? window : globalThis
+          , v = {
+            status: "created"
+          }
+          , h = {};
+        f.debug = function (e) {
+          p = "function" == typeof e ? e : function () { }
+        }
+          ;
+        var p = function () { };
+        f.detect = function () {
+          return y()
+        }
+          ;
+        var y = function () {
+          var e = {};
+          ["speechSynthesis", "speechSynthesisUtterance", "speechSynthesisVoice", "speechSynthesisEvent", "speechSynthesisErrorEvent"].forEach((function (t) {
+            e[t] = L(t)
+          }
+          )),
+            e.onvoiceschanged = m(e.speechSynthesis, "onvoiceschanged");
+          var t = m(e.speechSynthesisUtterance, "prototype");
+          return N.forEach((function (n) {
+            var r = "on".concat(n);
+            e[r] = t && m(e.speechSynthesisUtterance.prototype, r)
+          }
+          )),
+            h.isAndroid = b(),
+            h.isFirefox = S() || w(),
+            h.isSafari = x(),
+            p("is android: ".concat(!!h.isAndroid)),
+            p("is firefox: ".concat(!!h.isFirefox)),
+            p("is safari: ".concat(!!h.isSafari)),
+            e
+        }
+          , m = function () {
+            var e = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {}
+              , t = arguments.length > 1 ? arguments[1] : void 0;
+            return Object.hasOwnProperty.call(e, t) || t in e || !!e[t]
+          }
+          , g = function () {
+            return (d.navigator || {}).userAgent || ""
+          }
+          , b = function () {
+            return /android/i.test(g())
+          }
+          , w = function () {
+            return /kaios/i.test(g())
+          }
+          , S = function () {
+            return void 0 !== d.InstallTrigger || /firefox/i.test(g())
+          }
+          , x = function () {
+            return void 0 !== d.GestureEvent
+          }
+          , E = ["webKit", "moz", "ms", "o"]
+          , L = function (e) {
+            var t, n = "".concat((t = e).charAt(0).toUpperCase()).concat(t.slice(1)), r = E.map((function (e) {
+              return "".concat(e).concat(n)
+            }
+            )), o = [e, n].concat(r).find(O);
+            return d[o]
+          }
+          , O = function (e) {
+            return d[e]
+          };
+        f.status = function () {
+          return t({}, v)
+        }
+          ,
+          f.filterVoices = function (e) {
+            var t = e.name
+              , n = e.language
+              , r = e.localService
+              , o = e.voiceURI
+              , i = v.voices || []
+              , a = void 0 !== t
+              , c = void 0 !== o
+              , u = void 0 !== r
+              , s = void 0 !== n
+              , l = s && n.split(/[-_]+/g)[0].toLocaleLowerCase();
+            return i.filter((function (e) {
+              if (a && e.name.includes(t) || c && e.voiceURI.includes(o) || u && e.localService === r)
+                return !0;
+              if (s) {
+                var n = e.lang && e.lang.toLocaleLowerCase();
+                return n && (n === l || n.indexOf("".concat(l, "-")) > -1 || n.indexOf("".concat(l, "_")) > -1)
+              }
+              return !1
+            }
+            ))
+          }
+          ;
+        var j = function (e) {
+          p(e),
+            v.status = e
+        };
+        f.init = function () {
+          var e = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {}
+            , t = e.maxTimeout
+            , n = void 0 === t ? 5e3 : t
+            , r = e.interval
+            , o = void 0 === r ? 250 : r
+            , i = e.quiet
+            , a = e.maxLengthExceeded;
+          return new Promise((function (e, t) {
+            if (v.initialized)
+              return e(!1);
+            var r, c;
+            f.reset(),
+              j("init: start");
+            var u = !1;
+            v.maxLengthExceeded = a || "warn";
+            var s = function (n) {
+              return j("init: failed (".concat(n, ")")),
+                clearInterval(r),
+                v.initialized = !1,
+                i ? e(!1) : t(new Error("EasySpeech: ".concat(n)))
+            }
+              , l = function () {
+                if (!u)
+                  return j("init: complete"),
+                    u = !0,
+                    v.initialized = !0,
+                    clearInterval(r),
+                    p.onvoiceschanged = null,
+                    c && p.removeEventListener("voiceschanged", c),
+                    e(!0)
+              }
+              , h = y();
+            if (!(!!h.speechSynthesis && !!h.speechSynthesisUtterance))
+              return s("browser misses features");
+            Object.keys(h).forEach((function (e) {
+              v[e] = h[e]
+            }
+            ));
+            var p = v.speechSynthesis
+              , g = function () {
+                var e = p.getVoices() || [];
+                if (e.length > 0) {
+                  if (v.voices = e,
+                    j("voices loaded: ".concat(e.length)),
+                    v.defaultVoice = e.find((function (e) {
+                      return e.default
+                    }
+                    )),
+                    !v.defaultVoice) {
+                    var t = (d.navigator || {}).language || ""
+                      , n = f.filterVoices({
+                        language: t
+                      });
+                    n.length > 0 && (v.defaultVoice = n[0])
+                  }
+                  return v.defaultVoice || (v.defaultVoice = e[0]),
+                    !0
+                }
+                return !1
+              };
+            if (j("init: voices"),
+              g())
+              return l();
+            var b = function () {
+              j("init: voices (timer)");
+              var e = 0;
+              r = setInterval((function () {
+                return g() ? l() : e > n ? s("browser has no voices (timeout)") : void (e += o)
+              }
+              ), o)
+            };
+            h.onvoiceschanged ? (j("init: voices (onvoiceschanged)"),
+              p.onvoiceschanged = function () {
+                return g() ? l() : b()
+              }
+              ,
+              setTimeout((function () {
+                return g() ? l() : s("browser has no voices (timeout)")
+              }
+              ), n)) : (m(p, "addEventListener") && (j("init: voices (addEventListener)"),
+                c = function () {
+                  if (g())
+                    return l()
+                }
+                ,
+                p.addEventListener("voiceschanged", c)),
+                b())
+          }
+          ))
+        }
+          ;
+        var k = function () {
+          if (!(arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {}).force && !v.initialized)
+            throw new Error("EasySpeech: not initialized. Run EasySpeech.init() first")
+        };
+        f.voices = function () {
+          return k(),
+            v.voices
+        }
+          ,
+          f.on = function (e) {
+            return k(),
+              N.forEach((function (t) {
+                var n = e[t];
+                T.handler(n) && (v.handlers[t] = n)
+              }
+              )),
+              t({}, v.handlers)
+          }
+          ;
+        var N = ["boundary", "end", "error", "mark", "pause", "resume", "start"]
+          , T = {
+            isNumber: function (e) {
+              return "number" == typeof e && !Number.isNaN(e)
+            },
+            pitch: function (e) {
+              return T.isNumber(e) && e >= 0 && e <= 2
+            },
+            volume: function (e) {
+              return T.isNumber(e) && e >= 0 && e <= 1
+            },
+            rate: function (e) {
+              return T.isNumber(e) && e >= .1 && e <= 10
+            },
+            text: function (e) {
+              return "string" == typeof e
+            },
+            handler: function (e) {
+              return "function" == typeof e
+            },
+            voice: function (e) {
+              return e && e.lang && e.name && e.voiceURI
+            }
+          };
+        f.defaults = function (e) {
+          return k(),
+            e && (v.defaults = v.defaults || {},
+              ["voice", "pitch", "rate", "volume"].forEach((function (t) {
+                var n = e[t];
+                (0,
+                  T[t])(n) && (v.defaults[t] = n)
+              }
+              ))),
+            t({}, v.defaults)
+        }
+          ;
+        f.speak = function (e) {
+          var t = e.text
+            , n = e.voice
+            , r = e.pitch
+            , o = e.rate
+            , i = e.volume
+            , a = e.force
+            , s = e.infiniteResume
+            , f = e.noStop
+            , d = c(e, l);
+          if (k({
+            force: a
+          }),
+            !T.text(t))
+            throw new Error("EasySpeech: at least some valid text is required to speak");
+          if ((new TextEncoder).encode(t).length > 4096) {
+            var p = "EasySpeech: text exceeds max length of 4096 bytes, which will not work with some voices.";
+            switch (v.maxLengthExceeded) {
+              case "none":
+                break;
+              case "error":
+                throw new Error(p);
+              default:
+                console.warn(p)
+            }
+          }
+          var y = function (e) {
+            var t, n = u(Object.entries(e)[0], 2), r = n[0], o = n[1];
+            return T[r](o) ? o : null === (t = v.defaults) || void 0 === t ? void 0 : t[r]
+          };
+          return new Promise((function (e, a) {
+            j("init speak");
+            var c = function (e) {
+              return new (0,
+                v.speechSynthesisUtterance)(e)
+            }(t)
+              , u = function (e) {
+                var t, n;
+                return e || (null === (t = v.defaults) || void 0 === t ? void 0 : t.voice) || v.defaultVoice || (null === (n = v.voices) || void 0 === n ? void 0 : n[0])
+              }(n);
+            u && (c.voice = u,
+              c.lang = u.lang,
+              c.voiceURI = u.voiceURI),
+              c.text = t,
+              c.pitch = y({
+                pitch: r
+              }),
+              c.rate = y({
+                rate: o
+              }),
+              c.volume = y({
+                volume: i
+              });
+            var l = c.voice && c.voice.name && c.voice.name.toLocaleLowerCase().includes("(natural)");
+            I(c, {
+              isMsNatural: l
+            }),
+              N.forEach((function (e) {
+                var t, n = d[e];
+                T.handler(n) && c.addEventListener(e, n),
+                  null !== (t = v.handlers) && void 0 !== t && t[e] && c.addEventListener(e, v.handlers[e])
+              }
+              )),
+              c.addEventListener("start", (function () {
+                h.paused = !1,
+                  h.speaking = !0;
+                var e = !l && !h.isFirefox && !h.isSafari && !0 !== h.isAndroid;
+                ("boolean" == typeof s ? s : e) && q(c)
+              }
+              )),
+              c.addEventListener("end", (function (t) {
+                j("speak complete"),
+                  h.paused = !1,
+                  h.speaking = !1,
+                  clearTimeout(C),
+                  e(t)
+              }
+              )),
+              c.addEventListener("error", (function () {
+                var e = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {};
+                j("speak failed: ".concat(e.message)),
+                  h.paused = !1,
+                  h.speaking = !1,
+                  clearTimeout(C),
+                  a(e)
+              }
+              )),
+              clearTimeout(C),
+              !0 !== f && v.speechSynthesis.cancel(),
+              setTimeout((function () {
+                return v.speechSynthesis.speak(c)
+              }
+              ), 10)
+          }
+          ))
+        }
+          ;
+        var C, P, A, I = function (e) {
+          var t = e.voice
+            , n = e.pitch
+            , r = e.rate
+            , o = e.volume
+            , i = (arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : {}).isMsNatural
+            , a = void 0 !== i && i;
+          p("utterance: voice=".concat(null == t ? void 0 : t.name, " volume=").concat(o, " rate=").concat(r, " pitch=").concat(n, " isMsNatural=").concat(a))
+        };
+        function q(e) {
+          if (!e && C)
+            return p("force-clear timeout"),
+              d.clearTimeout(C);
+          var t = v.speechSynthesis
+            , n = t.paused
+            , r = t.speaking || h.speaking
+            , o = n || h.paused;
+          p("resumeInfinity isSpeaking=".concat(r, " isPaused=").concat(o)),
+            r && !o && (v.speechSynthesis.pause(),
+              v.speechSynthesis.resume()),
+            C = d.setTimeout((function () {
+              q(e)
+            }
+            ), 5e3)
+        }
+        f.cancel = function () {
+          k(),
+            j("cancelling"),
+            v.speechSynthesis.cancel(),
+            h.paused = !1,
+            h.speaking = !1
+        }
+          ,
+          f.resume = function () {
+            k(),
+              j("resuming"),
+              h.paused = !1,
+              h.speaking = !0,
+              v.speechSynthesis.resume()
+          }
+          ,
+          f.pause = function () {
+            if (k(),
+              j("pausing"),
+              h.isAndroid)
+              return p("patch pause on Android with cancel"),
+                v.speechSynthesis.cancel();
+            v.speechSynthesis.pause(),
+              h.paused = !0,
+              h.speaking = !1
+          }
+          ,
+          f.reset = function () {
+            Object.assign(v, {
+              status: "reset",
+              initialized: !1,
+              speechSynthesis: null,
+              speechSynthesisUtterance: null,
+              speechSynthesisVoice: null,
+              speechSynthesisEvent: null,
+              speechSynthesisErrorEvent: null,
+              voices: null,
+              defaultVoice: null,
+              defaults: {
+                pitch: 1,
+                rate: 1,
+                volume: 1,
+                voice: null
+              },
+              handlers: {}
+            })
+          }
+          ,
+          document.body.onload = i(n().mark((function e() {
+            var t;
+            return n().wrap((function (e) {
+              for (; ;)
+                switch (e.prev = e.next) {
+                  case 0:
+                    return R(),
+                      f.debug(F),
+                      $(f.detect()),
+                      e.next = 5,
+                      z();
+                  case 5:
+                    return t = e.sent,
+                      e.next = 8,
+                      D(t);
+                  case 8:
+                    return V(t),
+                      e.next = 11,
+                      K(t);
+                  case 11:
+                    B(t),
+                      window.EasySpeech = f;
+                  case 13:
+                  case "end":
+                    return e.stop()
+                }
+            }
+            ), e)
+          }
+          )));
+        var U = {
+          voice: void 0,
+          rate: void 0,
+          pitch: void 0,
+          volume: void 0,
+          text: void 0
+        }
+          , _ = {
+            volume: void 0,
+            rate: void 0,
+            pitch: void 0,
+            text: void 0,
+            language: void 0,
+            voice: void 0
+          };
+        function V(e) {
+          if (e) {
+            F("init volume input");
+            var t = document.querySelector(".volume-value");
+            _.volume = document.querySelector("#volume-input"),
+              _.volume.disabled = !1,
+              _.volume.addEventListener("change", (function (e) {
+                U.volume = Number(e.target.value),
+                  t.removeChild(t.firstChild),
+                  t.appendChild(document.createTextNode(U.volume))
+              }
+              )),
+              F("init rate input");
+            var n = document.querySelector(".rate-value");
+            _.rate = document.querySelector("#rate-input"),
+              _.rate.disabled = !1,
+              _.rate.addEventListener("change", (function (e) {
+                U.rate = Number(e.target.value) / 10,
+                  n.removeChild(n.firstChild),
+                  n.appendChild(document.createTextNode(U.rate))
+              }
+              )),
+              F("init pitch input");
+            var r = document.querySelector(".pitch-value");
+            _.pitch = document.querySelector("#pitch-input"),
+              _.pitch.disabled = !1,
+              _.pitch.addEventListener("change", (function (e) {
+                U.pitch = Number(e.target.value),
+                  r.removeChild(r.firstChild),
+                  r.appendChild(document.createTextNode(U.pitch))
+              }
+              )),
+              _.text = document.querySelector("#text-input"),
+              _.text.disabled = !1
+          }
+        }
+        function R() {
+          P = document.querySelector(".log-body"),
+            f.debug(F)
+        }
+        function F() {
+          for (var e = arguments.length, t = new Array(e), n = 0; n < e; n++)
+            t[n] = arguments[n];
+          P.appendChild(H(t.join(" ")))
+        }
+        function z() {
+          return G.apply(this, arguments)
+        }
+        function G() {
+          return (G = i(n().mark((function e() {
+            var t, r, o, i, a, c, u, s, l;
+            return n().wrap((function (e) {
+              for (; ;)
+                switch (e.prev = e.next) {
+                  case 0:
+                    return F("init EasySpeech"),
+                      // t = document.querySelector(".init-status-header"),
+                      // r = document.querySelector(".init-status-loader"),
+                      // o = document.querySelector(".init-status-text"),
+                      // i = document.querySelector(".init-status-body"),
+                      e.prev = 5,
+                      e.next = 8,
+                      f.init();
+                  case 8:
+                    a = e.sent,
+                      c = "Successfully intialized 🎉",
+                      u = "Successful",
+                      e.next = 23;
+                    break;
+                  case 13:
+                    e.prev = 13,
+                      e.t0 = e.catch(5),
+                      console.error(e.t0),
+                      F("error:", e.t0.message),
+                      a = !1,
+                      c = e.t0.message,
+                      u = "Failed",
+                      (s = document.querySelector(".speak-btn")).classList.add("disabled"),
+                      s.setAttribute("disabled", "");
+                  case 23:
+                    return e.prev = 23,
+                      // l = a ? "bg-success" : "bg-danger",
+                      // r.classList.add("d-none"),
+                      // t.classList.remove("bg-info"),
+                      // t.classList.add(l),
+                      // o.textContent = u,
+                      // i.appendChild(H(c)),
+                      e.finish(23);
+                  case 31:
+                    return e.abrupt("return", a);
+                  case 32:
+                  case "end":
+                    return e.stop()
+                }
+            }
+            ), e, null, [[5, 13, 23, 31]])
+          }
+          )))).apply(this, arguments)
+        }
+        function D(e) {
+          return M.apply(this, arguments)
+        }
+        function M() {
+          return (M = i(n().mark((function e(t) {
+            var r, o, i, a, c, u, s;
+            return n().wrap((function (e) {
+              for (; ;)
+                switch (e.prev = e.next) {
+                  case 0:
+                    if (t) {
+                      e.next = 2;
+                      break
+                    }
+                    return e.abrupt("return");
+                  case 2:
+                    F("init voice select"),
+                      r = f.voices(),
+                      o = new Set,
+                      r.forEach((function (e, t) {
+                        var n = e.lang.split(/[-_]/)[0];
+                        o.add(n),
+                          e.default && (i = n,
+                            a = e.voiceURI,
+                            F("detected a default voice ".concat(e.name, "; voice lang=").concat(i)))
+                      }
+                      )),
+                      c = (window.navigator || {}).language || "",
+                      F("detected user lang is", u = c.split(/[-_]/)[0], "(".concat(c, ")")),
+                      !i && o.has(u) && (s = f.filterVoices({
+                        language: u
+                      })[0]) && (i = u,
+                        a = s.voiceURI,
+                        F("set a default voice ".concat(a))),
+                      F("populate ".concat(o.size, " languages to select component")),
+                      _.language = document.querySelector("#lang-select"),
+                      Array.from(o).sort().forEach((function (e) {
+                        var t = H(e, "option");
+                        t.setAttribute("value", e),
+                          i && e === i && (t.setAttribute("selected", ""),
+                            setTimeout((function () {
+                              return Y(r, e, a)
+                            }
+                            ), 250),
+                            setTimeout((function () {
+                              J(A.findIndex((function (e) {
+                                return e.voiceURI === a
+                              }
+                              )) + 1)
+                            }
+                            ), 500)),
+                          _.language.appendChild(t)
+                      }
+                      )),
+                      F("attach events, cleanup"),
+                      _.voice = document.querySelector("#voice-select"),
+                      _.language.addEventListener("change", (function (e) {
+                        return Y(r, e.target.value)
+                      }
+                      )),
+                      _.voice.addEventListener("change", (function (e) {
+                        J(Number.parseInt(e.target.value, 10))
+                      }
+                      )),
+                      _.language.classList.remove("disabled"),
+                      _.language.removeAttribute("disabled");
+                  case 19:
+                  case "end":
+                    return e.stop()
+                }
+            }
+            ), e)
+          }
+          )))).apply(this, arguments)
+        }
+        function Y(e, t, n) {
+          for (F("update selected voice", t); _.voice.firstChild;)
+            _.voice.removeChild(_.voice.lastChild);
+          _.voice.appendChild(H("(Select voice)", "option")),
+            t ? ((A = "all" === t ? e : f.filterVoices({
+              language: t
+            }).sort((function (e, t) {
+              return e.name.localeCompare(t.name)
+            }
+            ))).forEach((function (e, t) {
+              var r = e.localService ? "local" : "remote"
+                , o = e.default ? "[DEFAULT]" : ""
+                , i = "".concat(o).concat(e.name, " - ").concat(e.voiceURI, " (").concat(r, ")")
+                , a = H(i, "option");
+              a.setAttribute("value", t.toString(10)),
+                n && n === e.voiceURI && a.setAttribute("selected", ""),
+                _.voice.appendChild(a)
+            }
+            )),
+              _.voice.classList.remove("disabled"),
+              _.voice.removeAttribute("disabled")) : (_.voice.classList.add("disabled"),
+                _.voice.disabled = !0,
+                U.voice = null,
+                A = null)
+        }
+        function J(e) {
+          if (e < 0 || e > A.length - 1)
+            return U.voice = void 0,
+              void F("no voice found by index", e);
+          U.voice = (A || [])[e],
+            F("select voice", U.voice && U.voice.name)
+        }
+        function K(e) {
+          if (e) {
+            var r = document.querySelector(".speak-btn")
+              , o = Object.values(_);
+            r.addEventListener("click", function () {
+              var e = i(n().mark((function e(i) {
+                var a, c, u, s, l, d;
+                return n().wrap((function (e) {
+                  for (; ;)
+                    switch (e.prev = e.next) {
+                      case 0:
+                        return r.disabled = !0,
+                          o.forEach((function (e) {
+                            e.disabled = !0
+                          }
+                          )),
+                          a = t({}, U),
+                          c = a.pitch,
+                          u = a.rate,
+                          s = a.voice,
+                          l = a.volume,
+                          d = _.text.value,
+                          e.prev = 4,
+                          e.next = 7,
+                          f.speak({
+                            text: d,
+                            pitch: c,
+                            rate: u,
+                            voice: s,
+                            volume: l
+                          });
+                      case 7:
+                        e.next = 12;
+                        break;
+                      case 9:
+                        e.prev = 9,
+                          e.t0 = e.catch(4),
+                          F(e.t0.message);
+                      case 12:
+                        return e.prev = 12,
+                          r.disabled = !1,
+                          o.forEach((function (e) {
+                            e.disabled = !1
+                          }
+                          )),
+                          e.finish(12);
+                      case 16:
+                      case "end":
+                        return e.stop()
+                    }
+                }
+                ), e, null, [[4, 9, 12, 16]])
+              }
+              )));
+              return function (t) {
+                return e.apply(this, arguments)
+              }
+            }())
+          }
+        }
+        function $(e) {
+          // var t = document.querySelector(".features")
+          //   , n = {};
+          // Object.entries(e).forEach((function (e) {
+          //   var t = u(e, 2)
+          //     , o = t[0]
+          //     , i = t[1];
+          //   "object" === r(i) ? n[o] = i.toString() : n[o] = "function" == typeof i ? i.name : i
+          // }
+          // ));
+          // var o = document.createTextNode(JSON.stringify(n, null, 2));
+          // t.appendChild(o)
+        }
+        function B(e) {
+          if (e) {
+            var t = function (e) {
+              return F("event: ".concat(e.type))
+            };
+            f.on({
+              boundary: t,
+              start: t,
+              end: t,
+              error: function (e) {
+                console.error(e),
+                  F("error: ".concat(e.message))
+              }
+            })
+          }
+        }
+        var H = function (e) {
+          var t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : "div"
+            , n = document.createElement(t);
+          return n.appendChild(document.createTextNode(e)),
+            n
+        }
+      }();
     </script>
   </body>
 </html>
