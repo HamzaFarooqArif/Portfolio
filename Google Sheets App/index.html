@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    .table-container {
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        max-height: 60vh;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <button id="playButton" onclick="readTexts()" disabled>Play</button>
+    <button id="pauseButton" onclick="pauseSpeech()" style="display: none;">Pause</button>
+    <button id="resumeButton" onclick="resumeSpeech()" style="display: none;">Resume</button>
+    <button id="stopButton" onclick="stopSpeech()" style="display: none;">Stop</button>
+    <br>
+    <br>
+
+    <label for="rate">Speed:</label>
+    <input type="range" id="rate" min="0.5" max="1.5" value="1" step="0.1">
+    <br>
+    
+    <label for="delay">In-between delay (ms):</label>
+    <input type="range" id="delay" min="0" max="3000" value="0000" step="100">
+    <br>
+
+    <label for="startRow">Starting Row:</label>
+    <input type="number" id="startRow" min="1" value="1">
+    <br>
+
+    <div class="table-container" id="tableContainer">
+      <table id="wordsTable" border="1">
+      </table>
+    </div>
+    
+    <script>
+      let voices = [];
+      let germanVoice;
+      let englishVoice;
+      let wordsJson;
+      let isStopped = false; // Flag to track if the speech should stop
+      let isPaused = false; // Flag to track if the speech should stop
+
+      // Button elements
+      const playButton = document.getElementById('playButton');
+      const pauseButton = document.getElementById('pauseButton');
+      const resumeButton = document.getElementById('resumeButton');
+      const stopButton = document.getElementById('stopButton');
+
+      function fetchData() {
+        google.script.run.withSuccessHandler(fetchDataCallback).getSheetData();
+      }
+
+      function fetchDataCallback(data) {
+        wordsJson = data.map(pair => ({
+          word: pair[0],
+          meaning: pair[1]
+        }));
+
+        document.getElementById('wordsTable').innerHTML = 
+        wordsJson.map((text, index) => `
+          <tr>
+            <td id="index-${index}">${index}</td>
+            <td id="word-${index}">${text.word}</td>
+            <td id="meaning-${index}">${text.meaning}</td>
+          </tr>
+        `).join('');
+        document.getElementById('playButton').disabled = false;
+      }
+
+      function loadVoices() {
+        voices = window.speechSynthesis.getVoices();
+        setDefaultVoice();
+      }
+
+      function setDefaultVoice() {
+        // Find a German voice (Google Deutsch or any German voice)
+        germanVoice = voices.find(voice => voice.lang === 'de-DE' && voice.name.includes('Google Deutsch')) || 
+                            voices.find(voice => voice.lang === 'de-DE');
+        
+        englishVoice = voices.find(voice => voice.lang === 'en-US' && voice.name.includes('Google US English')) || 
+                            voices.find(voice => voice.lang === 'en-US');
+      }
+
+      function readTexts() {
+        const startRowInput = document.getElementById('startRow').value;
+        const startIndex = parseInt(startRowInput, 10);
+
+        if (isNaN(startIndex) || startIndex < 0 || startIndex >= wordsJson.length) {
+          alert("Please enter a valid row number.");
+          return;
+        }
+
+        removeAllHighlights();
+        isStopped = false;
+        playButton.style.display = 'none';
+        pauseButton.style.display = 'inline';
+        stopButton.style.display = 'inline';
+
+        playAllTexts("word", wordsJson, startIndex);
+      }
+
+      function pauseSpeech() {
+        if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+          window.speechSynthesis.pause();
+          pauseButton.style.display = 'none';
+          resumeButton.style.display = 'inline';
+        }
+      }
+
+      function resumeSpeech() {
+        window.speechSynthesis.resume();
+        resumeButton.style.display = 'none';
+        pauseButton.style.display = 'inline';
+      }
+
+      function stopSpeech() {
+        removeAllHighlights();
+        isStopped = true;
+        resetButtons();
+        window.speechSynthesis.cancel();
+      }
+
+      function resetButtons() {
+        playButton.style.display = 'inline';
+        pauseButton.style.display = 'none';
+        resumeButton.style.display = 'none';
+        stopButton.style.display = 'none';
+      }
+
+      async function playAllTexts(textType, wordsJson, currentIndex) {
+        if (isStopped) {
+          return Promise.resolve(true);
+        };
+        if(currentIndex < wordsJson.length) {
+          let utterance = new SpeechSynthesisUtterance(wordsJson[currentIndex][textType]);
+          utterance.rate = parseFloat(document.getElementById('rate').value);
+
+          if(textType == "word") {
+            utterance.voice = germanVoice;  
+          }
+          else if (textType == "meaning") {
+            utterance.voice = englishVoice;
+          }
+          else {
+            utterance.voice = window.defaultVoice;
+          }
+
+          window.speechSynthesis.speak(utterance);
+          highlightWord(textType, currentIndex);
+          
+          return new Promise(resolve => {
+            utterance.onend = resolve;
+          }).then(() => {
+            removeHighlight(textType, currentIndex);
+            if(textType == "word") {
+              const delay = parseInt(document.getElementById('delay').value, 10);
+              setTimeout(() => {
+                return playAllTexts("meaning", wordsJson, currentIndex);
+              }, delay); 
+            }
+            else {
+              return playAllTexts("word", wordsJson, currentIndex + 1);
+            }
+          });
+        }
+        else {
+          resetButtons();
+          return Promise.resolve(true);
+        }
+      } 
+
+      function removeAllHighlights() {
+        wordsJson.forEach((_, index) => {
+          removeHighlight('word', index);
+          removeHighlight('meaning', index);
+        });
+      }
+
+      function highlightWord(textType, index) {
+        const element = document.getElementById(textType + '-' + index);
+        document.getElementById(textType + '-' + index).style.backgroundColor = 'yellow';
+        element.style.backgroundColor = 'yellow';
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      function removeHighlight(textType, index) {
+        document.getElementById(textType + '-' + index).style.backgroundColor = '';
+      }
+
+      // Load voices and set default when voices are ready
+      if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+      }
+
+      loadVoices();
+      fetchData();
+    </script>
+  </body>
+</html>
