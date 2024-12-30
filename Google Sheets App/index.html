@@ -304,7 +304,6 @@
       }
 
       function stopSpeech() {
-        enableControls();
         removeAllHighlights();
         isStopped = true;
         window.EasySpeech.cancel();
@@ -344,6 +343,7 @@
 
       async function playAllTexts(textType, currentIndex) {
         if (isStopped) {
+          enableControls();
           isPaused = false;
           return true;
         };
