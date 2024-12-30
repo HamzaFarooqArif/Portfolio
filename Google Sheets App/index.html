@@ -29,6 +29,8 @@
         max-width: 400px; /* Set max width for cells */
         word-wrap: break-word; /* Ensure long words break and wrap */
         white-space: normal; /* Allow text to wrap normally */
+        padding-left: 10px;
+        padding-right: 10px;
     }
 
     input[type=checkbox]
@@ -62,10 +64,10 @@
         <button id="stopButton" onclick="stopSpeech()" style="display: none;">Stop</button>
       </div>
       <div>
-        <label for="rate">Speed:</label>
+        <label for="rate">Vocal Speed:</label>
         <input type="range" id="rate" min="0.5" max="1.5" value="1" step="0.1">
         <br>
-        <label for="delay">In-between delay:</label>
+        <label for="delay">In-between Delay:</label>
         <input type="range" id="delay" min="0" max="3000" value="0000" step="100">
         <br>
         <label for="startRow">Starting Row:</label>
