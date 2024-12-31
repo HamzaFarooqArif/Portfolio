@@ -3,3 +3,5 @@ export const GOOGLE_SHEETS_URL = `https://docs.google.com/spreadsheets/d/${GOOGL
 
 export const PREFERRED_LANG_1 = ['de-DE', 'de_DE'];
 export const PREFERRED_LANG_2 = ['en-US', 'en_US'];
+
+export const ELIGIBLE_ROW_SYMBOL = 'y'

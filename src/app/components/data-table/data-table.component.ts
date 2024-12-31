@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { RowItem } from '../../models/row-item.model';
 import { SpeechService } from '../../services/speech/speech.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { PREFERRED_LANG_1, PREFERRED_LANG_2 } from '../../constants/constants';
+import { ELIGIBLE_ROW_SYMBOL, PREFERRED_LANG_1, PREFERRED_LANG_2 } from '../../constants/constants';
 
 
 @Component({
@@ -20,6 +20,8 @@ export class DataTableComponent implements OnInit {
   languages: { value: string; label: string }[] = [];
   lang1Voices: { value: string; label: string }[] = [];
   lang2Voices: { value: string; label: string }[] = [];
+  highlightedRow: number | null = 1;
+  highlightedCol: number | null = 1;
 
   constructor(
     private spreadsheetService: SpreadsheetService, 
@@ -41,6 +43,13 @@ export class DataTableComponent implements OnInit {
       lang2: ['', Validators.required],
       lang1Voice: ['', Validators.required],
       lang2Voice: ['', Validators.required],
+      startRow: ['', Validators.required],
+      endRow: ['', Validators.required],
+      vocalSpeed: [1],
+      inbetweenDelay: [0],
+      repeat: [true],
+      reversePlayback: [false],
+      reverseSpeechOrder: [false],
     });
 
     this.speechService.getLangsAsync().subscribe((voices: SpeechSynthesisVoice[]) => {
@@ -121,7 +130,8 @@ export class DataTableComponent implements OnInit {
         this.papa.parse(csvData, {
           skipEmptyLines: true,
           complete: (result) => {
-            let parsedRows = (result.data as any[]).map((row: any) => ({
+            let filteredData = (result.data as any[]).filter((row: any) => row[2] == ELIGIBLE_ROW_SYMBOL);
+            let parsedRows = filteredData.map((row: any) => ({
               first: row[0],
               second: row[1]
             })).filter(row => {
@@ -144,6 +154,10 @@ export class DataTableComponent implements OnInit {
     }, err => {
       console.log(err);
     });
+  }
+
+  isHighlighted(rowIndex: number, colIndex: number): boolean {
+    return this.highlightedRow === rowIndex && this.highlightedCol === colIndex;
   }
 
   onSpeakButtonClick() {
