@@ -59,8 +59,12 @@ export class DataTableComponent implements OnInit {
       );
     });
 
-    let preferredLang1 = this.languages.find(x => x.value.includes(PREFERRED_LANG_1))?.value ?? this.languages[0];
-    let preferredLang2 = this.languages.find(x => x.value.includes(PREFERRED_LANG_2))?.value ?? this.languages[0];
+    let preferredLang1 = this.languages.find(x => {
+      return PREFERRED_LANG_1.some((langItem: string) => langItem == x.value);
+    })?.value ?? this.languages[0].value;
+    let preferredLang2 = this.languages.find(x => {
+      return PREFERRED_LANG_2.some((langItem: string) => langItem == x.value);
+    })?.value ?? this.languages[0].value;
     this.playbackForm.get('lang1')?.setValue(preferredLang1);
     this.playbackForm.get('lang2')?.setValue(preferredLang2);
     this.refreshVoiceDropdown('lang1Voice');
