@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -26,7 +27,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     AppRoutingModule
   ],
   providers: [
-    provideAnimationsAsync()
+    {provide: LocationStrategy, useClass: HashLocationStrategy},
+    provideAnimationsAsync(),
   ],
   bootstrap: [AppComponent]
 })
