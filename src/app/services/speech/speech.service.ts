@@ -29,13 +29,15 @@ export class SpeechService {
     });
   }
 
-  speakAsync(): Observable<void> {
+  speakAsync(text: string, voice: SpeechSynthesisVoice, vocalSpeed: number = 1): Observable<void> {
     return new Observable<void>((observer) => {
       let interval = setInterval(() => {
         if(EasySpeech.status().status != 'created') {
           clearInterval(interval);
           EasySpeech.speak({
-            text: 'Hello, world',
+            text: text,
+            voice: voice,
+            rate: vocalSpeed,
             boundary: event => console.debug('word boundary reached', event.charIndex)
           })
             .then(() => {

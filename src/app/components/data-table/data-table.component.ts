@@ -110,8 +110,9 @@ export class DataTableComponent implements OnInit {
     }
   }
 
-  onSpeakButtonClick() {
-    this.speechService.speakAsync().subscribe();
+  getSpeechSynthesisVoice(controlName: string): SpeechSynthesisVoice | undefined {
+    let voice: SpeechSynthesisVoice | undefined = this.allVoices.find((voiceItem: SpeechSynthesisVoice) => voiceItem.voiceURI == this.playbackForm.get(controlName)?.value);
+    return voice;
   }
 
   fetchDataAndParseAsync(): Observable<RowItem[]> {
@@ -143,6 +144,13 @@ export class DataTableComponent implements OnInit {
     }, err => {
       console.log(err);
     });
+  }
+
+  onSpeakButtonClick() {
+    let voice: SpeechSynthesisVoice | undefined = this.getSpeechSynthesisVoice('lang1Voice');
+    if(voice) {
+      this.speechService.speakAsync('gehört', voice, 1).subscribe();
+    }
   }
 
 }
