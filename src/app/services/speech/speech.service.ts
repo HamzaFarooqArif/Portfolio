@@ -14,10 +14,22 @@ export class SpeechService {
   init() {
     EasySpeech.init({ maxTimeout: 5000, interval: 250 })
     .then(() => console.log('easy-speech load complete'))
-    .catch(e => console.error(e))
+    .catch(e => console.error(e));
   }
 
-  speak(): Observable<void> {
+  getLangsAsync(): Observable<SpeechSynthesisVoice[]> {
+    return new Observable<SpeechSynthesisVoice[]>((observer) => {
+      let interval = setInterval(() => {
+        if(EasySpeech.status().status != 'created') {
+          clearInterval(interval);
+          observer.next(EasySpeech.voices());
+          observer.complete();
+        }
+      }, 10);
+    });
+  }
+
+  speakAsync(): Observable<void> {
     return new Observable<void>((observer) => {
       let interval = setInterval(() => {
         if(EasySpeech.status().status != 'created') {

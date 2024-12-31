@@ -1,4 +1,52 @@
 <button (click)="onSpeakButtonClick()">Play</button>
+<form [formGroup]="playbackForm">
+  <div>
+    <mat-form-field>
+      <mat-label>Select Language for First Column</mat-label>
+      <mat-select id="lang1" formControlName="lang1" (selectionChange)="refreshVoiceDropdown('lang1Voice');">
+        <mat-option *ngFor="let option of languages" [value]="option.value">
+          {{ option.label }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="playbackForm.get('lang1')?.hasError('required')">
+        Selection is required.
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Select Voice for First Language</mat-label>
+      <mat-select id="lang1Voice" formControlName="lang1Voice">
+        <mat-option *ngFor="let option of lang1Voices" [value]="option.value">
+          {{ option.label }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="playbackForm.get('lang1Voice')?.hasError('required')">
+        Selection is required.
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Select Language for First Column</mat-label>
+      <mat-select id="lang2" formControlName="lang2" (selectionChange)="refreshVoiceDropdown('lang2Voice');">
+        <mat-option *ngFor="let option of languages" [value]="option.value">
+          {{ option.label }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="playbackForm.get('lang2')?.hasError('required')">
+        Selection is required.
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Select Voice for First Language</mat-label>
+      <mat-select id="lang2Voice" formControlName="lang2Voice">
+        <mat-option *ngFor="let option of lang2Voices" [value]="option.value">
+          {{ option.label }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="playbackForm.get('lang2Voice')?.hasError('required')">
+        Selection is required.
+      </mat-error>
+    </mat-form-field>
+  </div>
+</form>
 <div class="table-container">
     <table>
         <thead>
