@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 
@@ -14,7 +14,16 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSliderModule } from '@angular/material/slider';
 import {MatCheckboxModule} from '@angular/material/checkbox';
-import { MatIconModule } from '@angular/material/icon'
+import { MatIconModule } from '@angular/material/icon';
+import { ConfigService } from './services/config/config.service';
+
+export function loadAppConfig(configService: ConfigService): () => Promise<void> {
+  return () =>
+    configService
+      .loadConfig()
+      .toPromise()
+      .then((config) => configService.setConfig(config));
+}
 
 @NgModule({
   declarations: [
@@ -36,6 +45,12 @@ import { MatIconModule } from '@angular/material/icon'
     MatIconModule,
   ],
   providers: [
+    {
+      provide: APP_INITIALIZER,
+      useFactory: loadAppConfig,
+      deps: [ConfigService],
+      multi: true
+    },
     {provide: LocationStrategy, useClass: HashLocationStrategy},
     provideAnimationsAsync(),
   ],

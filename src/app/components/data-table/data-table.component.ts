@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { SpreadsheetService as SpreadsheetService } from '../../services/spreadsheet/spreadsheet.service';
 import { Papa } from 'ngx-papaparse';
 import { Observable } from 'rxjs';
-import { RowItem } from '../../models/row-item.model';
 import { SpeechService } from '../../services/speech/speech.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ELIGIBLE_ROW_SYMBOL, PREFERRED_LANG_1, PREFERRED_LANG_2 } from '../../constants/constants';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ELIGIBLE_ROW_SYMBOL, PREFERRED_LANGS } from '../../constants/constants';
+import { ConfigService } from '../../services/config/config.service';
 
 
 @Component({
@@ -15,23 +15,25 @@ import { ELIGIBLE_ROW_SYMBOL, PREFERRED_LANG_1, PREFERRED_LANG_2 } from '../../c
 })
 
 export class DataTableComponent implements OnInit {
+  numberOfLanguages: number = 0; 
   playbackForm!: FormGroup;
   allVoices: SpeechSynthesisVoice[] = [];
-  languages: { value: string; label: string }[] = [];
-  lang1Voices: { value: string; label: string }[] = [];
-  lang2Voices: { value: string; label: string }[] = [];
+  masterLanguages: { value: string; label: string }[] = [];
+  populatedVoicesData: { value: string; label: string }[][] = [];
   highlightedRow: number | null = 1;
   highlightedCol: number | null = 1;
 
   constructor(
-    private spreadsheetService: SpreadsheetService, 
+    private spreadsheetService: SpreadsheetService,
+    private configService: ConfigService,
     private papa: Papa,
     private speechService: SpeechService,
     private fb: FormBuilder) {}
 
-  tableData: RowItem[] = [];
+  tableData: string[][] = [];
 
   ngOnInit(): void {
+    this.numberOfLanguages = Number(this.configService.getConfigValue('numberOfLanguages'));
     this.fetchData();
     this.initForm();
     
@@ -39,10 +41,6 @@ export class DataTableComponent implements OnInit {
 
   initForm() {
     this.playbackForm = this.fb.group({
-      lang1: ['', Validators.required],
-      lang2: ['', Validators.required],
-      lang1Voice: ['', Validators.required],
-      lang2Voice: ['', Validators.required],
       startRow: ['', Validators.required],
       endRow: ['', Validators.required],
       vocalSpeed: [1],
@@ -56,6 +54,11 @@ export class DataTableComponent implements OnInit {
       this.allVoices = voices;
       this.initializeDropdowns();
     });
+
+    for (let i = 0; i < this.numberOfLanguages; i++) {
+      this.playbackForm.addControl(`lang${i+1}`, this.fb.control('', Validators.required));
+      this.playbackForm.addControl(`lang${i+1}Voice`, this.fb.control('', Validators.required));
+    }
   }
 
   patchForm() {
@@ -77,7 +80,7 @@ export class DataTableComponent implements OnInit {
 
   initializeDropdowns() {
     Array.from(new Set(this.allVoices.map(item => item.lang))).forEach((item: string) => {
-      this.languages.push(
+      this.masterLanguages.push(
         {
           value: item,
           label: item
@@ -85,55 +88,31 @@ export class DataTableComponent implements OnInit {
       );
     });
 
-    let preferredLang1 = this.languages.find(x => {
-      return PREFERRED_LANG_1.some((langItem: string) => langItem == x.value);
-    })?.value ?? this.languages[0].value;
-    let preferredLang2 = this.languages.find(x => {
-      return PREFERRED_LANG_2.some((langItem: string) => langItem == x.value);
-    })?.value ?? this.languages[0].value;
-    this.playbackForm.get('lang1')?.setValue(preferredLang1);
-    this.playbackForm.get('lang2')?.setValue(preferredLang2);
-    this.refreshVoiceDropdown('lang1Voice');
-    this.refreshVoiceDropdown('lang2Voice');
+    for(let i = 0; i < this.numberOfLanguages; i++) {
+      let preferredLang = this.masterLanguages.find(x => {
+        return PREFERRED_LANGS?.length > i && PREFERRED_LANGS[i].some((langItem: string) => langItem == x.value);
+      })?.value ?? this.masterLanguages[0].value;
+      this.playbackForm.get(`lang${i+1}`)?.setValue(preferredLang);
+      this.refreshVoiceDropdown(i+1);
+    }
   }
 
-  refreshVoiceDropdown(controlName: string) {
-    switch (controlName) {
-      case 'lang1Voice':
-        {
-          this.lang1Voices = [];
-          let selectedLang: string | null = this.playbackForm.get('lang1')?.value;
-          this.allVoices.forEach((voiceItem: SpeechSynthesisVoice) => {
-            if(selectedLang?.toLowerCase() == voiceItem.lang.toLowerCase()) {
-              let voiceItemForDropdown = {
-                value: voiceItem.voiceURI,
-                label: `${voiceItem.name} (${voiceItem.localService ? 'LOCAL' : 'CLOUD'})`
-              };
-              this.lang1Voices.push(voiceItemForDropdown);
-            }
-          });
-          this.playbackForm.get('lang1Voice')?.setValue(this.lang1Voices[0].value);
-          break;
-        }
-      case 'lang2Voice':
-        {
-          this.lang2Voices = [];
-          let selectedLang: string | null = this.playbackForm.get('lang2')?.value;
-          this.allVoices.forEach((voiceItem: SpeechSynthesisVoice) => {
-            if(selectedLang?.toLowerCase() == voiceItem.lang.toLowerCase()) {
-              let voiceItemForDropdown = {
-                value: voiceItem.voiceURI,
-                label: `${voiceItem.name} (${voiceItem.localService ? 'LOCAL' : 'CLOUD'})`
-              };
-              this.lang2Voices.push(voiceItemForDropdown);
-            }
-          });
-          this.playbackForm.get('lang2Voice')?.setValue(this.lang2Voices[0].value);
-          break;
-        }
-      default:
-        break;
+  refreshVoiceDropdown(controlIndex: number) {
+    if(!this.populatedVoicesData?.length || this.populatedVoicesData?.length < controlIndex) {
+      this.populatedVoicesData.push([]);
     }
+    this.populatedVoicesData[controlIndex-1] = [];
+    let selectedLang: string | null = this.playbackForm.get(`lang${controlIndex}`)?.value;
+    this.allVoices.forEach((voiceItem: SpeechSynthesisVoice) => {
+      if(selectedLang?.toLowerCase() == voiceItem.lang.toLowerCase()) {
+        let voiceItemForDropdown = {
+          value: voiceItem.voiceURI,
+          label: `${voiceItem.name} (${voiceItem.localService ? 'LOCAL' : 'CLOUD'})`
+        };
+        this.populatedVoicesData[controlIndex-1].push(voiceItemForDropdown);
+      }
+    });
+    this.playbackForm.get(`lang${controlIndex}Voice`)?.setValue(this.populatedVoicesData[controlIndex-1][0].value);
   }
 
   getSpeechSynthesisVoice(controlName: string): SpeechSynthesisVoice | undefined {
@@ -141,18 +120,18 @@ export class DataTableComponent implements OnInit {
     return voice;
   }
 
-  async fetchDataAndParseAsync(): Promise<RowItem[]> {
+  async fetchDataAndParseAsync(): Promise<string[][]> {
     return new Promise((resolve, reject) => {
       this.spreadsheetService.getSheetData().subscribe((csvData: string) => {
         this.papa.parse(csvData, {
-          skipEmptyLines: true,
           complete: (result) => {
-            let filteredData = (result.data as any[]).filter((row: any) => row[2] == ELIGIBLE_ROW_SYMBOL);
-            let parsedRows = filteredData.map((row: any) => ({
-              first: row[0],
-              second: row[1]
-            })).filter(row => {
-              return row.first.trim() !== '' || row.second.trim() !== '';
+            let filteredData = (result.data as any[]).filter((row: any, index: number) => {
+              return index == 0 || row[this.numberOfLanguages] == ELIGIBLE_ROW_SYMBOL;
+            });
+            let parsedRows = filteredData.map((row: any) => (
+              row.slice(0, this.numberOfLanguages)
+              )).filter((row: string[]) => {
+              return row.every(el => el != "");
             });
   
             resolve(parsedRows);
@@ -165,7 +144,7 @@ export class DataTableComponent implements OnInit {
   }
 
   fetchData() {
-    this.fetchDataAndParseAsync().then((data: RowItem[]) => {
+    this.fetchDataAndParseAsync().then((data: string[][]) => {
       this.tableData = data;
       this.patchForm();
     }, err => {
@@ -178,47 +157,42 @@ export class DataTableComponent implements OnInit {
   }
 
   onSpeakButtonClick() {
-    this.playAllTexts('lang1', 1);
+    // this.playAllTexts('lang1', 1);
   }
 
-  highlightWord(langType: string, index: number) {
-    this.highlightedRow = index;
-    if(langType == 'lang1') {
-      this.highlightedCol = 0;
-    }
-    else if(langType == 'lang2') {
-      this.highlightedCol = 1;
-    }
+  highlightWord(row: number, col: number) {
+    this.highlightedRow = row;
+    this.highlightedCol = col;
   }
 
-  async playAllTexts(langType: string, currentIndex: number): Promise<void> {
-    this.highlightWord(langType, currentIndex);
-    let text = '';
-    let voice: SpeechSynthesisVoice | undefined;
-    if(langType == 'lang1') {
-      text = this.tableData[currentIndex].first;
-      voice = this.getSpeechSynthesisVoice('lang1Voice');
-    }
-    else if(langType == 'lang2') {
-      text = this.tableData[currentIndex].second;
-      voice = this.getSpeechSynthesisVoice('lang2Voice');
-    }
+  // async playAllTexts(langType: string, currentIndex: number): Promise<void> {
+  //   this.highlightWord(langType, currentIndex);
+  //   let text = '';
+  //   let voice: SpeechSynthesisVoice | undefined;
+  //   if(langType == 'lang1') {
+  //     text = this.tableData[currentIndex].first;
+  //     voice = this.getSpeechSynthesisVoice('lang1Voice');
+  //   }
+  //   else if(langType == 'lang2') {
+  //     text = this.tableData[currentIndex].second;
+  //     voice = this.getSpeechSynthesisVoice('lang2Voice');
+  //   }
     
-    if(text && voice) {
-      await this.speechService.speakAsync(text, voice);
-    }
+  //   if(text && voice) {
+  //     await this.speechService.speakAsync(text, voice);
+  //   }
 
-    if(currentIndex >= this.tableData?.length) {
+  //   if(currentIndex >= this.tableData?.length) {
       
-    }
-    else {
-      if(langType == 'lang1') {
-        return this.playAllTexts('lang2', currentIndex);
-      }
-      else {
-        return this.playAllTexts('lang1', currentIndex + 1);
-      }
-    }
-  }
+  //   }
+  //   else {
+  //     if(langType == 'lang1') {
+  //       return this.playAllTexts('lang2', currentIndex);
+  //     }
+  //     else {
+  //       return this.playAllTexts('lang1', currentIndex + 1);
+  //     }
+  //   }
+  // }
 
 }

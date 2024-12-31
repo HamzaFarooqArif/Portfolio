@@ -71,66 +71,48 @@
       <mat-label>Meaning-to-word</mat-label>
       <mat-checkbox formControlName="reverseSpeechOrder"></mat-checkbox>
     </div>
-    <mat-form-field>
-      <mat-label>Select Language for First Column</mat-label>
-      <mat-select id="lang1" formControlName="lang1" (selectionChange)="refreshVoiceDropdown('lang1Voice');">
-        <mat-option *ngFor="let option of languages" [value]="option.value">
-          {{ option.label }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="playbackForm.get('lang1')?.hasError('required')">
-        Required.
-      </mat-error>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Select Voice for First Language</mat-label>
-      <mat-select id="lang1Voice" formControlName="lang1Voice">
-        <mat-option *ngFor="let option of lang1Voices" [value]="option.value">
-          {{ option.label }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="playbackForm.get('lang1Voice')?.hasError('required')">
-        Required.
-      </mat-error>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Select Language for First Column</mat-label>
-      <mat-select id="lang2" formControlName="lang2" (selectionChange)="refreshVoiceDropdown('lang2Voice');">
-        <mat-option *ngFor="let option of languages" [value]="option.value">
-          {{ option.label }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="playbackForm.get('lang2')?.hasError('required')">
-        Required.
-      </mat-error>
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Select Voice for First Language</mat-label>
-      <mat-select id="lang2Voice" formControlName="lang2Voice">
-        <mat-option *ngFor="let option of lang2Voices" [value]="option.value">
-          {{ option.label }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="playbackForm.get('lang2Voice')?.hasError('required')">
-        Required.
-      </mat-error>
-    </mat-form-field>
+    <ng-container *ngFor="let _ of [].constructor(numberOfLanguages); let i = index">
+      <mat-form-field>
+        <mat-label>Select Language for Column {{ i + 1 }}</mat-label>
+        <mat-select [id]="'lang' + (i + 1)" [formControlName]="'lang' + (i + 1)" (selectionChange)="refreshVoiceDropdown(i + 1);">
+          <mat-option *ngFor="let option of masterLanguages" [value]="option.value">
+            {{ option.label }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="playbackForm.get('lang' + (i + 1))?.hasError('required')">
+          Required.
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Select Voice for Language {{ i + 1 }}</mat-label>
+        <mat-select [id]="'lang' + (i + 1) + 'Voice'" [formControlName]="'lang' + (i + 1) + 'Voice'">
+          <mat-option *ngFor="let option of populatedVoicesData[i]" [value]="option.value">
+            {{ option.label }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="playbackForm.get('lang' + (i + 1) + 'Voice')?.hasError('required')">
+          Required.
+        </mat-error>
+      </mat-form-field>
+    </ng-container>
   </div>
 </form>
 <div class="table-container">
     <table>
-        <thead>
-            <tr *ngIf="tableData.length > 0">
-                <th>Index</th>
-                <th>{{ tableData[0].first }}</th>
-                <th>{{ tableData[0].second }}</th>
-            </tr>
-          </thead>
+      <thead>
+          <tr *ngIf="tableData.length > 0">
+            <th>Index</th>
+            <th *ngFor="let lang of [].constructor(numberOfLanguages); let i = index">
+              {{ tableData[0][i] }}
+            </th>
+          </tr>
+      </thead>
       <tbody>
-        <tr *ngFor="let item of tableData | slice: 1; let i = index">
+        <tr *ngFor="let rowItem of tableData | slice: 1; let i = index">
             <td>{{ i + 1 }}</td>
-            <td [ngClass]="{'highlight': isHighlighted(i, 0)}">{{ item.first }}</td>
-            <td [ngClass]="{'highlight': isHighlighted(i, 1)}">{{ item.second }}</td>
+            <td *ngFor="let cellItem of rowItem;">
+              {{ cellItem }}
+            </td>
         </tr>
       </tbody>
     </table>
