@@ -20,8 +20,8 @@ export class DataTableComponent implements OnInit {
   allVoices: SpeechSynthesisVoice[] = [];
   masterLanguages: { value: string; label: string }[] = [];
   populatedVoicesData: { value: string; label: string }[][] = [];
-  highlightedRow: number | null = 1;
-  highlightedCol: number | null = 1;
+  highlightedRow: number | null = -1;
+  highlightedCol: number | null = -1;
 
   constructor(
     private spreadsheetService: SpreadsheetService,
@@ -157,7 +157,7 @@ export class DataTableComponent implements OnInit {
   }
 
   onSpeakButtonClick() {
-    // this.playAllTexts('lang1', 1);
+    this.playAllTexts(1, 0);
   }
 
   highlightWord(row: number, col: number) {
@@ -165,34 +165,26 @@ export class DataTableComponent implements OnInit {
     this.highlightedCol = col;
   }
 
-  // async playAllTexts(langType: string, currentIndex: number): Promise<void> {
-  //   this.highlightWord(langType, currentIndex);
-  //   let text = '';
-  //   let voice: SpeechSynthesisVoice | undefined;
-  //   if(langType == 'lang1') {
-  //     text = this.tableData[currentIndex].first;
-  //     voice = this.getSpeechSynthesisVoice('lang1Voice');
-  //   }
-  //   else if(langType == 'lang2') {
-  //     text = this.tableData[currentIndex].second;
-  //     voice = this.getSpeechSynthesisVoice('lang2Voice');
-  //   }
+  async playAllTexts(rowIndex: number, colIndex: number): Promise<void> {
+    this.highlightWord(rowIndex-1, colIndex);
+    let text = this.tableData[rowIndex][colIndex];
+    let voice: SpeechSynthesisVoice | undefined = this.getSpeechSynthesisVoice(`lang${colIndex + 1}Voice`);
     
-  //   if(text && voice) {
-  //     await this.speechService.speakAsync(text, voice);
-  //   }
+    if(text && voice) {
+      await this.speechService.speakAsync(text, voice);
+    }
 
-  //   if(currentIndex >= this.tableData?.length) {
+    if(rowIndex >= this.tableData?.length) {
       
-  //   }
-  //   else {
-  //     if(langType == 'lang1') {
-  //       return this.playAllTexts('lang2', currentIndex);
-  //     }
-  //     else {
-  //       return this.playAllTexts('lang1', currentIndex + 1);
-  //     }
-  //   }
-  // }
+    }
+    else {
+      if(colIndex < this.tableData[0]?.length) {
+        return this.playAllTexts(rowIndex, colIndex + 1);
+      }
+      else {
+        return this.playAllTexts(rowIndex + 1, 0);
+      }
+    }
+  }
 
 }
