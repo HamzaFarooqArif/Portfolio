@@ -179,6 +179,8 @@ export class DataTableComponent implements OnInit {
   }
 
   playClick() {
+    this.playbackForm.get('startRow')?.disable();
+    this.playbackForm.get('endRow')?.disable();
     this.currentRow = Number(this.playbackForm.get('startRow')?.value);
     let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
     if(reverseSpeechOrder) {
@@ -191,6 +193,8 @@ export class DataTableComponent implements OnInit {
   }
 
   stopClick() {
+    this.playbackForm.get('startRow')?.enable();
+    this.playbackForm.get('endRow')?.enable();
     this.highlightWord(-1, -1);
     this.speechService.stopSpeech();
   }
@@ -229,8 +233,16 @@ export class DataTableComponent implements OnInit {
       }
     }
     else {
-      this.highlightWord(-1, -1);
-      return;
+      let repeat = this.playbackForm?.get('repeat')?.value;
+      if(repeat) {
+        this.playClick();
+      }
+      else {
+        this.highlightWord(-1, -1);
+        this.playbackForm.get('startRow')?.enable();
+        this.playbackForm.get('endRow')?.enable();
+        return;
+      }
     }
   }
 
