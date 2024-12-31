@@ -156,8 +156,14 @@ export class DataTableComponent implements OnInit {
     return this.highlightedRow === rowIndex && this.highlightedCol === colIndex;
   }
 
-  onSpeakButtonClick() {
-    this.playAllTexts(1, 0);
+  playClick() {
+    let row = Number(this.playbackForm.get('startRow')?.value);
+    this.playAllTexts(row, 0);
+  }
+
+  stopClick() {
+    this.highlightWord(-1, -1);
+    this.speechService.stopSpeech();
   }
 
   highlightWord(row: number, col: number) {
@@ -169,17 +175,26 @@ export class DataTableComponent implements OnInit {
     this.highlightWord(rowIndex-1, colIndex);
     let text = this.tableData[rowIndex][colIndex];
     let voice: SpeechSynthesisVoice | undefined = this.getSpeechSynthesisVoice(`lang${colIndex + 1}Voice`);
-    
+    let vocalSpeed = Number(this.playbackForm?.get('vocalSpeed')?.value);
     if(text && voice) {
-      await this.speechService.speakAsync(text, voice);
+      await this.speechService.speakAsync(text, voice, vocalSpeed);
     }
 
     if(rowIndex >= this.tableData?.length) {
-      
+      return;
     }
     else {
       if(colIndex < this.tableData[0]?.length) {
-        return this.playAllTexts(rowIndex, colIndex + 1);
+        if(colIndex == 0) {
+          let delay = Number(this.playbackForm.get('inbetweenDelay')?.value);
+          let timeout = setTimeout(() => {
+            clearTimeout(timeout);
+            return this.playAllTexts(rowIndex, colIndex + 1);
+          }, delay*1000);
+        }
+        else {
+          return this.playAllTexts(rowIndex, colIndex + 1);
+        }
       }
       else {
         return this.playAllTexts(rowIndex + 1, 0);

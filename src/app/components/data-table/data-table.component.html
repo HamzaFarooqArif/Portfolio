@@ -1,7 +1,6 @@
-<button (click)="onSpeakButtonClick()">Play</button>
 <form [formGroup]="playbackForm">
   <div>
-    <button mat-fab>
+    <button mat-fab (click)="playClick()">
       <mat-icon>play_circle</mat-icon>
     </button>
     <button mat-fab>
@@ -10,7 +9,7 @@
     <button mat-fab>
       <mat-icon>play_arrow</mat-icon>
     </button>
-    <button mat-fab>
+    <button mat-fab (click)="stopClick()">
       <mat-icon>stop</mat-icon>
     </button>
     <mat-form-field>

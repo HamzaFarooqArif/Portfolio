@@ -28,7 +28,7 @@ export class SpeechService {
     });
   }
 
-  async speakAsync(text: string, voice: SpeechSynthesisVoice, vocalSpeed: number = 1): Promise<void> {
+  async speakAsync(text: string, voice: SpeechSynthesisVoice, vocalSpeed?: number): Promise<void> {
     return new Promise((resolve, reject) => {
       let interval = setInterval(() => {
         if(EasySpeech.status().status != 'created') {
@@ -36,8 +36,7 @@ export class SpeechService {
           EasySpeech.speak({
             text: text,
             voice: voice,
-            rate: vocalSpeed,
-            boundary: event => console.debug('word boundary reached', event.charIndex)
+            rate: vocalSpeed ?? 1
           })
             .then(() => {
               resolve();
@@ -48,5 +47,9 @@ export class SpeechService {
         }
       }, 10);
     });
+  }
+
+  stopSpeech() {
+    EasySpeech.cancel();
   }
 }
