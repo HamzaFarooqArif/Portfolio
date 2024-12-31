@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { VocabularyTableComponent } from './components/vocabulary-table/vocabulary-table.component';
+import { DataTableComponent } from './components/data-table/data-table.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/vocabulary', pathMatch: 'full' },
-  { path: 'vocabulary', component: VocabularyTableComponent },
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: 'home', component: DataTableComponent },
 ];
 
 @NgModule({

@@ -6,7 +6,7 @@ import { GOOGLE_SHEETS_URL } from '../../constants/constants';
 @Injectable({
   providedIn: 'root'
 })
-export class GoogleSheetServiceService {
+export class SpreadsheetService {
 
   constructor(private http: HttpClient) { }
 

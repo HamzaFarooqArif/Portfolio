@@ -3,14 +3,14 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { VocabularyTableComponent } from './components/vocabulary-table/vocabulary-table.component';
+import { DataTableComponent } from './components/data-table/data-table.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
     AppComponent,
-    VocabularyTableComponent
+    DataTableComponent
   ],
   imports: [
     BrowserModule,
