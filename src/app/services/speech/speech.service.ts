@@ -17,20 +17,19 @@ export class SpeechService {
     .catch(e => console.error(e));
   }
 
-  getLangsAsync(): Observable<SpeechSynthesisVoice[]> {
-    return new Observable<SpeechSynthesisVoice[]>((observer) => {
+  getLangsAsync(): Promise<SpeechSynthesisVoice[]> {
+    return new Promise((resolve) => {
       let interval = setInterval(() => {
         if(EasySpeech.status().status != 'created') {
           clearInterval(interval);
-          observer.next(EasySpeech.voices());
-          observer.complete();
+          resolve(EasySpeech.voices());
         }
       }, 10);
     });
   }
 
-  speakAsync(text: string, voice: SpeechSynthesisVoice, vocalSpeed: number = 1): Observable<void> {
-    return new Observable<void>((observer) => {
+  async speakAsync(text: string, voice: SpeechSynthesisVoice, vocalSpeed: number = 1): Promise<void> {
+    return new Promise((resolve, reject) => {
       let interval = setInterval(() => {
         if(EasySpeech.status().status != 'created') {
           clearInterval(interval);
@@ -41,11 +40,10 @@ export class SpeechService {
             boundary: event => console.debug('word boundary reached', event.charIndex)
           })
             .then(() => {
-              observer.next();
-              observer.complete();
+              resolve();
             })
             .catch((err) => {
-              observer.error(err);
+              reject(err);
             });
         }
       }, 10);

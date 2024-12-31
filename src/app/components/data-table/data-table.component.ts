@@ -52,10 +52,27 @@ export class DataTableComponent implements OnInit {
       reverseSpeechOrder: [false],
     });
 
-    this.speechService.getLangsAsync().subscribe((voices: SpeechSynthesisVoice[]) => {
+    this.speechService.getLangsAsync().then((voices: SpeechSynthesisVoice[]) => {
       this.allVoices = voices;
       this.initializeDropdowns();
     });
+  }
+
+  patchForm() {
+    if(this.tableData?.length) {
+      this.playbackForm.get('startRow')?.setValue(1);
+      this.playbackForm.get('endRow')?.setValue(this.tableData?.length - 1);
+      this.playbackForm.get('startRow')?.setValidators([
+        Validators.min(1),
+        Validators.max(this.tableData?.length - 1)
+      ]);
+      this.playbackForm.get('endRow')?.setValidators([
+        Validators.min(1),
+        Validators.max(this.tableData?.length - 1)
+      ]);
+      this.playbackForm.get('startRow')?.updateValueAndValidity();
+      this.playbackForm.get('endRow')?.updateValueAndValidity();
+    }
   }
 
   initializeDropdowns() {
@@ -124,8 +141,8 @@ export class DataTableComponent implements OnInit {
     return voice;
   }
 
-  fetchDataAndParseAsync(): Observable<RowItem[]> {
-    return new Observable<RowItem[]>((observer) => {
+  async fetchDataAndParseAsync(): Promise<RowItem[]> {
+    return new Promise((resolve, reject) => {
       this.spreadsheetService.getSheetData().subscribe((csvData: string) => {
         this.papa.parse(csvData, {
           skipEmptyLines: true,
@@ -137,20 +154,20 @@ export class DataTableComponent implements OnInit {
             })).filter(row => {
               return row.first.trim() !== '' || row.second.trim() !== '';
             });
-
-            observer.next(parsedRows);
-            observer.complete();
+  
+            resolve(parsedRows);
           }
         });
       }, err => {
-        observer.error(err);
+        reject(err);
       });
     });
   }
 
   fetchData() {
-    this.fetchDataAndParseAsync().subscribe((data: RowItem[]) => {
+    this.fetchDataAndParseAsync().then((data: RowItem[]) => {
       this.tableData = data;
+      this.patchForm();
     }, err => {
       console.log(err);
     });
@@ -161,9 +178,46 @@ export class DataTableComponent implements OnInit {
   }
 
   onSpeakButtonClick() {
-    let voice: SpeechSynthesisVoice | undefined = this.getSpeechSynthesisVoice('lang1Voice');
-    if(voice) {
-      this.speechService.speakAsync('gehört', voice, 1).subscribe();
+    this.playAllTexts('lang1', 1);
+  }
+
+  highlightWord(langType: string, index: number) {
+    this.highlightedRow = index;
+    if(langType == 'lang1') {
+      this.highlightedCol = 0;
+    }
+    else if(langType == 'lang2') {
+      this.highlightedCol = 1;
+    }
+  }
+
+  async playAllTexts(langType: string, currentIndex: number): Promise<void> {
+    this.highlightWord(langType, currentIndex);
+    let text = '';
+    let voice: SpeechSynthesisVoice | undefined;
+    if(langType == 'lang1') {
+      text = this.tableData[currentIndex].first;
+      voice = this.getSpeechSynthesisVoice('lang1Voice');
+    }
+    else if(langType == 'lang2') {
+      text = this.tableData[currentIndex].second;
+      voice = this.getSpeechSynthesisVoice('lang2Voice');
+    }
+    
+    if(text && voice) {
+      await this.speechService.speakAsync(text, voice);
+    }
+
+    if(currentIndex >= this.tableData?.length) {
+      
+    }
+    else {
+      if(langType == 'lang1') {
+        return this.playAllTexts('lang2', currentIndex);
+      }
+      else {
+        return this.playAllTexts('lang1', currentIndex + 1);
+      }
     }
   }
 

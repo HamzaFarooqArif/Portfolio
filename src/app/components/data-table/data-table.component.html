@@ -20,6 +20,15 @@
         type="number"
         class="form-control"
         formControlName="startRow">
+      <mat-error *ngIf="playbackForm.get('startRow')?.hasError('required')">
+        Required
+      </mat-error>
+      <mat-error *ngIf="playbackForm.get('startRow')?.hasError('min')">
+        Value should be greater than 0
+      </mat-error>
+      <mat-error *ngIf="playbackForm.get('startRow')?.hasError('max')">
+        Value should be less than {{tableData?.length}}
+      </mat-error>
     </mat-form-field>
     <mat-form-field>
       <mat-label>Ending Row</mat-label>
@@ -28,6 +37,15 @@
         type="number"
         class="form-control"
         formControlName="endRow">
+      <mat-error *ngIf="playbackForm.get('endRow')?.hasError('required')">
+        Required
+      </mat-error>
+      <mat-error *ngIf="playbackForm.get('endRow')?.hasError('min')">
+        Value should be greater than 0
+      </mat-error>
+      <mat-error *ngIf="playbackForm.get('endRow')?.hasError('max')">
+        Value should be less than {{tableData?.length}}
+      </mat-error>
     </mat-form-field>
     <div>
       <mat-label>Vocal Speed</mat-label>
@@ -61,7 +79,7 @@
         </mat-option>
       </mat-select>
       <mat-error *ngIf="playbackForm.get('lang1')?.hasError('required')">
-        Selection is required.
+        Required.
       </mat-error>
     </mat-form-field>
     <mat-form-field>
@@ -72,7 +90,7 @@
         </mat-option>
       </mat-select>
       <mat-error *ngIf="playbackForm.get('lang1Voice')?.hasError('required')">
-        Selection is required.
+        Required.
       </mat-error>
     </mat-form-field>
     <mat-form-field>
@@ -83,7 +101,7 @@
         </mat-option>
       </mat-select>
       <mat-error *ngIf="playbackForm.get('lang2')?.hasError('required')">
-        Selection is required.
+        Required.
       </mat-error>
     </mat-form-field>
     <mat-form-field>
@@ -94,7 +112,7 @@
         </mat-option>
       </mat-select>
       <mat-error *ngIf="playbackForm.get('lang2Voice')?.hasError('required')">
-        Selection is required.
+        Required.
       </mat-error>
     </mat-form-field>
   </div>
