@@ -22,6 +22,8 @@ export class DataTableComponent implements OnInit {
   populatedVoicesData: { value: string; label: string }[][] = [];
   highlightedRow: number | null = -1;
   highlightedCol: number | null = -1;
+  currentRow: number = 1;
+  currentColumn: number = 0;
 
   constructor(
     private spreadsheetService: SpreadsheetService,
@@ -152,13 +154,40 @@ export class DataTableComponent implements OnInit {
     });
   }
 
+  reverseChanged() {
+    let reverse: boolean = this.playbackForm?.get('reversePlayback')?.value;
+    let startRow = Number(this.playbackForm.get('startRow')?.value);
+    let endRow = Number(this.playbackForm.get('endRow')?.value);
+    if(reverse) {
+      if(startRow <= endRow) {
+        let temp = startRow;
+        this.playbackForm.get('startRow')?.setValue(endRow);
+        this.playbackForm.get('endRow')?.setValue(temp);
+      }
+    }
+    else {
+      if(startRow >= endRow) {
+        let temp = startRow;
+        this.playbackForm.get('startRow')?.setValue(endRow);
+        this.playbackForm.get('endRow')?.setValue(temp);
+      }
+    }
+  }
+
   isHighlighted(rowIndex: number, colIndex: number): boolean {
     return this.highlightedRow === rowIndex && this.highlightedCol === colIndex;
   }
 
   playClick() {
-    let row = Number(this.playbackForm.get('startRow')?.value);
-    this.playAllTexts(row, 0);
+    this.currentRow = Number(this.playbackForm.get('startRow')?.value);
+    let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
+    if(reverseSpeechOrder) {
+      this.currentColumn = this.tableData[0]?.length - 1;
+    }
+    else {
+      this.currentColumn = 0;
+    }
+    this.playAllTexts();
   }
 
   stopClick() {
@@ -171,34 +200,95 @@ export class DataTableComponent implements OnInit {
     this.highlightedCol = col;
   }
 
-  async playAllTexts(rowIndex: number, colIndex: number): Promise<void> {
-    this.highlightWord(rowIndex-1, colIndex);
-    let text = this.tableData[rowIndex][colIndex];
-    let voice: SpeechSynthesisVoice | undefined = this.getSpeechSynthesisVoice(`lang${colIndex + 1}Voice`);
-    let vocalSpeed = Number(this.playbackForm?.get('vocalSpeed')?.value);
-    if(text && voice) {
-      await this.speechService.speakAsync(text, voice, vocalSpeed);
-    }
-
-    if(rowIndex >= this.tableData?.length) {
-      return;
-    }
-    else {
-      if(colIndex < this.tableData[0]?.length) {
-        if(colIndex == 0) {
+  async playAllTexts(): Promise<void> {
+    if(this.speechTerminationCriteria()) {
+      this.highlightWord(this.currentRow-1, this.currentColumn);
+      let text = this.tableData[this.currentRow][this.currentColumn];
+      let voice: SpeechSynthesisVoice | undefined = this.getSpeechSynthesisVoice(`lang${this.currentColumn + 1}Voice`);
+      let vocalSpeed = Number(this.playbackForm?.get('vocalSpeed')?.value);
+      if(text && voice) {
+        await this.speechService.speakAsync(text, voice, vocalSpeed);
+      }
+      if(this.currentColumn < this.tableData[0]?.length) {
+        if(this.currentColumn == 0) {
           let delay = Number(this.playbackForm.get('inbetweenDelay')?.value);
           let timeout = setTimeout(() => {
             clearTimeout(timeout);
-            return this.playAllTexts(rowIndex, colIndex + 1);
+            this.setNextCell();
+            return this.playAllTexts();
           }, delay*1000);
         }
         else {
-          return this.playAllTexts(rowIndex, colIndex + 1);
+          this.setNextCell();
+          return this.playAllTexts();
         }
       }
       else {
-        return this.playAllTexts(rowIndex + 1, 0);
+        this.setNextCell();
+        return this.playAllTexts();
       }
+    }
+    else {
+      this.highlightWord(-1, -1);
+      return;
+    }
+  }
+
+  setNextCell() {
+    let reverse: boolean = this.playbackForm?.get('reversePlayback')?.value;
+    let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
+
+    if(reverse) {
+      if(reverseSpeechOrder) {
+        if(this.currentColumn == 0) {
+          this.currentColumn = this.tableData[0]?.length - 1;
+          this.currentRow -= 1;
+        }
+        else {
+          this.currentColumn -= 1;
+        }
+      }
+      else {
+        if(this.currentColumn == this.tableData[0]?.length - 1) {
+          this.currentColumn = 0;
+          this.currentRow -= 1;  
+        }
+        else {
+          this.currentColumn += 1;
+        }
+      }
+    }
+    else {
+      if(reverseSpeechOrder) {
+        if(this.currentColumn == 0) {
+          this.currentColumn = this.tableData[0]?.length - 1;
+          this.currentRow += 1;  
+        }
+        else {
+          this.currentColumn -= 1;
+        }
+      }
+      else {
+        if(this.currentColumn == this.tableData[0]?.length - 1) {
+          this.currentColumn = 0;
+          this.currentRow += 1;  
+        }
+        else {
+          this.currentColumn += 1;
+        }
+      }
+    }
+  }
+
+  speechTerminationCriteria(): boolean {
+    let reverse: boolean = this.playbackForm?.get('reversePlayback')?.value;
+    let startRowInputVal: number = Number(this.playbackForm?.get('startRow')?.value);
+    let endRowInputVal: number = Number(this.playbackForm?.get('endRow')?.value);
+    if(reverse) {
+      return this.currentRow > 0 && (startRowInputVal > endRowInputVal && this.currentRow >= endRowInputVal);
+    }
+    else {
+      return this.currentRow < this.tableData?.length && (startRowInputVal < endRowInputVal && this.currentRow <= endRowInputVal);
     }
   }
 

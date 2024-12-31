@@ -1,3 +1,4 @@
+{{currentRow}}_{{currentColumn}}
 <form [formGroup]="playbackForm">
   <div>
     <button mat-fab (click)="playClick()">
@@ -64,7 +65,7 @@
     </div>
     <div>
       <mat-label>Reverse</mat-label>
-      <mat-checkbox formControlName="reversePlayback"></mat-checkbox>
+      <mat-checkbox formControlName="reversePlayback" (change)="reverseChanged()"></mat-checkbox>
     </div>
     <div>
       <mat-label>Meaning-to-word</mat-label>
