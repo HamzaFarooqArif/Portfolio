@@ -21,7 +21,7 @@
     <button mat-fab (click)="saveClick()">
       <mat-icon>save</mat-icon>
     </button>
-    <mat-form-field>
+    <mat-form-field style="width: 300px;">
       <mat-label>Sheet ID</mat-label>
       <input
         matInput
@@ -35,7 +35,7 @@
     <button mat-fab (click)="loadSheetClick()">
       <mat-icon>autorenew</mat-icon>
     </button>
-    <mat-form-field>
+    <mat-form-field style="width: 120px;">
       <mat-label>Starting Row</mat-label>
       <input
         matInput
@@ -54,7 +54,7 @@
         Invalid
       </mat-error>
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field style="width: 120px;">
       <mat-label>Ending Row</mat-label>
       <input
         matInput
@@ -98,7 +98,7 @@
       <mat-checkbox formControlName="reverseSpeechOrder"></mat-checkbox>
     </div>
     <ng-container *ngFor="let _ of [].constructor(numberOfLanguages); let i = index">
-      <mat-form-field>
+      <mat-form-field style="width: 300px;">
         <mat-label>Select Language for Column {{ i + 1 }}</mat-label>
         <mat-select [id]="'lang' + (i + 1)" [formControlName]="'lang' + (i + 1)" (selectionChange)="refreshVoiceDropdown(i + 1);">
           <mat-option *ngFor="let option of masterLanguages" [value]="option.value">
@@ -109,7 +109,7 @@
           Required.
         </mat-error>
       </mat-form-field>
-      <mat-form-field>
+      <mat-form-field style="width: 500px;">
         <mat-label>Select Voice for Language {{ i + 1 }}</mat-label>
         <mat-select [id]="'lang' + (i + 1) + 'Voice'" [formControlName]="'lang' + (i + 1) + 'Voice'">
           <mat-option *ngFor="let option of populatedVoicesData[i]" [value]="option.value">
@@ -145,5 +145,5 @@
 </div>
 <ngx-loading
   [show]="loading"
-  [config]="{ backdropBorderRadius: '3px' }"
+  [config]="{ backdropBackgroundColour: 'rgba(0, 0, 0, 0.8)' }"
 ></ngx-loading>
