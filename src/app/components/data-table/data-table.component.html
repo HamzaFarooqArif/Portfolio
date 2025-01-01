@@ -81,7 +81,7 @@
         <mat-label>Select Language for Column {{ i + 1 }}</mat-label>
         <mat-select [id]="'lang' + (i + 1)" [formControlName]="'lang' + (i + 1)" (selectionChange)="refreshVoiceDropdown(i + 1);">
           <mat-option *ngFor="let option of masterLanguages" [value]="option.value">
-            {{ option.label }}
+            {{ getLanguageName(option.label) }} ({{ option.label }})
           </mat-option>
         </mat-select>
         <mat-error *ngIf="playbackForm.get('lang' + (i + 1))?.hasError('required')">

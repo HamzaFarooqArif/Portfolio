@@ -4,7 +4,7 @@ import { Papa } from 'ngx-papaparse';
 import { Observable } from 'rxjs';
 import { SpeechService } from '../../services/speech/speech.service';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ELIGIBLE_ROW_SYMBOL, PREFERRED_LANGS } from '../../constants/constants';
+import { ALLLANGUAGES, ELIGIBLE_ROW_SYMBOL, PREFERRED_LANGS } from '../../constants/constants';
 import { ConfigService } from '../../services/config/config.service';
 
 
@@ -467,6 +467,10 @@ export class DataTableComponent implements OnInit {
     else {
       return this.currentRow < this.tableData?.length && (startRowInputVal < endRowInputVal && this.currentRow <= endRowInputVal);
     }
+  }
+
+  getLanguageName(label: string) {
+    return ALLLANGUAGES.find((lang) => lang.value.some(x => x == label))?.label;
   }
 
 }
