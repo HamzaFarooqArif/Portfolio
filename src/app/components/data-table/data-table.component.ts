@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { SpreadsheetService as SpreadsheetService } from '../../services/spreadsheet/spreadsheet.service';
 import { Papa } from 'ngx-papaparse';
-import { Observable } from 'rxjs';
 import { SpeechService } from '../../services/speech/speech.service';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ALLLANGUAGES, ELIGIBLE_ROW_SYMBOL, PREFERRED_LANGS } from '../../constants/constants';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ALLLANGUAGES } from '../../constants/constants';
 import { ConfigService } from '../../services/config/config.service';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -229,6 +228,7 @@ export class DataTableComponent implements OnInit {
   }
 
   initializeDropdowns() {
+    let preferredLangs = this.configService.getConfigValue("preferredLangs");
     Array.from(new Set(this.allVoices.map(item => item.lang))).forEach((item: string) => {
       this.masterLanguages.push(
         {
@@ -240,7 +240,7 @@ export class DataTableComponent implements OnInit {
 
     for(let i = 0; i < this.numberOfLanguages; i++) {
       let preferredLang = this.masterLanguages.find(x => {
-        return PREFERRED_LANGS?.length > i && PREFERRED_LANGS[i].some((langItem: string) => langItem == x.value);
+        return preferredLangs?.length > i && preferredLangs[i].some((langItem: string) => langItem == x.value);
       })?.value ?? this.masterLanguages[0].value;
       this.playbackForm.get(`lang${i+1}`)?.setValue(preferredLang);
       this.refreshVoiceDropdown(i+1);
@@ -262,7 +262,15 @@ export class DataTableComponent implements OnInit {
         this.populatedVoicesData[controlIndex-1].push(voiceItemForDropdown);
       }
     });
-    this.playbackForm.get(`lang${controlIndex}Voice`)?.setValue(this.populatedVoicesData[controlIndex-1][0].value);
+
+    const preferredVoice = this.configService.getConfigValue("preferredVoice");
+    let foundPreferredVoice = this.populatedVoicesData[controlIndex-1].find(x => x.value.includes(preferredVoice));
+    if(foundPreferredVoice) {
+      this.playbackForm.get(`lang${controlIndex}Voice`)?.setValue(foundPreferredVoice.value);
+    }
+    else {
+      this.playbackForm.get(`lang${controlIndex}Voice`)?.setValue(this.populatedVoicesData[controlIndex-1][0].value);
+    }
   }
 
   getSpeechSynthesisVoice(controlName: string): SpeechSynthesisVoice | undefined {
@@ -271,12 +279,13 @@ export class DataTableComponent implements OnInit {
   }
 
   async fetchDataAndParseAsync(): Promise<string[][]> {
+    let EligibleRowSymbol = this.configService.getConfigValue("EligibleRowSymbol");
     return new Promise((resolve, reject) => {
       this.spreadsheetService.getSheetData().subscribe((csvData: string) => {
         this.papa.parse(csvData, {
           complete: (result) => {
             let filteredData = (result.data as any[]).filter((row: any, index: number) => {
-              return index == 0 || row[this.numberOfLanguages] == ELIGIBLE_ROW_SYMBOL;
+              return index == 0 || row[this.numberOfLanguages] == EligibleRowSymbol;
             });
             let parsedRows = filteredData.map((row: any) => (
               row.slice(0, this.numberOfLanguages)
@@ -469,6 +478,15 @@ export class DataTableComponent implements OnInit {
     this.playbackForm.get('reversePlayback')?.patchValue(Boolean(savedData['reversePlayback']));
     this.playbackForm.get('repeat')?.patchValue(Boolean(savedData['repeat']));
     this.playbackForm.get('reverseSpeechOrder')?.patchValue(Boolean(savedData['reverseSpeechOrder']));
+    
+    for(let i = 0; i < this.numberOfLanguages; i++) {
+      if(savedData[`lang${i+1}`] && this.masterLanguages.some(x => x.value == savedData[`lang${i+1}`])) {
+        this.playbackForm.get(`lang${i+1}`)?.setValue(savedData[`lang${i+1}`]);  
+      }
+      if(savedData[`lang${i+1}Voice`] && this.allVoices.some(x => x.name == savedData[`lang${i+1}Voice`])) {
+        this.playbackForm.get(`lang${i+1}Voice`)?.setValue(savedData[`lang${i+1}Voice`]);
+      }
+    }
   }
 
   highlightWord(row: number, col: number) {

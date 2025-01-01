@@ -1,10 +1,3 @@
-export const GOOGLE_SHEETS_ID = "1qS7yrrPvKIIJ_OvuYEyw1dNYq2nWCLU2k-IAIc4hTyU";
-export const GOOGLE_SHEETS_URL = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_ID}/export?format=csv`;
-
-export const PREFERRED_LANGS = [['de-DE', 'de_DE'], ['en-US', 'en_US']];
-
-export const ELIGIBLE_ROW_SYMBOL = 'y';
-
 export const ALLLANGUAGES = [
     { label: 'English (United States)', value: ['en-US', 'en_US'] },
     { label: 'English (United Kingdom)', value: ['en-GB', 'en_GB'] },

@@ -1,17 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { GOOGLE_SHEETS_URL } from '../../constants/constants';
+import { ConfigService } from '../config/config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SpreadsheetService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private config: ConfigService) { }
 
   getSheetData(): Observable<string> {
-    const csvUrl = GOOGLE_SHEETS_URL;
+    const csvUrl = this.config.getConfigValue("googleSheetsUrl").replace("<googleSheetsId>", this.config.getConfigValue("googleSheetsId"));
     return this.http.get(csvUrl, { responseType: 'text' });
   }
 }

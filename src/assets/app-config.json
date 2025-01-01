@@ -1,3 +1,11 @@
 {
-    "numberOfLanguages": "2"
+    "numberOfLanguages": "2",
+    "googleSheetsId": "1qS7yrrPvKIIJ_OvuYEyw1dNYq2nWCLU2k-IAIc4hTyU",
+    "googleSheetsUrl": "https://docs.google.com/spreadsheets/d/<googleSheetsId>/export?format=csv",
+    "preferredLangs": [
+        ["de-DE", "de_DE"], 
+        ["en-US", "en_US"]
+    ],
+    "preferredVoice": "Google",
+    "EligibleRowSymbol": "y"
 }
