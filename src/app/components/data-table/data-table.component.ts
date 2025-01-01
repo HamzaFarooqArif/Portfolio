@@ -538,8 +538,18 @@ export class DataTableComponent implements OnInit {
     this.highlightedRow = row;
     this.highlightedCol = col;
 
+    const container = document.getElementById('table-container');
     const element = document.getElementById(`cell_${row}_${col}`);
-    element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    if (element && container) {
+      const elementOffset = element.offsetTop;
+      const scrollPosition = elementOffset - container.clientHeight / 2 + element.clientHeight / 2;
+
+      container.scrollTo({
+        top: scrollPosition,
+        behavior: 'smooth',
+      });
+    }
   }
 
   async playAllTexts(): Promise<void> {

@@ -1,5 +1,5 @@
-<div class="content">
-  <form [formGroup]="playbackForm">
+<div id="container" class="container">
+  <form id="form-container" class="form-container" [formGroup]="playbackForm">
     <div>
       <button mat-fab *ngIf="getButtonVisibility('backward')" [disabled]="getButtonDisabledStatus('backward')" (click)="rewindClick()">
         <mat-icon>fast_rewind</mat-icon>
@@ -124,7 +124,7 @@
       </ng-container>
     </div>
   </form>
-  <div class="table-container">
+  <div id="table-container" class="table-container">
     <table>
       <thead>
           <tr *ngIf="tableData.length > 0">

@@ -2,12 +2,18 @@
     background-color: yellow;
 }
 
-.content {
-  height: 94vh; /* Ensure the viewport height is considered */
+.container {
   display: flex;
   flex-direction: column;
+  height: 100%;
+}
+
+.form-container {
+  flex-shrink: 0;
 }
 
 .table-container {
-  overflow-y: scroll;
+  flex-grow: 1;
+  overflow-y: auto;
+  min-height: 0; /* Prevent flex growth from breaking the layout */
 }
