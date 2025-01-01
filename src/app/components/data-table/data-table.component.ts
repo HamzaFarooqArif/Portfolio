@@ -537,6 +537,9 @@ export class DataTableComponent implements OnInit {
   highlightWord(row: number, col: number) {
     this.highlightedRow = row;
     this.highlightedCol = col;
+
+    const element = document.getElementById(`cell_${row}_${col}`);
+    element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   async playAllTexts(): Promise<void> {
