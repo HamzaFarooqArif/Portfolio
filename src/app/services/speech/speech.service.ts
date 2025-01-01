@@ -7,6 +7,9 @@ import { Observable } from 'rxjs';
 })
 export class SpeechService {
 
+  private isPaused: boolean = false;
+  private isStopped: boolean = true;
+
   constructor() {
     this.init();
   }
@@ -36,10 +39,21 @@ export class SpeechService {
           EasySpeech.speak({
             text: text,
             voice: voice,
-            rate: vocalSpeed ?? 1
+            rate: vocalSpeed ?? 1,
+            boundary: event => console.debug('word boundary reached', event.charIndex),
           })
             .then(() => {
-              resolve();
+              if(this.isPaused) {
+                let interval = setInterval(() => {
+                  if(!this.isPaused) {
+                    clearInterval(interval);
+                    resolve();
+                  }
+                }, 10);
+              }
+              else {
+                resolve();
+              }
             })
             .catch((err) => {
               reject(err);
@@ -50,6 +64,18 @@ export class SpeechService {
   }
 
   stopSpeech() {
+    this.isPaused = false;
+    this.isStopped = true;
     EasySpeech.cancel();
+  }
+
+  pauseSpeech() {
+    this.isPaused = true;
+    EasySpeech.pause();
+  }
+
+  resumeSpeech() {
+    this.isPaused = false;
+    EasySpeech.resume();
   }
 }

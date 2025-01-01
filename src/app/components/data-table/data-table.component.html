@@ -1,15 +1,21 @@
 <form [formGroup]="playbackForm">
   <div>
-    <button mat-fab (click)="playClick()">
-      <mat-icon>play_circle</mat-icon>
+    <button mat-fab *ngIf="getButtonVisibility('backward')" [disabled]="getButtonDisabledStatus('backward')" (click)="rewindClick()">
+      <mat-icon>fast_rewind</mat-icon>
     </button>
-    <button mat-fab>
-      <mat-icon>pause</mat-icon>
-    </button>
-    <button mat-fab>
+    <button mat-fab *ngIf="getButtonVisibility('play')" [disabled]="getButtonDisabledStatus('play')" (click)="playClick()">
       <mat-icon>play_arrow</mat-icon>
     </button>
-    <button mat-fab (click)="stopClick()">
+    <button mat-fab *ngIf="getButtonVisibility('resume')" [disabled]="getButtonDisabledStatus('resume')" (click)="resumeClick()">
+      <mat-icon>play_arrow</mat-icon>
+    </button>
+    <button mat-fab *ngIf="getButtonVisibility('pause')" [disabled]="getButtonDisabledStatus('pause')" (click)="pauseClick()">
+      <mat-icon>pause</mat-icon>
+    </button>
+    <button mat-fab *ngIf="getButtonVisibility('forward')" [disabled]="getButtonDisabledStatus('forward')" (click)="forwardClick()">
+      <mat-icon>fast_forward</mat-icon>
+    </button>
+    <button mat-fab *ngIf="getButtonVisibility('stop')" [disabled]="getButtonDisabledStatus('stop')" (click)="stopClick()">
       <mat-icon>stop</mat-icon>
     </button>
     <mat-form-field>

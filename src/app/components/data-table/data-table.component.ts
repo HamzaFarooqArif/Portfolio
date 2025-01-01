@@ -24,6 +24,9 @@ export class DataTableComponent implements OnInit {
   highlightedCol: number | null = -1;
   currentRow: number = 1;
   currentColumn: number = 0;
+  playbackButtonsStatus: {name: string, visible: boolean, disabled: boolean}[] = [];
+  isSpeaking: boolean = false;
+  isStopped: boolean = true;
 
   constructor(
     private spreadsheetService: SpreadsheetService,
@@ -38,7 +41,8 @@ export class DataTableComponent implements OnInit {
     this.numberOfLanguages = Number(this.configService.getConfigValue('numberOfLanguages'));
     this.fetchData();
     this.initForm();
-    
+    this.initButtons();
+    this.disableAllPlaybackButtons();
   }
 
   initForm() {
@@ -60,6 +64,107 @@ export class DataTableComponent implements OnInit {
     for (let i = 0; i < this.numberOfLanguages; i++) {
       this.playbackForm.addControl(`lang${i+1}`, this.fb.control('', Validators.required));
       this.playbackForm.addControl(`lang${i+1}Voice`, this.fb.control('', Validators.required));
+    }
+  }
+
+  initButtons() {
+    this.playbackButtonsStatus = [
+      {
+        name: 'play',
+        visible: true,
+        disabled: false
+      },
+      {
+        name: 'pause',
+        visible: true,
+        disabled: false
+      },
+      {
+        name: 'resume',
+        visible: true,
+        disabled: false
+      },
+      {
+        name: 'stop',
+        visible: true,
+        disabled: false
+      },
+      {
+        name: 'forward',
+        visible: true,
+        disabled: false
+      },
+      {
+        name: 'backward',
+        visible: true,
+        disabled: false
+      }
+    ];
+  }
+
+  getButtonVisibility(name: string) {
+    return this.playbackButtonsStatus.find((btn) => btn.name == name)?.visible;
+  }
+
+  getButtonDisabledStatus(name: string) {
+    return this.playbackButtonsStatus.find((btn) => btn.name == name)?.disabled;
+  }
+
+  setButtonVisibility(name: string, value: boolean) {
+    let button = this.playbackButtonsStatus.find((btn) => btn.name == name);
+    if(button) {
+      button.visible = value;
+    }
+  }
+
+  setButtonDisabledStatus(name: string, value: boolean) {
+    let button = this.playbackButtonsStatus.find((btn) => btn.name == name);
+    if(button) {
+      button.disabled = value;
+    }
+  }
+
+  disableAllPlaybackButtons() {
+    this.playbackButtonsStatus.forEach((btn) => {
+      this.setButtonDisabledStatus(btn.name, true);
+    });
+  }
+
+  refreshPlaybackButtons() {
+    if(this.isSpeaking) {
+      this.setButtonVisibility('play', false);
+      this.setButtonVisibility('resume', false);
+      this.setButtonVisibility('pause', true);
+      this.setButtonDisabledStatus('pause', false);
+      this.setButtonVisibility('forward', true);
+      this.setButtonDisabledStatus('forward', false);
+      this.setButtonVisibility('backward', true);
+      this.setButtonDisabledStatus('backward', false);
+      this.setButtonVisibility('stop', true);
+      this.setButtonDisabledStatus('stop', false);
+    }
+    else if(this.isStopped) {
+      this.setButtonVisibility('play', true);
+      this.setButtonDisabledStatus('play', false);
+      this.setButtonVisibility('resume', false);
+      this.setButtonVisibility('pause', false);
+      this.setButtonVisibility('forward', true);
+      this.setButtonDisabledStatus('forward', true);
+      this.setButtonVisibility('backward', true);
+      this.setButtonDisabledStatus('backward', true);
+      this.setButtonVisibility('stop', false);
+    }
+    else if(!this.isSpeaking && !this.isStopped) {
+      this.setButtonVisibility('play', false);
+      this.setButtonVisibility('resume', true);
+      this.setButtonDisabledStatus('resume', false);
+      this.setButtonVisibility('pause', false);
+      this.setButtonVisibility('forward', true);
+      this.setButtonDisabledStatus('forward', false);
+      this.setButtonVisibility('backward', true);
+      this.setButtonDisabledStatus('backward', false);
+      this.setButtonVisibility('stop', true);
+      this.setButtonDisabledStatus('stop', false);
     }
   }
 
@@ -149,6 +254,7 @@ export class DataTableComponent implements OnInit {
     this.fetchDataAndParseAsync().then((data: string[][]) => {
       this.tableData = data;
       this.patchForm();
+      this.refreshPlaybackButtons();
     }, err => {
       console.log(err);
     });
@@ -178,7 +284,56 @@ export class DataTableComponent implements OnInit {
     return this.highlightedRow === rowIndex && this.highlightedCol === colIndex;
   }
 
+  rewindClick() {
+    let reverse: boolean = this.playbackForm?.get('reversePlayback')?.value;
+    let startRow = Number(this.playbackForm.get('startRow')?.value);
+    if(reverse) {
+      if(this.currentRow < startRow) {
+        this.currentRow++;
+      }
+    }
+    else {
+      if(this.currentRow > startRow) {
+        this.currentRow--;
+      }
+    }
+    this.highlightWord(this.currentRow-1, this.currentColumn);
+    this.refreshPlaybackButtons();
+  }
+
+  forwardClick() {
+    let reverse: boolean = this.playbackForm?.get('reversePlayback')?.value;
+    let endRow = Number(this.playbackForm.get('endRow')?.value);
+    if(reverse) {
+      if(this.currentRow > endRow) {
+        this.currentRow--;
+      }
+    }
+    else {
+      if(this.currentRow < endRow) {
+        this.currentRow++;
+      }
+    }
+    this.highlightWord(this.currentRow-1, this.currentColumn);
+    this.refreshPlaybackButtons();
+  }
+
+  resumeClick() {
+    this.isSpeaking = true;
+    this.speechService.resumeSpeech();
+    this.refreshPlaybackButtons();
+  }
+
+  pauseClick() {
+    this.isSpeaking = false;
+    this.speechService.pauseSpeech();
+    this.refreshPlaybackButtons();
+  }
+
   playClick() {
+    this.isSpeaking = true;
+    this.isStopped = false;
+    this.refreshPlaybackButtons();
     this.playbackForm.get('startRow')?.disable();
     this.playbackForm.get('endRow')?.disable();
     this.currentRow = Number(this.playbackForm.get('startRow')?.value);
@@ -193,6 +348,9 @@ export class DataTableComponent implements OnInit {
   }
 
   stopClick() {
+    this.isSpeaking = false;
+    this.isStopped = true;
+    this.refreshPlaybackButtons();
     this.playbackForm.get('startRow')?.enable();
     this.playbackForm.get('endRow')?.enable();
     this.highlightWord(-1, -1);
@@ -205,6 +363,13 @@ export class DataTableComponent implements OnInit {
   }
 
   async playAllTexts(): Promise<void> {
+    if(this.isStopped) {
+      this.highlightWord(-1, -1);
+      this.playbackForm.get('startRow')?.enable();
+      this.playbackForm.get('endRow')?.enable();
+      return;
+    }
+
     if(this.speechTerminationCriteria()) {
       this.highlightWord(this.currentRow-1, this.currentColumn);
       let text = this.tableData[this.currentRow][this.currentColumn];
