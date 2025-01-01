@@ -233,8 +233,8 @@ export class DataTableComponent implements OnInit {
     let endRow = Number(this.playbackForm.get('endRow')?.value);
     if(controlName == 'startRow') {
       if(reverse) {
-        min = this.tableData?.length - 1;
-        max = endRow + 1;
+        min = endRow + 1;
+        max = this.tableData?.length - 1;
       }
       else {
         min = 1;
@@ -594,10 +594,13 @@ export class DataTableComponent implements OnInit {
         this.playClick();
       }
       else {
-        this.highlightWord(-1, -1);
+        this.isSpeaking = false;
+        this.isStopped = true;
+        this.refreshPlaybackButtons();
         this.playbackForm.get('startRow')?.enable();
         this.playbackForm.get('endRow')?.enable();
         this.playbackForm.get('sheetId')?.enable();
+        this.highlightWord(-1, -1);
         return;
       }
     }
