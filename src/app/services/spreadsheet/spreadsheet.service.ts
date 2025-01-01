@@ -8,10 +8,19 @@ import { ConfigService } from '../config/config.service';
 })
 export class SpreadsheetService {
 
+  private sheetId: string = "";
+
   constructor(private http: HttpClient, private config: ConfigService) { }
 
-  getSheetData(): Observable<string> {
-    const csvUrl = this.config.getConfigValue("googleSheetsUrl").replace("<googleSheetsId>", this.config.getConfigValue("googleSheetsId"));
+  setSheetId(value: string) {
+    this.sheetId = value;
+  }
+
+  fetchSheetData(): Observable<string> {
+    if(!this.sheetId) {
+      this.sheetId = this.config.getConfigValue("googleSheetsId");
+    }
+    const csvUrl = this.config.getConfigValue("googleSheetsUrl").replace("<googleSheetsId>", this.sheetId);
     return this.http.get(csvUrl, { responseType: 'text' });
   }
 }

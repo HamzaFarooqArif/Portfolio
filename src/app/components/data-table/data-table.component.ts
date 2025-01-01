@@ -48,14 +48,41 @@ export class DataTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.numberOfLanguages = Number(this.configService.getConfigValue('numberOfLanguages'));
-    this.fetchData();
     this.initForm();
     this.initButtons();
     this.disableAllPlaybackButtons();
+    this.setGoogleSheetId();
+    this.fetchData();
+    
+  }
+
+  setGoogleSheetId() {
+    let localStorageData = JSON.parse(localStorage.getItem('formData') || '{}');
+    let savedData = JSON.parse(JSON.stringify(localStorageData));
+    if(!savedData || isEmpty(savedData)) {
+      this.route.queryParams.subscribe(params => {
+        savedData = params;
+        this.patchSavedSheetId(savedData);
+      });
+    }
+    else {
+      this.patchSavedSheetId(savedData);
+    }
+  }
+
+  patchSavedSheetId(savedData: any) {
+    if(savedData['sheetId']) {
+      this.playbackForm.get('sheetId')?.patchValue(savedData['sheetId']);
+    }
+    else {
+      this.playbackForm.get('sheetId')?.patchValue(this.configService.getConfigValue("googleSheetsId"));
+    }
+    this.spreadsheetService.setSheetId(this.playbackForm.get('sheetId')?.value);
   }
 
   initForm() {
     this.playbackForm = this.fb.group({
+      sheetId: ['', Validators.required],
       startRow: ['', Validators.required],
       endRow: ['', Validators.required],
       vocalSpeed: [1],
@@ -107,7 +134,7 @@ export class DataTableComponent implements OnInit {
         name: 'backward',
         visible: true,
         disabled: false
-      }
+      },
     ];
   }
 
@@ -281,7 +308,7 @@ export class DataTableComponent implements OnInit {
   async fetchDataAndParseAsync(): Promise<string[][]> {
     let EligibleRowSymbol = this.configService.getConfigValue("EligibleRowSymbol");
     return new Promise((resolve, reject) => {
-      this.spreadsheetService.getSheetData().subscribe((csvData: string) => {
+      this.spreadsheetService.fetchSheetData().subscribe((csvData: string) => {
         this.papa.parse(csvData, {
           complete: (result) => {
             let filteredData = (result.data as any[]).filter((row: any, index: number) => {
@@ -304,15 +331,20 @@ export class DataTableComponent implements OnInit {
 
   fetchData() {
     this.loading = true;
+    this.playbackForm.disable();
+    this.playbackForm.get('sheetId')?.enable();
     this.fetchDataAndParseAsync().then((data: string[][]) => {
       this.loading = false;
+      this.playbackForm.enable();
       this.tableData = data;
       this.patchForm();
       this.refreshPlaybackButtons();
       this.loadSavedData();
     }, err => {
       this.loading = false;
-      console.log(err);
+      this.toastr.error("Please check the 'Sheet ID' and make sure that the sheet has the public access", "Unable fetch sheet", {
+        timeOut: 5000
+      });
     });
   }
 
@@ -399,6 +431,7 @@ export class DataTableComponent implements OnInit {
     this.refreshPlaybackButtons();
     this.playbackForm.get('startRow')?.disable();
     this.playbackForm.get('endRow')?.disable();
+    this.playbackForm.get('sheetId')?.disable();
     this.currentRow = Number(this.playbackForm.get('startRow')?.value);
     let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
     if(reverseSpeechOrder) {
@@ -416,13 +449,20 @@ export class DataTableComponent implements OnInit {
     this.refreshPlaybackButtons();
     this.playbackForm.get('startRow')?.enable();
     this.playbackForm.get('endRow')?.enable();
+    this.playbackForm.get('sheetId')?.enable();
     this.highlightWord(-1, -1);
     this.speechService.stopSpeech();
   }
 
   saveClick() {
     if(this.playbackForm?.invalid) {
-      this.toastr.warning('Check the input fields', '', {
+      this.toastr.warning('Check the input fields', 'Unable to save your changes', {
+        timeOut: 2000
+      });
+      return;
+    }
+    else if(!this.tableData || this.tableData?.length == 0) {
+      this.toastr.warning('No sheet is loaded', 'Unable to save your changes', {
         timeOut: 2000
       });
       return;
@@ -438,6 +478,11 @@ export class DataTableComponent implements OnInit {
     this.toastr.success('Changes saved successfully', '', {
       timeOut: 2000
     });
+  }
+
+  loadSheetClick() {
+    this.spreadsheetService.setSheetId(this.playbackForm.get('sheetId')?.value);
+    this.fetchData();
   }
 
   loadSavedData() {
@@ -475,9 +520,9 @@ export class DataTableComponent implements OnInit {
     {
       this.playbackForm.get('inbetweenDelay')?.patchValue(Number(savedData['inbetweenDelay']));
     }
-    this.playbackForm.get('reversePlayback')?.patchValue(Boolean(savedData['reversePlayback']));
-    this.playbackForm.get('repeat')?.patchValue(Boolean(savedData['repeat']));
-    this.playbackForm.get('reverseSpeechOrder')?.patchValue(Boolean(savedData['reverseSpeechOrder']));
+    this.playbackForm.get('reversePlayback')?.patchValue(savedData['reversePlayback'] == 'true');
+    this.playbackForm.get('repeat')?.patchValue(savedData['repeat'] == 'true');
+    this.playbackForm.get('reverseSpeechOrder')?.patchValue(savedData['reverseSpeechOrder'] == 'true');
     
     for(let i = 0; i < this.numberOfLanguages; i++) {
       if(savedData[`lang${i+1}`] && this.masterLanguages.some(x => x.value == savedData[`lang${i+1}`])) {
@@ -499,6 +544,7 @@ export class DataTableComponent implements OnInit {
       this.highlightWord(-1, -1);
       this.playbackForm.get('startRow')?.enable();
       this.playbackForm.get('endRow')?.enable();
+      this.playbackForm.get('sheetId')?.enable();
       return;
     }
 
@@ -538,6 +584,7 @@ export class DataTableComponent implements OnInit {
         this.highlightWord(-1, -1);
         this.playbackForm.get('startRow')?.enable();
         this.playbackForm.get('endRow')?.enable();
+        this.playbackForm.get('sheetId')?.enable();
         return;
       }
     }
