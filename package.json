@@ -21,7 +21,9 @@
     "@angular/platform-browser-dynamic": "^17.3.0",
     "@angular/router": "^17.3.0",
     "easy-speech": "^2.4.0",
+    "ngx-loading": "^17.0.0",
     "ngx-papaparse": "^8.0.0",
+    "ngx-toastr": "^19.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"

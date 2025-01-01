@@ -6,6 +6,9 @@ import { SpeechService } from '../../services/speech/speech.service';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ALLLANGUAGES, ELIGIBLE_ROW_SYMBOL, PREFERRED_LANGS } from '../../constants/constants';
 import { ConfigService } from '../../services/config/config.service';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { isEmpty } from '../../Utilities/Utility';
 
 
 @Component({
@@ -15,6 +18,7 @@ import { ConfigService } from '../../services/config/config.service';
 })
 
 export class DataTableComponent implements OnInit {
+  loading: boolean = false;
   numberOfLanguages: number = 0; 
   playbackForm!: FormGroup;
   allVoices: SpeechSynthesisVoice[] = [];
@@ -27,13 +31,19 @@ export class DataTableComponent implements OnInit {
   playbackButtonsStatus: {name: string, visible: boolean, disabled: boolean}[] = [];
   isSpeaking: boolean = false;
   isStopped: boolean = true;
+  formQueryParams: Params | null | undefined;
+  vocalSpeedRange: {min: number, max: number} = {min: 0.1, max: 2};
+  inbetweenDelayRange: {min: number, max: number} = {min: 0, max: 3};
 
   constructor(
     private spreadsheetService: SpreadsheetService,
     private configService: ConfigService,
     private papa: Papa,
     private speechService: SpeechService,
-    private fb: FormBuilder) {}
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private toastr: ToastrService) {}
 
   tableData: string[][] = [];
 
@@ -172,17 +182,50 @@ export class DataTableComponent implements OnInit {
     if(this.tableData?.length) {
       this.playbackForm.get('startRow')?.setValue(1);
       this.playbackForm.get('endRow')?.setValue(this.tableData?.length - 1);
-      this.playbackForm.get('startRow')?.setValidators([
-        Validators.min(1),
-        Validators.max(this.tableData?.length - 1)
-      ]);
-      this.playbackForm.get('endRow')?.setValidators([
-        Validators.min(1),
-        Validators.max(this.tableData?.length - 1)
-      ]);
-      this.playbackForm.get('startRow')?.updateValueAndValidity();
-      this.playbackForm.get('endRow')?.updateValueAndValidity();
+      this.refreshRowFieldsValidity();
     }
+  }
+
+  refreshRowFieldsValidity() {
+    this.playbackForm.get('startRow')?.setValidators([
+      Validators.min(this.getRangeVal('startRow').min),
+      Validators.max(this.getRangeVal('startRow').max)
+    ]);
+    this.playbackForm.get('endRow')?.setValidators([
+      Validators.min(this.getRangeVal('endRow').min),
+      Validators.max(this.getRangeVal('endRow').max)
+    ]);
+    this.playbackForm.get('startRow')?.updateValueAndValidity();
+    this.playbackForm.get('endRow')?.updateValueAndValidity();
+  }
+
+  getRangeVal(controlName: string): {min: number, max: number} {
+    let min: number = 0;
+    let max: number = 0;
+    let reverse: boolean = this.playbackForm?.get('reversePlayback')?.value;
+    let startRow = Number(this.playbackForm.get('startRow')?.value);
+    let endRow = Number(this.playbackForm.get('endRow')?.value);
+    if(controlName == 'startRow') {
+      if(reverse) {
+        min = this.tableData?.length - 1;
+        max = endRow + 1;
+      }
+      else {
+        min = 1;
+        max = endRow - 1;
+      }
+    }
+    else if(controlName == 'endRow') {
+      if(reverse) {
+        min = 1;
+        max = startRow - 1;
+      }
+      else {
+        min = startRow + 1;
+        max = this.tableData?.length - 1;
+      }
+    }
+    return {min: min, max: max};
   }
 
   initializeDropdowns() {
@@ -251,11 +294,15 @@ export class DataTableComponent implements OnInit {
   }
 
   fetchData() {
+    this.loading = true;
     this.fetchDataAndParseAsync().then((data: string[][]) => {
+      this.loading = false;
       this.tableData = data;
       this.patchForm();
       this.refreshPlaybackButtons();
+      this.loadSavedData();
     }, err => {
+      this.loading = false;
       console.log(err);
     });
   }
@@ -278,6 +325,7 @@ export class DataTableComponent implements OnInit {
         this.playbackForm.get('endRow')?.setValue(temp);
       }
     }
+    this.refreshRowFieldsValidity();
   }
 
   isHighlighted(rowIndex: number, colIndex: number): boolean {
@@ -331,6 +379,12 @@ export class DataTableComponent implements OnInit {
   }
 
   playClick() {
+    if(this.playbackForm?.invalid) {
+      this.toastr.warning('Check the input fields', '', {
+        timeOut: 2000
+      });
+      return;
+    }
     this.isSpeaking = true;
     this.isStopped = false;
     this.refreshPlaybackButtons();
@@ -355,6 +409,66 @@ export class DataTableComponent implements OnInit {
     this.playbackForm.get('endRow')?.enable();
     this.highlightWord(-1, -1);
     this.speechService.stopSpeech();
+  }
+
+  saveClick() {
+    if(this.playbackForm?.invalid) {
+      this.toastr.warning('Check the input fields', '', {
+        timeOut: 2000
+      });
+      return;
+    }
+    this.formQueryParams = this.playbackForm.getRawValue();
+    this.router.navigate([], {
+      queryParams: this.formQueryParams,
+      queryParamsHandling: 'merge'
+    });
+
+    localStorage.setItem('formData', JSON.stringify(this.formQueryParams));
+
+    this.toastr.success('Changes saved successfully', '', {
+      timeOut: 2000
+    });
+  }
+
+  loadSavedData() {
+    let localStorageData = JSON.parse(localStorage.getItem('formData') || '{}');
+    let savedData = JSON.parse(JSON.stringify(localStorageData));
+    if(!savedData || isEmpty(savedData)) {
+      this.route.queryParams.subscribe(params => {
+        savedData = params;
+        this.patchSavedData(savedData);
+      });
+    }
+    else {
+      this.patchSavedData(savedData);
+    }
+  }
+
+  patchSavedData(savedData: any) {
+    if(savedData['startRow'] && 
+      Number(savedData['startRow']) <= this.getRangeVal('startRow').max && 
+      Number(savedData['startRow']) >= this.getRangeVal('startRow').min)
+    {
+      this.playbackForm.get('startRow')?.patchValue(Number(savedData['startRow']));
+    }
+    if(savedData['endRow'] && 
+      Number(savedData['endRow']) <= this.getRangeVal('endRow').max && 
+      Number(savedData['endRow']) >= this.getRangeVal('endRow').min)
+    {
+      this.playbackForm.get('endRow')?.patchValue(Number(savedData['endRow']));
+    }
+    if(savedData['vocalSpeed'] && Number(savedData['vocalSpeed']) >= this.vocalSpeedRange.min && Number(savedData['vocalSpeed']) <= this.vocalSpeedRange.max)
+    {
+      this.playbackForm.get('vocalSpeed')?.patchValue(Number(savedData['vocalSpeed']));
+    }
+    if(savedData['inbetweenDelay'] && Number(savedData['inbetweenDelay']) >= this.inbetweenDelayRange.min && Number(savedData['inbetweenDelay']) <= this.inbetweenDelayRange.max)
+    {
+      this.playbackForm.get('inbetweenDelay')?.patchValue(Number(savedData['inbetweenDelay']));
+    }
+    this.playbackForm.get('reversePlayback')?.patchValue(Boolean(savedData['reversePlayback']));
+    this.playbackForm.get('repeat')?.patchValue(Boolean(savedData['repeat']));
+    this.playbackForm.get('reverseSpeechOrder')?.patchValue(Boolean(savedData['reverseSpeechOrder']));
   }
 
   highlightWord(row: number, col: number) {
