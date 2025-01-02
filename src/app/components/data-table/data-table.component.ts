@@ -520,9 +520,9 @@ export class DataTableComponent implements OnInit {
     {
       this.playbackForm.get('inbetweenDelay')?.patchValue(Number(savedData['inbetweenDelay']));
     }
-    this.playbackForm.get('reversePlayback')?.patchValue(savedData['reversePlayback'] == 'true');
-    this.playbackForm.get('repeat')?.patchValue(savedData['repeat'] == 'true');
-    this.playbackForm.get('reverseSpeechOrder')?.patchValue(savedData['reverseSpeechOrder'] == 'true');
+    this.playbackForm.get('reversePlayback')?.patchValue(this.checkForTruthy(savedData['reversePlayback']));
+    this.playbackForm.get('repeat')?.patchValue(this.checkForTruthy(savedData['repeat']));
+    this.playbackForm.get('reverseSpeechOrder')?.patchValue(this.checkForTruthy(savedData['reverseSpeechOrder']));
     
     for(let i = 0; i < this.numberOfLanguages; i++) {
       if(savedData[`lang${i+1}`] && this.masterLanguages.some(x => x.value == savedData[`lang${i+1}`])) {
@@ -533,6 +533,11 @@ export class DataTableComponent implements OnInit {
       }
     }
   }
+
+  checkForTruthy(val: any) {
+    let result = (typeof(val) == 'boolean' && Boolean(val)) || (typeof(val) == 'string' && val == 'true');
+    return result;
+  } 
 
   highlightWord(row: number, col: number) {
     this.highlightedRow = row;
@@ -566,11 +571,12 @@ export class DataTableComponent implements OnInit {
       let text = this.tableData[this.currentRow][this.currentColumn];
       let voice: SpeechSynthesisVoice | undefined = this.getSpeechSynthesisVoice(`lang${this.currentColumn + 1}Voice`);
       let vocalSpeed = Number(this.playbackForm?.get('vocalSpeed')?.value);
+      let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
       if(text && voice) {
         await this.speechService.speakAsync(text, voice, vocalSpeed);
       }
-      if(this.currentColumn < this.tableData[0]?.length) {
-        if(this.currentColumn == 0) {
+      if(reverseSpeechOrder) {
+        if(this.currentColumn > 0) {
           let delay = Number(this.playbackForm.get('inbetweenDelay')?.value);
           let timeout = setTimeout(() => {
             clearTimeout(timeout);
@@ -584,8 +590,18 @@ export class DataTableComponent implements OnInit {
         }
       }
       else {
-        this.setNextCell();
-        return this.playAllTexts();
+        if(this.currentColumn < this.tableData[0]?.length - 1) {
+          let delay = Number(this.playbackForm.get('inbetweenDelay')?.value);
+          let timeout = setTimeout(() => {
+            clearTimeout(timeout);
+            this.setNextCell();
+            return this.playAllTexts();
+          }, delay*1000);
+        }
+        else {
+          this.setNextCell();
+          return this.playAllTexts();
+        }
       }
     }
     else {
