@@ -318,7 +318,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
             let parsedRows = filteredData.map((row: any) => (
               row.slice(0, this.numberOfLanguages)
               )).filter((row: string[]) => {
-              return row.every(el => el != "");
+              return row[0] != "";
             });
   
             resolve(parsedRows);
