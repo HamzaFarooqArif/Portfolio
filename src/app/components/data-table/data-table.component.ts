@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { SpreadsheetService as SpreadsheetService } from '../../services/spreadsheet/spreadsheet.service';
 import { Papa } from 'ngx-papaparse';
 import { SpeechService } from '../../services/speech/speech.service';
@@ -16,7 +16,8 @@ import { isEmpty } from '../../Utilities/Utility';
   styleUrl: './data-table.component.scss'
 })
 
-export class DataTableComponent implements OnInit {
+export class DataTableComponent implements OnInit, OnDestroy {
+  private wakeLock: WakeLockSentinel | null = null;
   loading: boolean = false;
   numberOfLanguages: number = 0; 
   playbackForm!: FormGroup;
@@ -53,7 +54,7 @@ export class DataTableComponent implements OnInit {
     this.disableAllPlaybackButtons();
     this.setGoogleSheetId();
     this.fetchData();
-    
+    this.keepScreenOn();
   }
 
   setGoogleSheetId() {
@@ -682,6 +683,36 @@ export class DataTableComponent implements OnInit {
 
   getLanguageName(label: string) {
     return ALLLANGUAGES.find((lang) => lang.value.some(x => x == label))?.label;
+  }
+
+  async keepScreenOn(): Promise<void> {
+    try {
+      if ('wakeLock' in navigator) {
+        this.wakeLock = await navigator.wakeLock.request('screen');
+        console.log('Screen Wake Lock activated');
+      } else {
+        console.error('Screen Wake Lock API is not supported on this device.');
+      }
+    } catch (err: any) {
+      console.error(`Failed to activate screen wake lock: ${err?.message}`);
+      console.log('Retrying Wake Lock...');
+      let timeOut = setTimeout(() => {
+        clearTimeout(timeOut);
+        this.keepScreenOn();
+      }, 1000);
+    }
+  }
+
+  async releaseScreenOn(): Promise<void> {
+    if (this.wakeLock) {
+      await this.wakeLock.release();
+      this.wakeLock = null;
+      console.log('Screen Wake Lock released');
+    }
+  }
+
+  ngOnDestroy(): void {
+      this.releaseScreenOn();
   }
 
 }
