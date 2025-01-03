@@ -38,9 +38,21 @@ td, th {
   justify-content: space-between;
 }
 
+.menu-mini-fab {
+  display: none;
+}
+
 @media (max-width: 580px) {
   .first-row-container {
     flex-direction: column;
+  }
+
+  .menu-mat-fab {
+    display: none;
+  }
+
+  .menu-mini-fab {
+    display: block;
   }
 }
 
