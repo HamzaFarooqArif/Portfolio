@@ -165,7 +165,7 @@
                   Required.
                 </mat-error>
               </mat-form-field>
-              <mat-form-field style="width: 500px;">
+              <mat-form-field style="width: 300px;">
                 <mat-label>Select Voice for Language {{ i + 1 }}</mat-label>
                 <mat-select [id]="'lang' + (i + 1) + 'Voice'" [formControlName]="'lang' + (i + 1) + 'Voice'">
                   <mat-option *ngFor="let option of populatedVoicesData[i]" [value]="option.value">
