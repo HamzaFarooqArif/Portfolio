@@ -13,3 +13,45 @@
   overflow-y: auto;
   min-height: 0; /* Prevent flex growth from breaking the layout */
 }
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+.form-container {
+  margin-top: 10px;
+  display: flex; 
+  flex-direction: column;
+}
+
+.first-row-container {
+  display: flex; 
+  flex-direction: row; 
+  justify-content: space-between;
+}
+
+@media (max-width: 580px) {
+  .first-row-container {
+    flex-direction: column;
+  }
+}
+
+.playback-btn {
+  margin: 5px;
+}
+
+:host ::ng-deep .mat-expansion-panel-body {
+  padding-right: 0px;
+}
+
+:host ::ng-deep .mat-expansion-panel-header-description {
+  margin-right: 0px;
+}

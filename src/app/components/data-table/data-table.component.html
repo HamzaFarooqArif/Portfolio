@@ -3,8 +3,8 @@
     <table>
       <thead>
           <tr *ngIf="tableData.length > 0">
-            <th>Index</th>
-            <th *ngFor="let lang of [].constructor(numberOfLanguages); let i = index">
+            <th align="left">Index</th>
+            <th align="left" *ngFor="let lang of [].constructor(numberOfLanguages); let i = index">
               {{ tableData[0][i] }}
             </th>
           </tr>
@@ -19,93 +19,125 @@
       </tbody>
     </table>
   </div>
-  <mat-accordion>
-    <mat-expansion-panel [disabled]="true" #mep="matExpansionPanel">
-      <mat-expansion-panel-header collapsedHeight="100px">
-        <div style="display: flex; flex-direction: column; justify-content: center;">
-          <button mat-mini-fab (click)="mep.expanded = !mep.expanded">
-            <mat-icon>menu</mat-icon>
-          </button>
-        </div>
-        <mat-panel-description style="height: 100px; display: flex; flex-direction: row; justify-content: center; margin-right: 20px;">
-          <button mat-fab *ngIf="getButtonVisibility('backward')" [disabled]="getButtonDisabledStatus('backward')" (click)="rewindClick(); $event.stopPropagation();">
-            <mat-icon>fast_rewind</mat-icon>
-          </button>
-          <button mat-fab *ngIf="getButtonVisibility('play')" [disabled]="getButtonDisabledStatus('play')" (click)="playClick(); $event.stopPropagation();">
-            <mat-icon>play_arrow</mat-icon>
-          </button>
-          <button mat-fab *ngIf="getButtonVisibility('resume')" [disabled]="getButtonDisabledStatus('resume')" (click)="resumeClick(); $event.stopPropagation();">
-            <mat-icon>play_arrow</mat-icon>
-          </button>
-          <button mat-fab *ngIf="getButtonVisibility('pause')" [disabled]="getButtonDisabledStatus('pause')" (click)="pauseClick(); $event.stopPropagation();">
-            <mat-icon>pause</mat-icon>
-          </button>
-          <button mat-fab *ngIf="getButtonVisibility('forward')" [disabled]="getButtonDisabledStatus('forward')" (click)="forwardClick(); $event.stopPropagation();">
-            <mat-icon>fast_forward</mat-icon>
-          </button>
-          <button mat-fab *ngIf="getButtonVisibility('stop')" [disabled]="getButtonDisabledStatus('stop')" (click)="stopClick(); $event.stopPropagation();">
-            <mat-icon>stop</mat-icon>
-          </button>
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-      <div style="height: 500px; overflow-y: scroll;">
-        <form id="form-container" class="form-container" [formGroup]="playbackForm">
-          <div>
-            <button mat-fab (click)="saveClick(); $event.stopPropagation();">
-              <mat-icon>save</mat-icon>
-            </button>
-            <mat-form-field style="width: 300px;">
-              <mat-label>Sheet ID</mat-label>
-              <input
-                matInput
-                class="form-control"
-                formControlName="sheetId"
-                >
-              <mat-error *ngIf="playbackForm.get('sheetId')?.hasError('required')">
-                Required
-              </mat-error>
-            </mat-form-field>
-            <button mat-fab (click)="loadSheetClick()">
-              <mat-icon>autorenew</mat-icon>
-            </button>
-            <mat-form-field style="width: 120px;">
-              <mat-label>Starting Row</mat-label>
-              <input
-                matInput
-                type="number"
-                class="form-control"
-                formControlName="startRow"
-                (change)="refreshRowFieldsValidity();"
-                >
-              <mat-error *ngIf="playbackForm.get('startRow')?.hasError('required')">
-                Required
-              </mat-error>
-              <mat-error *ngIf="playbackForm.get('startRow')?.hasError('min')">
-                Invalid
-              </mat-error>
-              <mat-error *ngIf="playbackForm.get('startRow')?.hasError('max')">
-                Invalid
-              </mat-error>
-            </mat-form-field>
-            <mat-form-field style="width: 120px;">
-              <mat-label>Ending Row</mat-label>
-              <input
-                matInput
-                type="number"
-                class="form-control"
-                formControlName="endRow"
-                (change)="refreshRowFieldsValidity();"
-                >
-              <mat-error *ngIf="playbackForm.get('endRow')?.hasError('required')">
-                Required
-              </mat-error>
-              <mat-error *ngIf="playbackForm.get('endRow')?.hasError('min')">
-                Invalid
-              </mat-error>
-              <mat-error *ngIf="playbackForm.get('endRow')?.hasError('max')">
-                Invalid
-              </mat-error>
-            </mat-form-field>
+  <form [formGroup]="playbackForm">
+    <mat-accordion>
+      <mat-expansion-panel [disabled]="true" #mep="matExpansionPanel" style="display: flex; flex-direction: column;">
+        <mat-expansion-panel-header collapsedHeight="130px" expandedHeight="130px">
+          <mat-panel-description style="height: 140px; display: flex; flex-direction: row; justify-content: end;">
+            <div style="display: flex; flex-direction: column; align-items: end;">
+              <div style="width: 50%; display: flex; flex-direction: row; justify-content: end;">
+                <button class="playback-btn" mat-fab *ngIf="getButtonVisibility('backward')" [disabled]="getButtonDisabledStatus('backward')" (click)="rewindClick(); $event.stopPropagation();">
+                  <mat-icon>fast_rewind</mat-icon>
+                </button>
+                <button class="playback-btn" mat-fab *ngIf="getButtonVisibility('play')" [disabled]="getButtonDisabledStatus('play')" (click)="playClick(); $event.stopPropagation();">
+                  <mat-icon>play_arrow</mat-icon>
+                </button>
+                <button class="playback-btn" mat-fab *ngIf="getButtonVisibility('resume')" [disabled]="getButtonDisabledStatus('resume')" (click)="resumeClick(); $event.stopPropagation();">
+                  <mat-icon>play_arrow</mat-icon>
+                </button>
+                <button class="playback-btn" mat-fab *ngIf="getButtonVisibility('pause')" [disabled]="getButtonDisabledStatus('pause')" (click)="pauseClick(); $event.stopPropagation();">
+                  <mat-icon>pause</mat-icon>
+                </button>
+                <button class="playback-btn" mat-fab *ngIf="getButtonVisibility('forward')" [disabled]="getButtonDisabledStatus('forward')" (click)="forwardClick(); $event.stopPropagation();">
+                  <mat-icon>fast_forward</mat-icon>
+                </button>
+                <button class="playback-btn" mat-fab *ngIf="getButtonVisibility('stop')" [disabled]="getButtonDisabledStatus('stop')" (click)="stopClick(); $event.stopPropagation();">
+                  <mat-icon>stop</mat-icon>
+                </button>
+              </div>
+              <div style="width: 100%; display: flex; flex-direction: row; justify-content: center; margin-top: 10px;">
+                <mat-checkbox style="display: none;" formControlName="reversePlayback" #reverseCheckbox (change)="reverseChanged()"></mat-checkbox>
+                <button class="playback-btn" mat-mini-fab (click)="reverseCheckbox.toggle(); reverseChanged(); $event.stopPropagation();">
+                  <mat-icon *ngIf="reverseCheckbox.checked">north</mat-icon>
+                  <mat-icon *ngIf="!reverseCheckbox.checked">south</mat-icon>
+                </button>
+                <mat-checkbox style="display: none;" #reverseSpeechCheckbox formControlName="reverseSpeechOrder"></mat-checkbox>
+                <button class="playback-btn" mat-mini-fab (click)="reverseSpeechCheckbox.toggle(); $event.stopPropagation();">
+                  <mat-icon *ngIf="reverseSpeechCheckbox.checked">west</mat-icon>
+                  <mat-icon *ngIf="!reverseSpeechCheckbox.checked">east</mat-icon>
+                </button>
+              </div>
+            </div>
+            <div style="width: 45%; display: flex; flex-direction: row; justify-content: end;">
+              <button mat-fab extended (click)="mep.expanded = !mep.expanded">
+                <mat-icon>menu</mat-icon>
+                Menu
+              </button>
+            </div>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div style="height: 500px; overflow-y: scroll;">
+          <div class="form-container">
+            <div style="margin-top: 10px; display: flex; flex-direction: row;">
+              <mat-form-field style="width: 120px; margin: 7px 10px 0px 0px;">
+                <mat-label>Starting Row</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  class="form-control"
+                  formControlName="startRow"
+                  (change)="refreshRowFieldsValidity();"
+                  >
+                <mat-error *ngIf="playbackForm.get('startRow')?.hasError('required')">
+                  Required
+                </mat-error>
+                <mat-error *ngIf="playbackForm.get('startRow')?.hasError('min')">
+                  Invalid
+                </mat-error>
+                <mat-error *ngIf="playbackForm.get('startRow')?.hasError('max')">
+                  Invalid
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field style="width: 120px; margin: 7px 0px 0px 10px;">
+                <mat-label>Ending Row</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  class="form-control"
+                  formControlName="endRow"
+                  (change)="refreshRowFieldsValidity();"
+                  >
+                <mat-error *ngIf="playbackForm.get('endRow')?.hasError('required')">
+                  Required
+                </mat-error>
+                <mat-error *ngIf="playbackForm.get('endRow')?.hasError('min')">
+                  Invalid
+                </mat-error>
+                <mat-error *ngIf="playbackForm.get('endRow')?.hasError('max')">
+                  Invalid
+                </mat-error>
+              </mat-form-field>
+              <div style="display: flex; flex-direction: row; align-items: center; margin-left: 10px;">
+                <div>
+                  <mat-label>Repeat</mat-label>
+                  <mat-checkbox formControlName="repeat"></mat-checkbox>
+                </div>
+              </div>
+            </div>
+            <div class="first-row-container">
+              <div style="display: flex; flex-direction: row;">
+                <mat-form-field style="width: 300px;">
+                  <mat-label>Sheet ID</mat-label>
+                  <input
+                    matInput
+                    class="form-control"
+                    formControlName="sheetId"
+                    >
+                  <mat-error *ngIf="playbackForm.get('sheetId')?.hasError('required')">
+                    Required
+                  </mat-error>
+                </mat-form-field>
+                <button mat-fab extended [disabled]="isSpeaking || (!isSpeaking && !isStopped)" (click)="loadSheetClick()" style="margin-left: 15px; margin-top: 7px;">
+                  <mat-icon>autorenew</mat-icon>
+                  Reload
+                </button>
+              </div>
+              <button mat-fab extended (click)="saveClick(); $event.stopPropagation();" style="margin: 7px 10px 0px 10px;">
+                <mat-icon>save</mat-icon>
+                Save Settings
+              </button>
+            </div>
+            
             <div>
               <mat-label>Vocal Speed</mat-label>
               <mat-slider [min]="vocalSpeedRange.min" [max]="vocalSpeedRange.max" step="0.1" discrete>
@@ -117,18 +149,6 @@
               <mat-slider [min]="inbetweenDelayRange.min" [max]="inbetweenDelayRange.max" step="0.1" discrete>
                 <input matSliderThumb formControlName="inbetweenDelay">
               </mat-slider>
-            </div>
-            <div>
-              <mat-label>Repeat</mat-label>
-              <mat-checkbox formControlName="repeat"></mat-checkbox>
-            </div>
-            <div>
-              <mat-label>Reverse Playback</mat-label>
-              <mat-checkbox formControlName="reversePlayback" (change)="reverseChanged()"></mat-checkbox>
-            </div>
-            <div>
-              <mat-label>Meaning-to-word</mat-label>
-              <mat-checkbox formControlName="reverseSpeechOrder"></mat-checkbox>
             </div>
             <ng-container *ngFor="let _ of [].constructor(numberOfLanguages); let i = index">
               <mat-form-field style="width: 300px;">
@@ -155,10 +175,10 @@
               </mat-form-field>
             </ng-container>
           </div>
-        </form>
-      </div>
-    </mat-expansion-panel>
-  </mat-accordion>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </form>
   <ngx-loading
     [show]="loading"
     [config]="{ backdropBackgroundColour: 'rgba(0, 0, 0, 0.8)' }"
