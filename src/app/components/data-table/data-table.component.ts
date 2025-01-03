@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { SpreadsheetService as SpreadsheetService } from '../../services/spreadsheet/spreadsheet.service';
 import { Papa } from 'ngx-papaparse';
 import { SpeechService } from '../../services/speech/speech.service';

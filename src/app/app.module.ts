@@ -18,6 +18,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { ConfigService } from './services/config/config.service';
 import { ToastrModule } from 'ngx-toastr';
 import { NgxLoadingModule } from "ngx-loading";
+import {MatExpansionModule} from '@angular/material/expansion';
+import {MatButtonModule} from '@angular/material/button';
 
 export function loadAppConfig(configService: ConfigService): () => Promise<void> {
   return () =>
@@ -45,6 +47,8 @@ export function loadAppConfig(configService: ConfigService): () => Promise<void>
     MatSliderModule,
     MatCheckboxModule,
     MatIconModule,
+    MatExpansionModule,
+    MatButtonModule,
     ToastrModule.forRoot(),
     NgxLoadingModule.forRoot({}),
   ],

@@ -1,129 +1,4 @@
 <div id="container" class="container">
-  <form id="form-container" class="form-container" [formGroup]="playbackForm">
-    <div>
-      <button mat-fab *ngIf="getButtonVisibility('backward')" [disabled]="getButtonDisabledStatus('backward')" (click)="rewindClick()">
-        <mat-icon>fast_rewind</mat-icon>
-      </button>
-      <button mat-fab *ngIf="getButtonVisibility('play')" [disabled]="getButtonDisabledStatus('play')" (click)="playClick()">
-        <mat-icon>play_arrow</mat-icon>
-      </button>
-      <button mat-fab *ngIf="getButtonVisibility('resume')" [disabled]="getButtonDisabledStatus('resume')" (click)="resumeClick()">
-        <mat-icon>play_arrow</mat-icon>
-      </button>
-      <button mat-fab *ngIf="getButtonVisibility('pause')" [disabled]="getButtonDisabledStatus('pause')" (click)="pauseClick()">
-        <mat-icon>pause</mat-icon>
-      </button>
-      <button mat-fab *ngIf="getButtonVisibility('forward')" [disabled]="getButtonDisabledStatus('forward')" (click)="forwardClick()">
-        <mat-icon>fast_forward</mat-icon>
-      </button>
-      <button mat-fab *ngIf="getButtonVisibility('stop')" [disabled]="getButtonDisabledStatus('stop')" (click)="stopClick()">
-        <mat-icon>stop</mat-icon>
-      </button>
-      <button mat-fab (click)="saveClick()">
-        <mat-icon>save</mat-icon>
-      </button>
-      <mat-form-field style="width: 300px;">
-        <mat-label>Sheet ID</mat-label>
-        <input
-          matInput
-          class="form-control"
-          formControlName="sheetId"
-          >
-        <mat-error *ngIf="playbackForm.get('sheetId')?.hasError('required')">
-          Required
-        </mat-error>
-      </mat-form-field>
-      <button mat-fab (click)="loadSheetClick()">
-        <mat-icon>autorenew</mat-icon>
-      </button>
-      <mat-form-field style="width: 120px;">
-        <mat-label>Starting Row</mat-label>
-        <input
-          matInput
-          type="number"
-          class="form-control"
-          formControlName="startRow"
-          (change)="refreshRowFieldsValidity();"
-          >
-        <mat-error *ngIf="playbackForm.get('startRow')?.hasError('required')">
-          Required
-        </mat-error>
-        <mat-error *ngIf="playbackForm.get('startRow')?.hasError('min')">
-          Invalid
-        </mat-error>
-        <mat-error *ngIf="playbackForm.get('startRow')?.hasError('max')">
-          Invalid
-        </mat-error>
-      </mat-form-field>
-      <mat-form-field style="width: 120px;">
-        <mat-label>Ending Row</mat-label>
-        <input
-          matInput
-          type="number"
-          class="form-control"
-          formControlName="endRow"
-          (change)="refreshRowFieldsValidity();"
-          >
-        <mat-error *ngIf="playbackForm.get('endRow')?.hasError('required')">
-          Required
-        </mat-error>
-        <mat-error *ngIf="playbackForm.get('endRow')?.hasError('min')">
-          Invalid
-        </mat-error>
-        <mat-error *ngIf="playbackForm.get('endRow')?.hasError('max')">
-          Invalid
-        </mat-error>
-      </mat-form-field>
-      <div>
-        <mat-label>Vocal Speed</mat-label>
-        <mat-slider [min]="vocalSpeedRange.min" [max]="vocalSpeedRange.max" step="0.1" discrete>
-          <input matSliderThumb formControlName="vocalSpeed">
-        </mat-slider>
-      </div>
-      <div>
-        <mat-label>In-between Delay</mat-label>
-        <mat-slider [min]="inbetweenDelayRange.min" [max]="inbetweenDelayRange.max" step="0.1" discrete>
-          <input matSliderThumb formControlName="inbetweenDelay">
-        </mat-slider>
-      </div>
-      <div>
-        <mat-label>Repeat</mat-label>
-        <mat-checkbox formControlName="repeat"></mat-checkbox>
-      </div>
-      <div>
-        <mat-label>Reverse Playback</mat-label>
-        <mat-checkbox formControlName="reversePlayback" (change)="reverseChanged()"></mat-checkbox>
-      </div>
-      <div>
-        <mat-label>Meaning-to-word</mat-label>
-        <mat-checkbox formControlName="reverseSpeechOrder"></mat-checkbox>
-      </div>
-      <ng-container *ngFor="let _ of [].constructor(numberOfLanguages); let i = index">
-        <mat-form-field style="width: 300px;">
-          <mat-label>Select Language for Column {{ i + 1 }}</mat-label>
-          <mat-select [id]="'lang' + (i + 1)" [formControlName]="'lang' + (i + 1)" (selectionChange)="refreshVoiceDropdown(i + 1);">
-            <mat-option *ngFor="let option of masterLanguages" [value]="option.value">
-              {{ getLanguageName(option.label) }} ({{ option.label }})
-            </mat-option>
-          </mat-select>
-          <mat-error *ngIf="playbackForm.get('lang' + (i + 1))?.hasError('required')">
-            Required.
-          </mat-error>
-        </mat-form-field>
-        <mat-form-field style="width: 500px;">
-          <mat-label>Select Voice for Language {{ i + 1 }}</mat-label>
-          <mat-select [id]="'lang' + (i + 1) + 'Voice'" [formControlName]="'lang' + (i + 1) + 'Voice'">
-            <mat-option *ngFor="let option of populatedVoicesData[i]" [value]="option.value">
-              {{ option.label }}
-            </mat-option>
-          </mat-select>
-          <mat-error *ngIf="playbackForm.get('lang' + (i + 1) + 'Voice')?.hasError('required')">
-            Required.
-          </mat-error>
-        </mat-form-field>
-      </ng-container>
-    </div>
-  </form>
   <div id="table-container" class="table-container">
     <table>
       <thead>
@@ -144,6 +19,146 @@
       </tbody>
     </table>
   </div>
+  <mat-accordion>
+    <mat-expansion-panel [disabled]="true" #mep="matExpansionPanel">
+      <mat-expansion-panel-header collapsedHeight="100px">
+        <div style="display: flex; flex-direction: column; justify-content: center;">
+          <button mat-mini-fab (click)="mep.expanded = !mep.expanded">
+            <mat-icon>menu</mat-icon>
+          </button>
+        </div>
+        <mat-panel-description style="height: 100px; display: flex; flex-direction: row; justify-content: center; margin-right: 20px;">
+          <button mat-fab *ngIf="getButtonVisibility('backward')" [disabled]="getButtonDisabledStatus('backward')" (click)="rewindClick(); $event.stopPropagation();">
+            <mat-icon>fast_rewind</mat-icon>
+          </button>
+          <button mat-fab *ngIf="getButtonVisibility('play')" [disabled]="getButtonDisabledStatus('play')" (click)="playClick(); $event.stopPropagation();">
+            <mat-icon>play_arrow</mat-icon>
+          </button>
+          <button mat-fab *ngIf="getButtonVisibility('resume')" [disabled]="getButtonDisabledStatus('resume')" (click)="resumeClick(); $event.stopPropagation();">
+            <mat-icon>play_arrow</mat-icon>
+          </button>
+          <button mat-fab *ngIf="getButtonVisibility('pause')" [disabled]="getButtonDisabledStatus('pause')" (click)="pauseClick(); $event.stopPropagation();">
+            <mat-icon>pause</mat-icon>
+          </button>
+          <button mat-fab *ngIf="getButtonVisibility('forward')" [disabled]="getButtonDisabledStatus('forward')" (click)="forwardClick(); $event.stopPropagation();">
+            <mat-icon>fast_forward</mat-icon>
+          </button>
+          <button mat-fab *ngIf="getButtonVisibility('stop')" [disabled]="getButtonDisabledStatus('stop')" (click)="stopClick(); $event.stopPropagation();">
+            <mat-icon>stop</mat-icon>
+          </button>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <div style="height: 500px; overflow-y: scroll;">
+        <form id="form-container" class="form-container" [formGroup]="playbackForm">
+          <div>
+            <button mat-fab (click)="saveClick(); $event.stopPropagation();">
+              <mat-icon>save</mat-icon>
+            </button>
+            <mat-form-field style="width: 300px;">
+              <mat-label>Sheet ID</mat-label>
+              <input
+                matInput
+                class="form-control"
+                formControlName="sheetId"
+                >
+              <mat-error *ngIf="playbackForm.get('sheetId')?.hasError('required')">
+                Required
+              </mat-error>
+            </mat-form-field>
+            <button mat-fab (click)="loadSheetClick()">
+              <mat-icon>autorenew</mat-icon>
+            </button>
+            <mat-form-field style="width: 120px;">
+              <mat-label>Starting Row</mat-label>
+              <input
+                matInput
+                type="number"
+                class="form-control"
+                formControlName="startRow"
+                (change)="refreshRowFieldsValidity();"
+                >
+              <mat-error *ngIf="playbackForm.get('startRow')?.hasError('required')">
+                Required
+              </mat-error>
+              <mat-error *ngIf="playbackForm.get('startRow')?.hasError('min')">
+                Invalid
+              </mat-error>
+              <mat-error *ngIf="playbackForm.get('startRow')?.hasError('max')">
+                Invalid
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field style="width: 120px;">
+              <mat-label>Ending Row</mat-label>
+              <input
+                matInput
+                type="number"
+                class="form-control"
+                formControlName="endRow"
+                (change)="refreshRowFieldsValidity();"
+                >
+              <mat-error *ngIf="playbackForm.get('endRow')?.hasError('required')">
+                Required
+              </mat-error>
+              <mat-error *ngIf="playbackForm.get('endRow')?.hasError('min')">
+                Invalid
+              </mat-error>
+              <mat-error *ngIf="playbackForm.get('endRow')?.hasError('max')">
+                Invalid
+              </mat-error>
+            </mat-form-field>
+            <div>
+              <mat-label>Vocal Speed</mat-label>
+              <mat-slider [min]="vocalSpeedRange.min" [max]="vocalSpeedRange.max" step="0.1" discrete>
+                <input matSliderThumb formControlName="vocalSpeed">
+              </mat-slider>
+            </div>
+            <div>
+              <mat-label>In-between Delay</mat-label>
+              <mat-slider [min]="inbetweenDelayRange.min" [max]="inbetweenDelayRange.max" step="0.1" discrete>
+                <input matSliderThumb formControlName="inbetweenDelay">
+              </mat-slider>
+            </div>
+            <div>
+              <mat-label>Repeat</mat-label>
+              <mat-checkbox formControlName="repeat"></mat-checkbox>
+            </div>
+            <div>
+              <mat-label>Reverse Playback</mat-label>
+              <mat-checkbox formControlName="reversePlayback" (change)="reverseChanged()"></mat-checkbox>
+            </div>
+            <div>
+              <mat-label>Meaning-to-word</mat-label>
+              <mat-checkbox formControlName="reverseSpeechOrder"></mat-checkbox>
+            </div>
+            <ng-container *ngFor="let _ of [].constructor(numberOfLanguages); let i = index">
+              <mat-form-field style="width: 300px;">
+                <mat-label>Select Language for Column {{ i + 1 }}</mat-label>
+                <mat-select [id]="'lang' + (i + 1)" [formControlName]="'lang' + (i + 1)" (selectionChange)="refreshVoiceDropdown(i + 1);">
+                  <mat-option *ngFor="let option of masterLanguages" [value]="option.value">
+                    {{ getLanguageName(option.label) }} ({{ option.label }})
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="playbackForm.get('lang' + (i + 1))?.hasError('required')">
+                  Required.
+                </mat-error>
+              </mat-form-field>
+              <mat-form-field style="width: 500px;">
+                <mat-label>Select Voice for Language {{ i + 1 }}</mat-label>
+                <mat-select [id]="'lang' + (i + 1) + 'Voice'" [formControlName]="'lang' + (i + 1) + 'Voice'">
+                  <mat-option *ngFor="let option of populatedVoicesData[i]" [value]="option.value">
+                    {{ option.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="playbackForm.get('lang' + (i + 1) + 'Voice')?.hasError('required')">
+                  Required.
+                </mat-error>
+              </mat-form-field>
+            </ng-container>
+          </div>
+        </form>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
   <ngx-loading
     [show]="loading"
     [config]="{ backdropBackgroundColour: 'rgba(0, 0, 0, 0.8)' }"
