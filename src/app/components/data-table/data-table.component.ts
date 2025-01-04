@@ -496,7 +496,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.router.navigate([], {
       queryParams: {},
     });
-    this.toastr.success("Settings Cleaned Successfully", "", {
+    this.toastr.success("Saved Changes Cleaned Successfully", "", {
       timeOut: 3000
     });
   }
