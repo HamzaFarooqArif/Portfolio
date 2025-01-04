@@ -88,7 +88,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       endRow: ['', Validators.required],
       vocalSpeed: [1],
       inbetweenDelay: [0],
-      repeat: [true],
+      repeat: [false],
       reversePlayback: [false],
       reverseSpeechOrder: [false],
     });
@@ -502,8 +502,21 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
   loadSheetClick() {
-    this.spreadsheetService.setSheetId(this.playbackForm.get('sheetId')?.value);
-    this.fetchData();
+    if(this.playbackForm.get('sheetId')?.valid) {
+      let input = this.playbackForm.get('sheetId')?.value;
+      const isSheetId = /^[a-zA-Z0-9-_]+$/.test(input); // Validate plain sheetId format
+      if (isSheetId) {
+        this.playbackForm.get('sheetId')?.setValue(input);
+      }
+      else {
+        const match = input.match(/\/d\/([a-zA-Z0-9-_]+)/);
+        if(match) {
+          this.playbackForm.get('sheetId')?.setValue(match[1]);
+        }
+      }
+      this.spreadsheetService.setSheetId(this.playbackForm.get('sheetId')?.value);
+      this.fetchData();
+    }
   }
 
   loadSavedData() {
