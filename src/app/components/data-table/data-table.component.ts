@@ -93,9 +93,19 @@ export class DataTableComponent implements OnInit, OnDestroy {
       reverseSpeechOrder: [false],
     });
 
-    this.speechService.getLangsAsync().then((voices: SpeechSynthesisVoice[]) => {
+    this.speechService.getLangsAsync()
+    .then((voices: SpeechSynthesisVoice[]) => {
       this.allVoices = voices;
       this.initializeDropdowns();
+    })
+    .catch((error: any) => {
+      // console.error(error);
+      this.speechService.init().then(() => {
+        this.speechService.getLangsAsync().then((voices: SpeechSynthesisVoice[]) => {
+          this.allVoices = voices;
+          this.initializeDropdowns();
+        });
+      });
     });
 
     for (let i = 0; i < this.numberOfLanguages; i++) {
@@ -686,6 +696,15 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
   async keepScreenOn(): Promise<void> {
+    let interval = setInterval(() => {
+      if(!this.wakeLock || this.wakeLock?.released == true) {
+        console.log('Retrying Wake Lock...');
+        this.applyScreenOn();
+      }
+    }, 1000);
+  }
+
+  async applyScreenOn(): Promise<void> {
     try {
       if ('wakeLock' in navigator) {
         this.wakeLock = await navigator.wakeLock.request('screen');
@@ -694,12 +713,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
         console.error('Screen Wake Lock API is not supported on this device.');
       }
     } catch (err: any) {
-      console.error(`Failed to activate screen wake lock: ${err?.message}`);
-      console.log('Retrying Wake Lock...');
-      let timeOut = setTimeout(() => {
-        clearTimeout(timeOut);
-        this.keepScreenOn();
-      }, 1000);
+      // console.error(`Failed to activate screen wake lock: ${err?.message}`);
     }
   }
 

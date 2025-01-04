@@ -6,7 +6,9 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class SpeechService {
-
+  private _maxTimeout: number = 5000;
+  private _interval: number = 250;
+  
   private isPaused: boolean = false;
   private isStopped: boolean = true;
 
@@ -14,20 +16,19 @@ export class SpeechService {
     this.init();
   }
 
-  init() {
-    EasySpeech.init({ maxTimeout: 5000, interval: 250 })
-    .then(() => console.log('easy-speech load complete'))
-    .catch(e => console.error(e));
+  init(): Promise<boolean> {
+    return EasySpeech.init({ maxTimeout: this._maxTimeout, interval: this._interval });
   }
 
   getLangsAsync(): Promise<SpeechSynthesisVoice[]> {
-    return new Promise((resolve) => {
-      let interval = setInterval(() => {
-        if(EasySpeech.status().status != 'created') {
-          clearInterval(interval);
-          resolve(EasySpeech.voices());
-        }
-      }, 10);
+    return new Promise((resolve, reject) => {
+      try {
+        let result = EasySpeech.voices();
+        resolve(result);
+      }
+      catch (error: any) {
+        reject(error);
+      }
     });
   }
 
