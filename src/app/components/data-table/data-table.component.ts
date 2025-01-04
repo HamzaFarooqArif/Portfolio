@@ -491,6 +491,16 @@ export class DataTableComponent implements OnInit, OnDestroy {
     });
   }
 
+  deleteClick() {
+    localStorage.clear();
+    this.router.navigate([], {
+      queryParams: {},
+    });
+    this.toastr.success("Settings Cleaned Successfully", "", {
+      timeOut: 3000
+    });
+  }
+
   loadSheetClick() {
     this.spreadsheetService.setSheetId(this.playbackForm.get('sheetId')?.value);
     this.fetchData();
