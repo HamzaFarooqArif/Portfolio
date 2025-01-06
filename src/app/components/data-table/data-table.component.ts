@@ -34,6 +34,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   formQueryParams: Params | null | undefined;
   vocalSpeedRange: {min: number, max: number} = {min: 0.1, max: 2};
   inbetweenDelayRange: {min: number, max: number} = {min: 0, max: 3};
+  playedIndices: number[] = [];
 
   constructor(
     private spreadsheetService: SpreadsheetService,
@@ -147,6 +148,11 @@ export class DataTableComponent implements OnInit, OnDestroy {
         visible: true,
         disabled: false
       },
+      {
+        name: 'reverse',
+        visible: true,
+        disabled: false
+      },
     ];
   }
 
@@ -179,15 +185,12 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
   refreshPlaybackButtons() {
+    this.refreshButtonsWithshuffle();
     if(this.isSpeaking) {
       this.setButtonVisibility('play', false);
       this.setButtonVisibility('resume', false);
       this.setButtonVisibility('pause', true);
       this.setButtonDisabledStatus('pause', false);
-      this.setButtonVisibility('forward', true);
-      this.setButtonDisabledStatus('forward', false);
-      this.setButtonVisibility('backward', true);
-      this.setButtonDisabledStatus('backward', false);
       this.setButtonVisibility('stop', true);
       this.setButtonDisabledStatus('stop', false);
     }
@@ -207,10 +210,6 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.setButtonVisibility('resume', true);
       this.setButtonDisabledStatus('resume', false);
       this.setButtonVisibility('pause', false);
-      this.setButtonVisibility('forward', true);
-      this.setButtonDisabledStatus('forward', false);
-      this.setButtonVisibility('backward', true);
-      this.setButtonDisabledStatus('backward', false);
       this.setButtonVisibility('stop', true);
       this.setButtonDisabledStatus('stop', false);
     }
@@ -464,6 +463,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.playbackForm.get('sheetId')?.enable();
     this.highlightWord(-1, -1);
     this.speechService.stopSpeech();
+    this.playedIndices = [];
   }
 
   saveClick() {
@@ -599,6 +599,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.playbackForm.get('startRow')?.enable();
       this.playbackForm.get('endRow')?.enable();
       this.playbackForm.get('sheetId')?.enable();
+      this.playedIndices = [];
       return;
     }
 
@@ -609,6 +610,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       let vocalSpeed = Number(this.playbackForm?.get('vocalSpeed')?.value);
       let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
       if(text && voice) {
+        this.addToPlayed(this.currentRow);
         await this.speechService.speakAsync(text, voice, vocalSpeed);
       }
       if(reverseSpeechOrder) {
@@ -643,6 +645,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     else {
       let repeat = this.playbackForm?.get('repeat')?.value;
       if(repeat) {
+        this.playedIndices = [];
         this.playClick();
       }
       else {
@@ -653,6 +656,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
         this.playbackForm.get('endRow')?.enable();
         this.playbackForm.get('sheetId')?.enable();
         this.highlightWord(-1, -1);
+        this.playedIndices = [];
         return;
       }
     }
@@ -660,13 +664,18 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   setNextCell() {
     let reverse: boolean = this.playbackForm?.get('reversePlayback')?.value;
+    let shuffle: boolean = this.playbackForm?.get('shuffle')?.value;
     let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
 
     if(reverse) {
       if(reverseSpeechOrder) {
         if(this.currentColumn == 0) {
           this.currentColumn = this.tableData[0]?.length - 1;
-          this.currentRow -= 1;
+          if(shuffle) {
+            this.currentRow = this.getRandomRow();
+          } else {
+            this.currentRow -= 1;
+          }
         }
         else {
           this.currentColumn -= 1;
@@ -675,7 +684,11 @@ export class DataTableComponent implements OnInit, OnDestroy {
       else {
         if(this.currentColumn == this.tableData[0]?.length - 1) {
           this.currentColumn = 0;
-          this.currentRow -= 1;  
+          if(shuffle) {
+            this.currentRow = this.getRandomRow();
+          } else {
+            this.currentRow -= 1;
+          }  
         }
         else {
           this.currentColumn += 1;
@@ -686,7 +699,11 @@ export class DataTableComponent implements OnInit, OnDestroy {
       if(reverseSpeechOrder) {
         if(this.currentColumn == 0) {
           this.currentColumn = this.tableData[0]?.length - 1;
-          this.currentRow += 1;  
+          if(shuffle) {
+            this.currentRow = this.getRandomRow();
+          } else {
+            this.currentRow += 1;
+          }  
         }
         else {
           this.currentColumn -= 1;
@@ -695,7 +712,11 @@ export class DataTableComponent implements OnInit, OnDestroy {
       else {
         if(this.currentColumn == this.tableData[0]?.length - 1) {
           this.currentColumn = 0;
-          this.currentRow += 1;  
+          if(shuffle) {
+            this.currentRow = this.getRandomRow();
+          } else {
+            this.currentRow += 1;
+          }  
         }
         else {
           this.currentColumn += 1;
@@ -712,7 +733,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       return this.currentRow > 0 && (startRowInputVal > endRowInputVal && this.currentRow >= endRowInputVal);
     }
     else {
-      return this.currentRow < this.tableData?.length && (startRowInputVal < endRowInputVal && this.currentRow <= endRowInputVal);
+      return this.currentRow > -1 && this.currentRow < this.tableData?.length && (startRowInputVal < endRowInputVal && this.currentRow <= endRowInputVal);
     }
   }
 
@@ -748,6 +769,57 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.wakeLock = null;
       console.log('Screen Wake Lock released');
     }
+  }
+
+  addToPlayed(val: number) {
+    if(!this.playedIndices.includes(val)) {
+      this.playedIndices.push(val);
+    }
+  }
+
+  getRandomRow(): number {
+    let min = this.playbackForm.get('startRow')?.value;
+    let max = this.playbackForm.get('endRow')?.value;
+    if(max < min) {
+      let temp = max;
+      max = min;
+      min = temp;
+    }
+
+    const possibleNumbers = [];
+    for (let i = min; i <= max; i++) {
+      if (!this.playedIndices.includes(i)) {
+        possibleNumbers.push(i);
+      }
+    }
+  
+    if (possibleNumbers.length === 0) {
+      return -1;
+    }
+  
+    const randomIndex = Math.floor(Math.random() * possibleNumbers.length);
+    return possibleNumbers[randomIndex];
+  }
+
+  refreshButtonsWithshuffle() {
+    if(this.playbackForm.get('shuffle')?.value)
+    {
+      this.setButtonDisabledStatus('forward', true);
+      this.setButtonDisabledStatus('backward', true);
+      this.setButtonDisabledStatus('reverse', true);
+    }
+    else {
+      this.setButtonDisabledStatus('forward', false);
+      this.setButtonDisabledStatus('backward', false);
+      this.setButtonDisabledStatus('reverse', false);
+    }
+  }
+
+  shuffleCheckboxChanged() {
+    let timeout = setTimeout(() => {
+      clearTimeout(timeout);
+      this.refreshPlaybackButtons();
+    }, 1);
   }
 
   ngOnDestroy(): void {

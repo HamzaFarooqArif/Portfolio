@@ -47,7 +47,7 @@
               </div>
               <div style="width: 100%; display: flex; flex-direction: row; justify-content: center; margin-top: 10px;">
                 <mat-checkbox style="display: none;" formControlName="reversePlayback" #reverseCheckbox (change)="reverseChanged()"></mat-checkbox>
-                <button class="playback-btn" mat-mini-fab (click)="reverseCheckbox.toggle(); reverseChanged(); $event.stopPropagation();">
+                <button class="playback-btn" mat-mini-fab (click)="reverseCheckbox.toggle(); reverseChanged(); $event.stopPropagation();" *ngIf="getButtonVisibility('reverse')" [disabled]="getButtonDisabledStatus('reverse')">
                   <mat-icon *ngIf="reverseCheckbox.checked">north</mat-icon>
                   <mat-icon *ngIf="!reverseCheckbox.checked">south</mat-icon>
                 </button>
@@ -121,7 +121,7 @@
                 </div>
                 <div style="margin-left: 10px;">
                   <mat-checkbox style="display: none;" formControlName="shuffle" #shuffleCheckbox></mat-checkbox>
-                  <button mat-fab extended (click)="shuffleCheckbox.toggle(); $event.stopPropagation();" [ngClass]="{'btn-pressed': shuffleCheckbox.checked}">
+                  <button mat-fab extended (click)="shuffleCheckboxChanged(); shuffleCheckbox.toggle(); $event.stopPropagation();" [ngClass]="{'btn-pressed': shuffleCheckbox.checked}">
                     <mat-icon *ngIf="shuffleCheckbox.checked">shuffle_on</mat-icon>
                     <mat-icon *ngIf="!shuffleCheckbox.checked">shuffle</mat-icon>
                     Shuffle
