@@ -60,6 +60,11 @@ td, th {
   margin: 5px;
 }
 
+:host ::ng-deep .btn-pressed {
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3),
+              inset -2px -2px 5px rgba(0, 0, 0, 0.3) !important;
+}
+
 :host ::ng-deep .mat-expansion-panel-body {
   padding-right: 0px;
 }

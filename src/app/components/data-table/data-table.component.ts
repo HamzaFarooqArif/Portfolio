@@ -89,6 +89,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       vocalSpeed: [1],
       inbetweenDelay: [0],
       repeat: [false],
+      shuffle: [false],
       reversePlayback: [false],
       reverseSpeechOrder: [false],
     });
@@ -556,6 +557,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     }
     this.playbackForm.get('reversePlayback')?.patchValue(this.checkForTruthy(savedData['reversePlayback']));
     this.playbackForm.get('repeat')?.patchValue(this.checkForTruthy(savedData['repeat']));
+    this.playbackForm.get('shuffle')?.patchValue(this.checkForTruthy(savedData['shuffle']));
     this.playbackForm.get('reverseSpeechOrder')?.patchValue(this.checkForTruthy(savedData['reverseSpeechOrder']));
     
     for(let i = 0; i < this.numberOfLanguages; i++) {

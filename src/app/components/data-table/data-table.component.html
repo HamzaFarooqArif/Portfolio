@@ -112,8 +112,20 @@
               </mat-form-field>
               <div style="display: flex; flex-direction: row; align-items: center; margin-left: 10px;">
                 <div>
-                  <mat-label>Repeat</mat-label>
-                  <mat-checkbox formControlName="repeat"></mat-checkbox>
+                  <mat-checkbox formControlName="repeat" style="display: none;" #repeatCheckbox></mat-checkbox>
+                  <button mat-fab extended (click)="repeatCheckbox.toggle(); $event.stopPropagation();" [ngClass]="{'btn-pressed': repeatCheckbox.checked}">
+                    <mat-icon *ngIf="repeatCheckbox.checked">repeat_on</mat-icon>
+                    <mat-icon *ngIf="!repeatCheckbox.checked">repeat</mat-icon>
+                    Repeat
+                  </button>
+                </div>
+                <div style="margin-left: 10px;">
+                  <mat-checkbox style="display: none;" formControlName="shuffle" #shuffleCheckbox></mat-checkbox>
+                  <button mat-fab extended (click)="shuffleCheckbox.toggle(); $event.stopPropagation();" [ngClass]="{'btn-pressed': shuffleCheckbox.checked}">
+                    <mat-icon *ngIf="shuffleCheckbox.checked">shuffle_on</mat-icon>
+                    <mat-icon *ngIf="!shuffleCheckbox.checked">shuffle</mat-icon>
+                    Shuffle
+                  </button>
                 </div>
               </div>
             </div>
