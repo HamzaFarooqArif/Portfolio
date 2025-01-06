@@ -8,6 +8,7 @@ import { ConfigService } from '../../services/config/config.service';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { isEmpty } from '../../Utilities/Utility';
+import { debounceTime, Subject } from 'rxjs';
 
 
 @Component({
@@ -35,6 +36,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
   vocalSpeedRange: {min: number, max: number} = {min: 0.1, max: 2};
   inbetweenDelayRange: {min: number, max: number} = {min: 0, max: 3};
   playedIndices: number[] = [];
+  jumpInterval: number = 200;
+  private skipSubject = new Subject<void>();
 
   constructor(
     private spreadsheetService: SpreadsheetService,
@@ -56,6 +59,15 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.setGoogleSheetId();
     this.fetchData();
     this.keepScreenOn();
+
+    this.skipSubject.pipe(
+      debounceTime(this.jumpInterval)
+    ).subscribe(() => {
+      this.isSpeaking = true;
+      this.speechService.resumeSpeech();
+      this.refreshPlaybackButtons();
+      this.speakNow();
+    });
   }
 
   setGoogleSheetId() {
@@ -386,6 +398,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   rewindClick() {
     let reverse: boolean = this.playbackForm?.get('reversePlayback')?.value;
+    let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
     let startRow = Number(this.playbackForm.get('startRow')?.value);
     if(reverse) {
       if(this.currentRow < startRow) {
@@ -397,12 +410,24 @@ export class DataTableComponent implements OnInit, OnDestroy {
         this.currentRow--;
       }
     }
+    if(reverseSpeechOrder) {
+      this.currentColumn = this.tableData[0]?.length - 1;
+    }
+    else {
+      this.currentColumn = 0;
+    }
     this.highlightWord(this.currentRow-1, this.currentColumn);
     this.refreshPlaybackButtons();
+
+    this.isSpeaking = false;
+    this.speechService.stopSpeech();
+    this.speechService.pauseSpeech();
+    this.skipSubject.next();
   }
 
   forwardClick() {
     let reverse: boolean = this.playbackForm?.get('reversePlayback')?.value;
+    let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
     let endRow = Number(this.playbackForm.get('endRow')?.value);
     if(reverse) {
       if(this.currentRow > endRow) {
@@ -414,8 +439,19 @@ export class DataTableComponent implements OnInit, OnDestroy {
         this.currentRow++;
       }
     }
+    if(reverseSpeechOrder) {
+      this.currentColumn = this.tableData[0]?.length - 1;
+    }
+    else {
+      this.currentColumn = 0;
+    }
     this.highlightWord(this.currentRow-1, this.currentColumn);
     this.refreshPlaybackButtons();
+
+    this.isSpeaking = false;
+    this.speechService.stopSpeech();
+    this.speechService.pauseSpeech();
+    this.skipSubject.next();
   }
 
   resumeClick() {
@@ -593,6 +629,16 @@ export class DataTableComponent implements OnInit, OnDestroy {
     }
   }
 
+  async speakNow() {
+    let text = this.tableData[this.currentRow][this.currentColumn];
+    let voice: SpeechSynthesisVoice | undefined = this.getSpeechSynthesisVoice(`lang${this.currentColumn + 1}Voice`);
+    let vocalSpeed = Number(this.playbackForm?.get('vocalSpeed')?.value);
+    if(text && voice) {
+      this.addToPlayed(this.currentRow);
+      await this.speechService.speakAsync(text, voice, vocalSpeed);
+    }
+  }
+
   async playAllTexts(): Promise<void> {
     if(this.isStopped) {
       this.highlightWord(-1, -1);
@@ -605,14 +651,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
     if(this.speechTerminationCriteria()) {
       this.highlightWord(this.currentRow-1, this.currentColumn);
-      let text = this.tableData[this.currentRow][this.currentColumn];
-      let voice: SpeechSynthesisVoice | undefined = this.getSpeechSynthesisVoice(`lang${this.currentColumn + 1}Voice`);
-      let vocalSpeed = Number(this.playbackForm?.get('vocalSpeed')?.value);
       let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
-      if(text && voice) {
-        this.addToPlayed(this.currentRow);
-        await this.speechService.speakAsync(text, voice, vocalSpeed);
-      }
+      await this.speakNow();
       if(reverseSpeechOrder) {
         if(this.currentColumn > 0) {
           let delay = Number(this.playbackForm.get('inbetweenDelay')?.value);

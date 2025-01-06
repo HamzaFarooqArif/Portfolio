@@ -10,7 +10,10 @@ export class SpeechService {
   private _interval: number = 250;
   
   private isPaused: boolean = false;
-  private isStopped: boolean = true;
+
+  public get easySpeechSpeaking() {
+    return (EasySpeech.status() as any)?.speechSynthesis?.speaking;
+  }
 
   constructor() {
     this.init();
@@ -33,7 +36,19 @@ export class SpeechService {
   }
 
   async speakAsync(text: string, voice: SpeechSynthesisVoice, vocalSpeed?: number): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
+      
+      let alreadyResolved: boolean = false;
+      let interval2 = setInterval(() => {
+        if(!this.isPaused && !alreadyResolved && !(EasySpeech.status() as any)?.speechSynthesis?.speaking) {
+          clearInterval(interval2);
+          resolve();
+        }
+        else if(alreadyResolved) {
+          clearInterval(interval2);
+        }
+      }, 200);
+
       let interval = setInterval(() => {
         if(EasySpeech.status().status != 'created') {
           clearInterval(interval);
@@ -48,16 +63,18 @@ export class SpeechService {
                 let interval = setInterval(() => {
                   if(!this.isPaused) {
                     clearInterval(interval);
+                    alreadyResolved = true;
                     resolve();
                   }
                 }, 10);
               }
               else {
+                alreadyResolved = true;
                 resolve();
               }
             })
             .catch((err) => {
-              reject(err);
+
             });
         }
       }, 10);
@@ -66,7 +83,6 @@ export class SpeechService {
 
   stopSpeech() {
     this.isPaused = false;
-    this.isStopped = true;
     EasySpeech.cancel();
   }
 
