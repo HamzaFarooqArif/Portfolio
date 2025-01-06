@@ -59,11 +59,11 @@
               </div>
             </div>
             <div style="width: 45%; display: flex; flex-direction: row; justify-content: end; padding-right: 10px;">
-              <button class="menu-mat-fab" mat-fab extended (click)="mep.expanded = !mep.expanded">
+              <button [ngClass]="{'btn-pressed': mep.expanded}" class="menu-mat-fab" mat-fab extended (click)="mep.expanded = !mep.expanded">
                 <mat-icon>menu</mat-icon>
                 Menu
               </button>
-              <button class="menu-mini-fab" mat-mini-fab extended (click)="mep.expanded = !mep.expanded">
+              <button [ngClass]="{'btn-pressed': mep.expanded}" class="menu-mini-fab" mat-mini-fab extended (click)="mep.expanded = !mep.expanded">
                 <mat-icon>menu</mat-icon>
               </button>
             </div>
