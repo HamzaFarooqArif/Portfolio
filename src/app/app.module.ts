@@ -20,6 +20,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { NgxLoadingModule } from "ngx-loading";
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatButtonModule} from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 export function loadAppConfig(configService: ConfigService): () => Promise<void> {
   return () =>
@@ -49,6 +50,7 @@ export function loadAppConfig(configService: ConfigService): () => Promise<void>
     MatIconModule,
     MatExpansionModule,
     MatButtonModule,
+    MatTooltipModule,
     ToastrModule.forRoot(),
     NgxLoadingModule.forRoot({}),
   ],

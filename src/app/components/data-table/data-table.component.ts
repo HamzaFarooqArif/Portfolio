@@ -111,14 +111,14 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.speechService.getLangsAsync()
     .then((voices: SpeechSynthesisVoice[]) => {
       this.allVoices = voices;
-      this.initializeDropdowns();
+      this.initializeMasterLanguages();
     })
     .catch((error: any) => {
       // console.error(error);
       this.speechService.init().then(() => {
         this.speechService.getLangsAsync().then((voices: SpeechSynthesisVoice[]) => {
           this.allVoices = voices;
-          this.initializeDropdowns();
+          this.initializeMasterLanguages();
         });
       });
     });
@@ -278,8 +278,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     return {min: min, max: max};
   }
 
-  initializeDropdowns() {
-    let preferredLangs = this.configService.getConfigValue("preferredLangs");
+  initializeMasterLanguages() {
     Array.from(new Set(this.allVoices.map(item => item.lang))).forEach((item: string) => {
       this.masterLanguages.push(
         {
@@ -288,12 +287,18 @@ export class DataTableComponent implements OnInit, OnDestroy {
         }
       );
     });
+  }
+
+  initializeDropdowns() {
+    let preferredLangs = this.configService.getConfigValue("preferredLangs");
 
     for(let i = 0; i < this.numberOfLanguages; i++) {
-      let preferredLang = this.masterLanguages.find(x => {
-        return preferredLangs?.length > i && preferredLangs[i].some((langItem: string) => langItem == x.value);
-      })?.value ?? this.masterLanguages[0].value;
-      this.playbackForm.get(`lang${i+1}`)?.setValue(preferredLang);
+      if(this.playbackForm.get(`lang${i+1}`)?.value?.length == 0) {
+        let preferredLang = this.masterLanguages.find(x => {
+          return preferredLangs?.length > i && preferredLangs[i].some((langItem: string) => langItem == x.value);
+        })?.value ?? this.masterLanguages[0].value;
+        this.playbackForm.get(`lang${i+1}`)?.setValue(preferredLang);
+      }
       this.refreshVoiceDropdown(i+1);
     }
   }
@@ -564,10 +569,12 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.route.queryParams.subscribe(params => {
         savedData = params;
         this.patchSavedData(savedData);
+        this.initializeDropdowns();
       });
     }
     else {
       this.patchSavedData(savedData);
+      this.initializeDropdowns();
     }
   }
 
@@ -873,6 +880,53 @@ export class DataTableComponent implements OnInit, OnDestroy {
       clearTimeout(timeout);
       this.refreshPlaybackButtons();
     }, 1);
+  }
+
+  resetRangeSlider(controlName: string) {
+    if(controlName == "inbetweenDelayRow") {
+      this.playbackForm.get(controlName)?.setValue(0);
+    }
+    else if(controlName == "inbetweenDelayColumn") {
+      this.playbackForm.get(controlName)?.setValue(0);
+    }
+    else if(controlName == "vocalSpeed") {
+      this.playbackForm.get(controlName)?.setValue(1);
+    }
+  }
+
+  resetToDefaults() {
+    this.playbackForm.get('sheetId')?.patchValue(this.configService.getConfigValue("googleSheetsId"));
+    this.spreadsheetService.setSheetId(this.playbackForm.get('sheetId')?.value);
+    this.loading = true;
+    this.playbackForm.disable();
+    this.playbackForm.get('sheetId')?.enable();
+    this.fetchDataAndParseAsync().then((data: string[][]) => {
+      this.loading = false;
+      this.playbackForm.enable();
+      this.tableData = data;
+      this.playbackForm.get('repeat')?.setValue(false);
+      this.playbackForm.get('shuffle')?.setValue(false);
+      this.playbackForm.get('reversePlayback')?.setValue(false);
+      this.playbackForm.get('reverseSpeechOrder')?.setValue(false);
+      if(this.tableData?.length) {
+        this.playbackForm.get('startRow')?.setValue(1);
+        this.playbackForm.get('endRow')?.setValue(this.tableData?.length - 1);
+        this.refreshRowFieldsValidity();
+      }
+      this.resetRangeSlider("inbetweenDelayRow");
+      this.resetRangeSlider("inbetweenDelayColumn");
+      this.resetRangeSlider("vocalSpeed");
+      for(let i = 0; i < this.numberOfLanguages; i++) {
+        this.playbackForm.get(`lang${i+1}`)?.setValue("");
+      }
+      this.initializeDropdowns();
+      this.refreshPlaybackButtons();
+    }, err => {
+      this.loading = false;
+      this.toastr.error("Please check the 'Sheet ID' and make sure that the sheet has the public access", "Unable fetch sheet", {
+        timeOut: 5000
+      });
+    });
   }
 
   ngOnDestroy(): void {

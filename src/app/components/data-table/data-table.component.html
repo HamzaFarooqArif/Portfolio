@@ -26,44 +26,44 @@
           <mat-panel-description style="height: 140px; display: flex; flex-direction: row; justify-content: end;">
             <div style="display: flex; flex-direction: column; align-items: end;">
               <div style="width: 50%; display: flex; flex-direction: row; justify-content: end;">
-                <button class="playback-btn" mat-fab *ngIf="getButtonVisibility('backward')" [disabled]="getButtonDisabledStatus('backward')" (click)="rewindClick(); $event.stopPropagation();">
+                <button matTooltip="Backward Jump" class="playback-btn" mat-fab *ngIf="getButtonVisibility('backward')" [disabled]="getButtonDisabledStatus('backward')" (click)="rewindClick(); $event.stopPropagation();">
                   <mat-icon>fast_rewind</mat-icon>
                 </button>
-                <button class="playback-btn" mat-fab *ngIf="getButtonVisibility('play')" [disabled]="getButtonDisabledStatus('play')" (click)="playClick(); $event.stopPropagation();">
+                <button matTooltip="Play" class="playback-btn" mat-fab *ngIf="getButtonVisibility('play')" [disabled]="getButtonDisabledStatus('play')" (click)="playClick(); $event.stopPropagation();">
                   <mat-icon>play_arrow</mat-icon>
                 </button>
-                <button class="playback-btn" mat-fab *ngIf="getButtonVisibility('resume')" [disabled]="getButtonDisabledStatus('resume')" (click)="resumeClick(); $event.stopPropagation();">
+                <button matTooltip="Resume" class="playback-btn" mat-fab *ngIf="getButtonVisibility('resume')" [disabled]="getButtonDisabledStatus('resume')" (click)="resumeClick(); $event.stopPropagation();">
                   <mat-icon>play_arrow</mat-icon>
                 </button>
-                <button class="playback-btn" mat-fab *ngIf="getButtonVisibility('pause')" [disabled]="getButtonDisabledStatus('pause')" (click)="pauseClick(); $event.stopPropagation();">
+                <button matTooltip="Pause" class="playback-btn" mat-fab *ngIf="getButtonVisibility('pause')" [disabled]="getButtonDisabledStatus('pause')" (click)="pauseClick(); $event.stopPropagation();">
                   <mat-icon>pause</mat-icon>
                 </button>
-                <button class="playback-btn" mat-fab *ngIf="getButtonVisibility('forward')" [disabled]="getButtonDisabledStatus('forward')" (click)="forwardClick(); $event.stopPropagation();">
+                <button matTooltip="Forward Jump" class="playback-btn" mat-fab *ngIf="getButtonVisibility('forward')" [disabled]="getButtonDisabledStatus('forward')" (click)="forwardClick(); $event.stopPropagation();">
                   <mat-icon>fast_forward</mat-icon>
                 </button>
-                <button class="playback-btn" mat-fab *ngIf="getButtonVisibility('stop')" [disabled]="getButtonDisabledStatus('stop')" (click)="stopClick(); $event.stopPropagation();">
+                <button matTooltip="Stop" class="playback-btn" mat-fab *ngIf="getButtonVisibility('stop')" [disabled]="getButtonDisabledStatus('stop')" (click)="stopClick(); $event.stopPropagation();">
                   <mat-icon>stop</mat-icon>
                 </button>
               </div>
               <div style="width: 100%; display: flex; flex-direction: row; justify-content: center; margin-top: 10px;">
                 <mat-checkbox style="display: none;" formControlName="reversePlayback" #reverseCheckbox (change)="reverseChanged()"></mat-checkbox>
-                <button class="playback-btn" mat-mini-fab (click)="reverseCheckbox.toggle(); reverseChanged(); $event.stopPropagation();" *ngIf="getButtonVisibility('reverse')" [disabled]="getButtonDisabledStatus('reverse')">
+                <button matTooltip="Vertical Reverse" class="playback-btn" mat-mini-fab (click)="reverseCheckbox.toggle(); reverseChanged(); $event.stopPropagation();" *ngIf="getButtonVisibility('reverse')" [disabled]="getButtonDisabledStatus('reverse')">
                   <mat-icon *ngIf="reverseCheckbox.checked">north</mat-icon>
                   <mat-icon *ngIf="!reverseCheckbox.checked">south</mat-icon>
                 </button>
                 <mat-checkbox style="display: none;" #reverseSpeechCheckbox formControlName="reverseSpeechOrder"></mat-checkbox>
-                <button class="playback-btn" mat-mini-fab (click)="reverseSpeechCheckbox.toggle(); $event.stopPropagation();">
+                <button matTooltip="Horizontal Reverse" class="playback-btn" mat-mini-fab (click)="reverseSpeechCheckbox.toggle(); $event.stopPropagation();">
                   <mat-icon *ngIf="reverseSpeechCheckbox.checked">west</mat-icon>
                   <mat-icon *ngIf="!reverseSpeechCheckbox.checked">east</mat-icon>
                 </button>
               </div>
             </div>
             <div style="width: 45%; display: flex; flex-direction: row; justify-content: end; padding-right: 10px;">
-              <button [ngClass]="{'btn-pressed': mep.expanded}" class="menu-mat-fab" mat-fab extended (click)="mep.expanded = !mep.expanded">
+              <button matTooltip="Toggle Menu" [ngClass]="{'btn-pressed': mep.expanded}" class="menu-mat-fab" mat-fab extended (click)="mep.expanded = !mep.expanded">
                 <mat-icon>menu</mat-icon>
                 Menu
               </button>
-              <button [ngClass]="{'btn-pressed': mep.expanded}" class="menu-mini-fab" mat-mini-fab extended (click)="mep.expanded = !mep.expanded">
+              <button matTooltip="Menu" [ngClass]="{'btn-pressed': mep.expanded}" class="menu-mini-fab" mat-mini-fab extended (click)="mep.expanded = !mep.expanded">
                 <mat-icon>menu</mat-icon>
               </button>
             </div>
@@ -115,7 +115,7 @@
               <div style="display: flex; flex-direction: row; align-items: center; margin-left: 10px; margin-bottom: 10px; padding-right: 10px;">
                 <div>
                   <mat-checkbox formControlName="repeat" style="display: none;" #repeatCheckbox></mat-checkbox>
-                  <button mat-fab extended (click)="repeatCheckbox.toggle(); $event.stopPropagation();" [ngClass]="{'btn-pressed': repeatCheckbox.checked}">
+                  <button matTooltip="Repeat" mat-fab extended (click)="repeatCheckbox.toggle(); $event.stopPropagation();" [ngClass]="{'btn-pressed': repeatCheckbox.checked}">
                     <mat-icon *ngIf="repeatCheckbox.checked">repeat_on</mat-icon>
                     <mat-icon *ngIf="!repeatCheckbox.checked">repeat</mat-icon>
                     Repeat
@@ -123,7 +123,7 @@
                 </div>
                 <div style="margin-left: 10px;">
                   <mat-checkbox style="display: none;" formControlName="shuffle" #shuffleCheckbox></mat-checkbox>
-                  <button mat-fab extended (click)="shuffleCheckboxChanged(); shuffleCheckbox.toggle(); $event.stopPropagation();" [ngClass]="{'btn-pressed': shuffleCheckbox.checked}">
+                  <button matTooltip="Shuffle" mat-fab extended (click)="shuffleCheckboxChanged(); shuffleCheckbox.toggle(); $event.stopPropagation();" [ngClass]="{'btn-pressed': shuffleCheckbox.checked}">
                     <mat-icon *ngIf="shuffleCheckbox.checked">shuffle_on</mat-icon>
                     <mat-icon *ngIf="!shuffleCheckbox.checked">shuffle</mat-icon>
                     Shuffle
@@ -144,42 +144,67 @@
                     Required
                   </mat-error>
                 </mat-form-field>
-                <button mat-fab extended [disabled]="isSpeaking || (!isSpeaking && !isStopped)" (click)="loadSheetClick()" style="margin-left: 15px; margin-top: 7px;">
+                <button matTooltip="Reload Sheet" mat-fab extended [disabled]="isSpeaking || (!isSpeaking && !isStopped)" (click)="loadSheetClick()" style="margin-left: 15px; margin-top: 7px;">
                   <mat-icon>autorenew</mat-icon>
                   Reload
                 </button>
               </div>
               <div>
-                <button mat-fab extended (click)="saveClick(); $event.stopPropagation();" style="margin: 7px 10px 0px 10px;">
+                <button matTooltip="Save Your Changes" mat-fab extended (click)="saveClick(); $event.stopPropagation();" style="margin: 7px 10px 0px 10px;">
                   <mat-icon>save</mat-icon>
                   Save Settings
                 </button>
-                <button mat-fab extended (click)="deleteClick(); $event.stopPropagation();" style="margin: 7px 10px 0px 10px;">
+                <button matTooltip="Clean Saved Changes" mat-fab extended (click)="deleteClick(); $event.stopPropagation();" style="margin: 7px 10px 0px 10px;">
                   <mat-icon>delete</mat-icon>
                   Clean Settings
+                </button>
+                <button [disabled]="isSpeaking || (!isSpeaking && !isStopped)" matTooltip="Clean & Reset to Defaults" mat-fab extended (click)="resetToDefaults(); $event.stopPropagation();" style="margin: 7px 10px 0px 10px;">
+                  <mat-icon>autorenew</mat-icon>
+                  Reset to Defaults
                 </button>
               </div>
             </div>
             <div style="max-width: 300px; box-shadow: 2px 0px 10px #CCC; margin: 10px 0px 10px 5px; padding-top: 10px;">
               <mat-label style="margin-left: 10px;">Vocal Speed</mat-label>
               <br>
-              <mat-slider style="margin-left: 30px;" [min]="vocalSpeedRange.min" [max]="vocalSpeedRange.max" step="0.1" discrete>
-                <input matSliderThumb formControlName="vocalSpeed">
-              </mat-slider>
+              <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <mat-slider style="margin-left: 30px;" [min]="vocalSpeedRange.min" [max]="vocalSpeedRange.max" step="0.1" discrete>
+                  <input matSliderThumb formControlName="vocalSpeed">
+                </mat-slider>
+                <div>
+                  <button matTooltip="Reset" class="playback-btn" style="margin-top: -10px; margin-right: 15px;" mat-mini-fab (click)="resetRangeSlider('vocalSpeed'); $event.stopPropagation();">
+                    <mat-icon>autorenew</mat-icon>
+                  </button>
+                </div>
+              </div>
             </div>
             <div style="max-width: 300px; box-shadow: 2px 0px 10px #CCC; margin: 10px 0px 10px 5px; padding-top: 10px;">
               <mat-label style="margin-left: 10px;">In-between Delay (Column)</mat-label>
               <br>
-              <mat-slider style="margin-left: 30px;" [min]="inbetweenDelayRange.min" [max]="inbetweenDelayRange.max" step="0.1" discrete>
-                <input matSliderThumb formControlName="inbetweenDelayColumn">
-              </mat-slider>
+              <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <mat-slider style="margin-left: 30px;" [min]="inbetweenDelayRange.min" [max]="inbetweenDelayRange.max" step="0.1" discrete>
+                  <input matSliderThumb formControlName="inbetweenDelayColumn">
+                </mat-slider>
+                <div>
+                  <button matTooltip="Reset" class="playback-btn" style="margin-top: -10px; margin-right: 15px;" mat-mini-fab (click)="resetRangeSlider('inbetweenDelayColumn'); $event.stopPropagation();">
+                    <mat-icon>autorenew</mat-icon>
+                  </button>
+                </div>
+              </div>
             </div>
             <div style="max-width: 300px; box-shadow: 2px 0px 10px #CCC; margin: 10px 0px 25px 5px; padding-top: 10px;">
               <mat-label style="margin-left: 10px;">In-between Delay (Rows)</mat-label>
               <br>
-              <mat-slider style="margin-left: 30px;" [min]="inbetweenDelayRange.min" [max]="inbetweenDelayRange.max" step="0.1" discrete>
-                <input matSliderThumb formControlName="inbetweenDelayRow">
-              </mat-slider>
+              <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <mat-slider style="margin-left: 30px;" [min]="inbetweenDelayRange.min" [max]="inbetweenDelayRange.max" step="0.1" discrete>
+                  <input matSliderThumb formControlName="inbetweenDelayRow">
+                </mat-slider>
+                <div>
+                  <button matTooltip="Reset" class="playback-btn" style="margin-top: -10px; margin-right: 15px;" mat-mini-fab (click)="resetRangeSlider('inbetweenDelayRow'); $event.stopPropagation();">
+                    <mat-icon>autorenew</mat-icon>
+                  </button>
+                </div>
+              </div>
             </div>
             <ng-container *ngFor="let _ of [].constructor(numberOfLanguages); let i = index">
               <mat-form-field style="width: 300px; margin-left: 5px;">
