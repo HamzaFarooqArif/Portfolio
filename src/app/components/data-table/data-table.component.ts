@@ -100,7 +100,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
       startRow: ['', Validators.required],
       endRow: ['', Validators.required],
       vocalSpeed: [1],
-      inbetweenDelay: [0],
+      inbetweenDelayColumn: [0],
+      inbetweenDelayRow: [0],
       repeat: [false],
       shuffle: [false],
       reversePlayback: [false],
@@ -587,9 +588,13 @@ export class DataTableComponent implements OnInit, OnDestroy {
     {
       this.playbackForm.get('vocalSpeed')?.patchValue(Number(savedData['vocalSpeed']));
     }
-    if(savedData['inbetweenDelay'] && Number(savedData['inbetweenDelay']) >= this.inbetweenDelayRange.min && Number(savedData['inbetweenDelay']) <= this.inbetweenDelayRange.max)
+    if(savedData['inbetweenDelayColumn'] && Number(savedData['inbetweenDelayColumn']) >= this.inbetweenDelayRange.min && Number(savedData['inbetweenDelayColumn']) <= this.inbetweenDelayRange.max)
     {
-      this.playbackForm.get('inbetweenDelay')?.patchValue(Number(savedData['inbetweenDelay']));
+      this.playbackForm.get('inbetweenDelayColumn')?.patchValue(Number(savedData['inbetweenDelayColumn']));
+    }
+    if(savedData['inbetweenDelayRow'] && Number(savedData['inbetweenDelayRow']) >= this.inbetweenDelayRange.min && Number(savedData['inbetweenDelayRow']) <= this.inbetweenDelayRange.max)
+    {
+      this.playbackForm.get('inbetweenDelayRow')?.patchValue(Number(savedData['inbetweenDelayRow']));
     }
     this.playbackForm.get('reversePlayback')?.patchValue(this.checkForTruthy(savedData['reversePlayback']));
     this.playbackForm.get('repeat')?.patchValue(this.checkForTruthy(savedData['repeat']));
@@ -655,7 +660,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       await this.speakNow();
       if(reverseSpeechOrder) {
         if(this.currentColumn > 0) {
-          let delay = Number(this.playbackForm.get('inbetweenDelay')?.value);
+          let delay = Number(this.playbackForm.get('inbetweenDelayColumn')?.value);
           let timeout = setTimeout(() => {
             clearTimeout(timeout);
             this.setNextCell();
@@ -663,13 +668,17 @@ export class DataTableComponent implements OnInit, OnDestroy {
           }, delay*1000);
         }
         else {
-          this.setNextCell();
-          return this.playAllTexts();
+          let delay = Number(this.playbackForm.get('inbetweenDelayRow')?.value);
+          let timeout = setTimeout(() => {
+            clearTimeout(timeout);
+            this.setNextCell();
+            return this.playAllTexts();
+          }, delay*1000);
         }
       }
       else {
         if(this.currentColumn < this.tableData[0]?.length - 1) {
-          let delay = Number(this.playbackForm.get('inbetweenDelay')?.value);
+          let delay = Number(this.playbackForm.get('inbetweenDelayColumn')?.value);
           let timeout = setTimeout(() => {
             clearTimeout(timeout);
             this.setNextCell();
@@ -677,8 +686,12 @@ export class DataTableComponent implements OnInit, OnDestroy {
           }, delay*1000);
         }
         else {
-          this.setNextCell();
-          return this.playAllTexts();
+          let delay = Number(this.playbackForm.get('inbetweenDelayRow')?.value);
+          let timeout = setTimeout(() => {
+            clearTimeout(timeout);
+            this.setNextCell();
+            return this.playAllTexts();
+          }, delay*1000);
         }
       }
     }

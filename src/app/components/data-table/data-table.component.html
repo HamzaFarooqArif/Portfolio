@@ -168,9 +168,15 @@
               </mat-slider>
             </div>
             <div>
-              <mat-label>In-between Delay</mat-label>
+              <mat-label>In-between Delay (Column)</mat-label>
               <mat-slider [min]="inbetweenDelayRange.min" [max]="inbetweenDelayRange.max" step="0.1" discrete>
-                <input matSliderThumb formControlName="inbetweenDelay">
+                <input matSliderThumb formControlName="inbetweenDelayColumn">
+              </mat-slider>
+            </div>
+            <div>
+              <mat-label>In-between Delay (Rows)</mat-label>
+              <mat-slider [min]="inbetweenDelayRange.min" [max]="inbetweenDelayRange.max" step="0.1" discrete>
+                <input matSliderThumb formControlName="inbetweenDelayRow">
               </mat-slider>
             </div>
             <ng-container *ngFor="let _ of [].constructor(numberOfLanguages); let i = index">
