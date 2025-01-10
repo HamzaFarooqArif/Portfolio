@@ -76,3 +76,7 @@ td, th {
 :host ::ng-deep .mat-mdc-text-field-wrapper {
   box-shadow: 0px 5px 5px #CCC;
 }
+
+:host ::ng-deep .mat-expansion-panel-body {
+  padding: 0 24px 0px;
+}
