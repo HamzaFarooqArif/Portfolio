@@ -72,7 +72,7 @@
         <div style="height: 500px; overflow-y: scroll;">
           <div class="form-container">
             <div class="first-row-container" style="margin-top: 10px;">
-              <div>
+              <div style="margin-left: 5px;">
                 <mat-form-field style="width: 120px; margin: 7px 10px 0px 0px;">
                   <mat-label>Starting Row</mat-label>
                   <input
@@ -132,7 +132,7 @@
               </div>
             </div>
             <div class="first-row-container">
-              <div style="display: flex; flex-direction: row;">
+              <div style="display: flex; flex-direction: row; margin-left: 5px;">
                 <mat-form-field style="width: 300px;">
                   <mat-label>Google Sheet ID</mat-label>
                   <input
@@ -160,27 +160,29 @@
                 </button>
               </div>
             </div>
-            
-            <div>
-              <mat-label>Vocal Speed</mat-label>
-              <mat-slider [min]="vocalSpeedRange.min" [max]="vocalSpeedRange.max" step="0.1" discrete>
+            <div style="max-width: 300px; box-shadow: 2px 0px 10px #CCC; margin: 10px 0px; margin-left: 5px; padding-top: 10px;">
+              <mat-label style="margin-left: 10px;">Vocal Speed</mat-label>
+              <br>
+              <mat-slider style="margin-left: 30px;" [min]="vocalSpeedRange.min" [max]="vocalSpeedRange.max" step="0.1" discrete>
                 <input matSliderThumb formControlName="vocalSpeed">
               </mat-slider>
             </div>
-            <div>
-              <mat-label>In-between Delay (Column)</mat-label>
-              <mat-slider [min]="inbetweenDelayRange.min" [max]="inbetweenDelayRange.max" step="0.1" discrete>
+            <div style="max-width: 300px; box-shadow: 2px 0px 10px #CCC; margin: 10px 0px; margin-left: 5px; padding-top: 10px;">
+              <mat-label style="margin-left: 10px;">In-between Delay (Column)</mat-label>
+              <br>
+              <mat-slider style="margin-left: 30px;" [min]="inbetweenDelayRange.min" [max]="inbetweenDelayRange.max" step="0.1" discrete>
                 <input matSliderThumb formControlName="inbetweenDelayColumn">
               </mat-slider>
             </div>
-            <div>
-              <mat-label>In-between Delay (Rows)</mat-label>
-              <mat-slider [min]="inbetweenDelayRange.min" [max]="inbetweenDelayRange.max" step="0.1" discrete>
+            <div style="max-width: 300px; box-shadow: 2px 0px 10px #CCC; margin: 10px 0px; margin-left: 5px; padding-top: 10px;">
+              <mat-label style="margin-left: 10px;">In-between Delay (Rows)</mat-label>
+              <br>
+              <mat-slider style="margin-left: 30px;" [min]="inbetweenDelayRange.min" [max]="inbetweenDelayRange.max" step="0.1" discrete>
                 <input matSliderThumb formControlName="inbetweenDelayRow">
               </mat-slider>
             </div>
             <ng-container *ngFor="let _ of [].constructor(numberOfLanguages); let i = index">
-              <mat-form-field style="width: 300px;">
+              <mat-form-field style="width: 300px; margin-left: 5px;">
                 <mat-label>Select Language for Column {{ i + 1 }}</mat-label>
                 <mat-select [id]="'lang' + (i + 1)" [formControlName]="'lang' + (i + 1)" (selectionChange)="refreshVoiceDropdown(i + 1);">
                   <mat-option *ngFor="let option of masterLanguages" [value]="option.value">
@@ -191,7 +193,7 @@
                   Required.
                 </mat-error>
               </mat-form-field>
-              <mat-form-field style="width: 300px;">
+              <mat-form-field style="width: 300px; margin-left: 5px;">
                 <mat-label>Select Voice for Language {{ i + 1 }}</mat-label>
                 <mat-select [id]="'lang' + (i + 1) + 'Voice'" [formControlName]="'lang' + (i + 1) + 'Voice'">
                   <mat-option *ngFor="let option of populatedVoicesData[i]" [value]="option.value">
