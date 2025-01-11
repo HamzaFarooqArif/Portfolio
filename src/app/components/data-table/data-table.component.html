@@ -1,4 +1,4 @@
-<div id="container" class="container">
+<div *ngIf="componentInitialized" id="container" class="container">
   <div id="table-container" class="table-container">
     <table>
       <thead>
@@ -235,8 +235,8 @@
       </mat-expansion-panel>
     </mat-accordion>
   </form>
-  <ngx-loading
-    [show]="loading"
-    [config]="{ backdropBackgroundColour: 'rgba(0, 0, 0, 0.8)' }"
-  ></ngx-loading>
 </div>
+<ngx-loading
+  [show]="loading"
+  [config]="{ backdropBackgroundColour: 'rgba(0, 0, 0, 0.8)' }"
+></ngx-loading>

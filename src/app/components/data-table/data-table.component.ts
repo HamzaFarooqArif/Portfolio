@@ -18,6 +18,7 @@ import { debounceTime, Subject } from 'rxjs';
 })
 
 export class DataTableComponent implements OnInit, OnDestroy {
+  componentInitialized: boolean = false;
   private wakeLock: WakeLockSentinel | null = null;
   loading: boolean = false;
   numberOfLanguages: number = 0; 
@@ -53,12 +54,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.numberOfLanguages = Number(this.configService.getConfigValue('numberOfLanguages'));
-    this.initForm();
-    this.initButtons();
-    this.disableAllPlaybackButtons();
-    this.setGoogleSheetId();
-    this.fetchData();
-    this.keepScreenOn();
+    this.onInitAsync();
 
     this.skipSubject.pipe(
       debounceTime(this.jumpInterval)
@@ -70,18 +66,51 @@ export class DataTableComponent implements OnInit, OnDestroy {
     });
   }
 
-  setGoogleSheetId() {
-    let localStorageData = JSON.parse(localStorage.getItem('formData') || '{}');
-    let savedData = JSON.parse(JSON.stringify(localStorageData));
-    if(!savedData || isEmpty(savedData)) {
-      this.route.queryParams.subscribe(params => {
-        savedData = params;
+  async onInitAsync() {
+    try {
+      this.initForm();
+      await this.getLanguages();
+      this.addLanguageControls();
+      this.initButtons();
+      this.disableAllPlaybackButtons();
+      await this.setGoogleSheetId();
+      await this.fetchData();
+      this.patchForm();
+      this.refreshPlaybackButtons();
+      this.loadSavedData();
+      this.keepScreenOn();
+    } catch (error) {
+      console.error('An error occurred during initialization:', error);
+    } finally {
+      this.componentInitialized = true;
+    }
+  }
+
+  addLanguageControls() {
+    for (let i = 0; i < this.numberOfLanguages; i++) {
+      this.playbackForm.addControl(`lang${i+1}`, this.fb.control('', Validators.required));
+      this.playbackForm.addControl(`lang${i+1}Voice`, this.fb.control('', Validators.required));
+    }
+  }
+
+  async setGoogleSheetId(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let localStorageData = JSON.parse(localStorage.getItem('formData') || '{}');
+      let savedData = JSON.parse(JSON.stringify(localStorageData));
+      if(!savedData || isEmpty(savedData)) {
+        this.route.queryParams.subscribe(params => {
+          savedData = params;
+          this.patchSavedSheetId(savedData);
+          resolve();
+        }, err => {
+          reject(err);
+        });
+      }
+      else {
         this.patchSavedSheetId(savedData);
-      });
-    }
-    else {
-      this.patchSavedSheetId(savedData);
-    }
+        resolve();
+      }
+    });
   }
 
   patchSavedSheetId(savedData: any) {
@@ -92,6 +121,27 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.playbackForm.get('sheetId')?.patchValue(this.configService.getConfigValue("googleSheetsId"));
     }
     this.spreadsheetService.setSheetId(this.playbackForm.get('sheetId')?.value);
+  }
+
+  async getLanguages(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.speechService.getLangsAsync()
+      .then((voices: SpeechSynthesisVoice[]) => {
+        this.allVoices = voices;
+        this.initializeMasterLanguages();
+        resolve();
+      })
+      .catch((error: any) => {
+        // console.error(error);
+        this.speechService.init().then(() => {
+          this.speechService.getLangsAsync().then((voices: SpeechSynthesisVoice[]) => {
+            this.allVoices = voices;
+            this.initializeMasterLanguages();
+            resolve();
+          }).catch(reject);
+        }).catch(reject);
+      });
+    });
   }
 
   initForm() {
@@ -107,26 +157,6 @@ export class DataTableComponent implements OnInit, OnDestroy {
       reversePlayback: [false],
       reverseSpeechOrder: [false],
     });
-
-    this.speechService.getLangsAsync()
-    .then((voices: SpeechSynthesisVoice[]) => {
-      this.allVoices = voices;
-      this.initializeMasterLanguages();
-    })
-    .catch((error: any) => {
-      // console.error(error);
-      this.speechService.init().then(() => {
-        this.speechService.getLangsAsync().then((voices: SpeechSynthesisVoice[]) => {
-          this.allVoices = voices;
-          this.initializeMasterLanguages();
-        });
-      });
-    });
-
-    for (let i = 0; i < this.numberOfLanguages; i++) {
-      this.playbackForm.addControl(`lang${i+1}`, this.fb.control('', Validators.required));
-      this.playbackForm.addControl(`lang${i+1}Voice`, this.fb.control('', Validators.required));
-    }
   }
 
   initButtons() {
@@ -335,11 +365,13 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
   async fetchDataAndParseAsync(): Promise<string[][]> {
+    this.loading = true;
     let EligibleRowSymbol = this.configService.getConfigValue("EligibleRowSymbol");
     return new Promise((resolve, reject) => {
       this.spreadsheetService.fetchSheetData().subscribe((csvData: string) => {
         this.papa.parse(csvData, {
           complete: (result) => {
+            this.loading = false;
             let filteredData = (result.data as any[]).filter((row: any, index: number) => {
               return index == 0 || row[this.numberOfLanguages] == EligibleRowSymbol;
             });
@@ -353,27 +385,29 @@ export class DataTableComponent implements OnInit, OnDestroy {
           }
         });
       }, err => {
+        this.loading = false;
         reject(err);
       });
     });
   }
 
-  fetchData() {
+  async fetchData(): Promise<void> {
     this.loading = true;
-    this.playbackForm.disable();
-    this.playbackForm.get('sheetId')?.enable();
-    this.fetchDataAndParseAsync().then((data: string[][]) => {
-      this.loading = false;
-      this.playbackForm.enable();
-      this.tableData = data;
-      this.patchForm();
-      this.refreshPlaybackButtons();
-      this.loadSavedData();
-    }, err => {
-      this.loading = false;
-      this.toastr.error("Please check the 'Sheet ID' and make sure that the sheet has the public access", "Unable fetch sheet", {
-        timeOut: 5000
-      });
+    return new Promise((resolve, reject) => {
+      this.playbackForm.disable();
+      this.playbackForm.get('sheetId')?.enable();
+      this.fetchDataAndParseAsync().then((data: string[][]) => {
+        this.loading = false;
+        this.playbackForm.enable();
+        this.tableData = data;
+        resolve();
+      }, err => {
+        this.loading = false;
+        this.toastr.error("Please check the 'Sheet ID' and make sure that the sheet has the public access", "Unable fetch sheet", {
+          timeOut: 5000
+        });
+        reject(err);
+      });  
     });
   }
 
@@ -544,7 +578,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadSheetClick() {
+  async loadSheetClick() {
     if(this.playbackForm.get('sheetId')?.valid) {
       let input = this.playbackForm.get('sheetId')?.value;
       const isSheetId = /^[a-zA-Z0-9-_]+$/.test(input); // Validate plain sheetId format
@@ -558,24 +592,33 @@ export class DataTableComponent implements OnInit, OnDestroy {
         }
       }
       this.spreadsheetService.setSheetId(this.playbackForm.get('sheetId')?.value);
-      this.fetchData();
+      await this.fetchData();
+      this.patchForm();
+      this.refreshPlaybackButtons();
+      this.loadSavedData();
     }
   }
 
-  loadSavedData() {
-    let localStorageData = JSON.parse(localStorage.getItem('formData') || '{}');
-    let savedData = JSON.parse(JSON.stringify(localStorageData));
-    if(!savedData || isEmpty(savedData)) {
-      this.route.queryParams.subscribe(params => {
-        savedData = params;
+  async loadSavedData(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let localStorageData = JSON.parse(localStorage.getItem('formData') || '{}');
+      let savedData = JSON.parse(JSON.stringify(localStorageData));
+      if(!savedData || isEmpty(savedData)) {
+        this.route.queryParams.subscribe(params => {
+          savedData = params;
+          this.patchSavedData(savedData);
+          this.initializeDropdowns();
+          resolve();
+        }, err => {
+          reject(err);
+        });
+      }
+      else {
         this.patchSavedData(savedData);
         this.initializeDropdowns();
-      });
-    }
-    else {
-      this.patchSavedData(savedData);
-      this.initializeDropdowns();
-    }
+        resolve();
+      }
+    });
   }
 
   patchSavedData(savedData: any) {
@@ -801,7 +844,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     return ALLLANGUAGES.find((lang) => lang.value.some(x => x == label))?.label;
   }
 
-  async keepScreenOn(): Promise<void> {
+  keepScreenOn(){
     let interval = setInterval(() => {
       if(!this.wakeLock || this.wakeLock?.released == true) {
         console.log('Retrying Wake Lock...');
@@ -894,39 +937,36 @@ export class DataTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  resetToDefaults() {
+  async resetToDefaults() {
     this.playbackForm.get('sheetId')?.patchValue(this.configService.getConfigValue("googleSheetsId"));
     this.spreadsheetService.setSheetId(this.playbackForm.get('sheetId')?.value);
-    this.loading = true;
     this.playbackForm.disable();
     this.playbackForm.get('sheetId')?.enable();
-    this.fetchDataAndParseAsync().then((data: string[][]) => {
-      this.loading = false;
-      this.playbackForm.enable();
-      this.tableData = data;
-      this.playbackForm.get('repeat')?.setValue(false);
-      this.playbackForm.get('shuffle')?.setValue(false);
-      this.playbackForm.get('reversePlayback')?.setValue(false);
-      this.playbackForm.get('reverseSpeechOrder')?.setValue(false);
-      if(this.tableData?.length) {
-        this.playbackForm.get('startRow')?.setValue(1);
-        this.playbackForm.get('endRow')?.setValue(this.tableData?.length - 1);
-        this.refreshRowFieldsValidity();
-      }
-      this.resetRangeSlider("inbetweenDelayRow");
-      this.resetRangeSlider("inbetweenDelayColumn");
-      this.resetRangeSlider("vocalSpeed");
-      for(let i = 0; i < this.numberOfLanguages; i++) {
-        this.playbackForm.get(`lang${i+1}`)?.setValue("");
-      }
-      this.initializeDropdowns();
-      this.refreshPlaybackButtons();
-    }, err => {
+    let data = await this.fetchDataAndParseAsync().catch(err => {
       this.loading = false;
       this.toastr.error("Please check the 'Sheet ID' and make sure that the sheet has the public access", "Unable fetch sheet", {
         timeOut: 5000
       });
     });
+    this.playbackForm.enable();
+    this.tableData = data ?? [];
+    this.playbackForm.get('repeat')?.setValue(false);
+    this.playbackForm.get('shuffle')?.setValue(false);
+    this.playbackForm.get('reversePlayback')?.setValue(false);
+    this.playbackForm.get('reverseSpeechOrder')?.setValue(false);
+    if(this.tableData?.length) {
+      this.playbackForm.get('startRow')?.setValue(1);
+      this.playbackForm.get('endRow')?.setValue(this.tableData?.length - 1);
+      this.refreshRowFieldsValidity();
+    }
+    this.resetRangeSlider("inbetweenDelayRow");
+    this.resetRangeSlider("inbetweenDelayColumn");
+    this.resetRangeSlider("vocalSpeed");
+    for(let i = 0; i < this.numberOfLanguages; i++) {
+      this.playbackForm.get(`lang${i+1}`)?.setValue("");
+    }
+    this.initializeDropdowns();
+    this.refreshPlaybackButtons();
   }
 
   ngOnDestroy(): void {
