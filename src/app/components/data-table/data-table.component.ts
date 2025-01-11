@@ -349,14 +349,17 @@ export class DataTableComponent implements OnInit, OnDestroy {
       }
     });
 
-    const preferredVoice = this.configService.getConfigValue("preferredVoice");
-    let foundPreferredVoice = this.populatedVoicesData[controlIndex-1].find(x => x.value.includes(preferredVoice));
-    if(foundPreferredVoice) {
-      this.playbackForm.get(`lang${controlIndex}Voice`)?.setValue(foundPreferredVoice.value);
+    if(this.playbackForm.get(`lang${controlIndex}Voice`)?.value?.length == 0) {
+      const preferredVoice = this.configService.getConfigValue("preferredVoice");
+      let foundPreferredVoice = this.populatedVoicesData[controlIndex-1].find(x => x.value.includes(preferredVoice));
+      if(foundPreferredVoice) {
+        this.playbackForm.get(`lang${controlIndex}Voice`)?.setValue(foundPreferredVoice.value);
+      }
+      else {
+        this.playbackForm.get(`lang${controlIndex}Voice`)?.setValue(this.populatedVoicesData[controlIndex-1][0].value);
+      }
     }
-    else {
-      this.playbackForm.get(`lang${controlIndex}Voice`)?.setValue(this.populatedVoicesData[controlIndex-1][0].value);
-    }
+
   }
 
   getSpeechSynthesisVoice(controlName: string): SpeechSynthesisVoice | undefined {
@@ -964,6 +967,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.resetRangeSlider("vocalSpeed");
     for(let i = 0; i < this.numberOfLanguages; i++) {
       this.playbackForm.get(`lang${i+1}`)?.setValue("");
+      this.playbackForm.get(`lang${i+1}Voice`)?.setValue("");
     }
     this.initializeDropdowns();
     this.refreshPlaybackButtons();
