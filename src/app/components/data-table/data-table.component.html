@@ -209,7 +209,7 @@
             <ng-container *ngFor="let _ of [].constructor(numberOfLanguages); let i = index">
               <mat-form-field style="width: 300px; margin-left: 5px;">
                 <mat-label>Select Language for Column {{ i + 1 }}</mat-label>
-                <mat-select [id]="'lang' + (i + 1)" [formControlName]="'lang' + (i + 1)" (selectionChange)="refreshVoiceDropdown(i + 1);">
+                <mat-select [id]="'lang' + (i + 1)" [formControlName]="'lang' + (i + 1)" (selectionChange)="refreshVoiceDropdown(i + 1, true);">
                   <mat-option *ngFor="let option of masterLanguages" [value]="option.value">
                     {{ getLanguageName(option.label) }} ({{ option.label }})
                   </mat-option>

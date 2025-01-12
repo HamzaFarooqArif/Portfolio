@@ -333,7 +333,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  refreshVoiceDropdown(controlIndex: number) {
+  refreshVoiceDropdown(controlIndex: number, changeFromForm?: boolean) {
     if(!this.populatedVoicesData?.length || this.populatedVoicesData?.length < controlIndex) {
       this.populatedVoicesData.push([]);
     }
@@ -358,6 +358,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
       else {
         this.playbackForm.get(`lang${controlIndex}Voice`)?.setValue(this.populatedVoicesData[controlIndex-1][0].value);
       }
+    } else if(changeFromForm) {
+      this.playbackForm.get(`lang${controlIndex}Voice`)?.setValue(this.populatedVoicesData[controlIndex-1][0].value);
     }
 
   }
