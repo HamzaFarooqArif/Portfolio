@@ -445,22 +445,37 @@ export class DataTableComponent implements OnInit, OnDestroy {
     let reverse: boolean = this.playbackForm?.get('reversePlayback')?.value;
     let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
     let startRow = Number(this.playbackForm.get('startRow')?.value);
+
     if(reverse) {
-      if(this.currentRow < startRow) {
-        this.currentRow++;
+      if(reverseSpeechOrder) {
+        if(this.currentColumn < this.tableData[0]?.length - 1) {
+          this.currentColumn = this.tableData[0]?.length - 1;
+        } else if(this.currentRow < startRow){
+          this.currentRow++;
+        }
+      } else {
+        if(this.currentColumn > 0) {
+          this.currentColumn = 0;
+        } else if(this.currentRow < startRow){
+          this.currentRow++;
+        }
+      }
+    } else {
+      if(reverseSpeechOrder) {
+        if(this.currentColumn < this.tableData[0]?.length - 1) {
+          this.currentColumn = this.tableData[0]?.length - 1;
+        } else if(this.currentRow > startRow){
+          this.currentRow--;
+        }
+      } else {
+        if(this.currentColumn > 0) {
+          this.currentColumn = 0;
+        } else if(this.currentRow > startRow){
+          this.currentRow--;
+        }
       }
     }
-    else {
-      if(this.currentRow > startRow) {
-        this.currentRow--;
-      }
-    }
-    if(reverseSpeechOrder) {
-      this.currentColumn = this.tableData[0]?.length - 1;
-    }
-    else {
-      this.currentColumn = 0;
-    }
+    
     this.highlightWord(this.currentRow-1, this.currentColumn);
     this.refreshPlaybackButtons();
 
@@ -474,6 +489,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     let reverse: boolean = this.playbackForm?.get('reversePlayback')?.value;
     let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
     let endRow = Number(this.playbackForm.get('endRow')?.value);
+
     if(reverse) {
       if(this.currentRow > endRow) {
         this.currentRow--;
@@ -490,6 +506,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     else {
       this.currentColumn = 0;
     }
+    
     this.highlightWord(this.currentRow-1, this.currentColumn);
     this.refreshPlaybackButtons();
 
