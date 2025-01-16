@@ -40,6 +40,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
         this.playClick();
       } else if(this.getButtonVisibility('resume')) {
         this.resumeClick();
+      } else if(this.getButtonVisibility('pause')) {
+        this.pauseClick();
       }
     }
   }
