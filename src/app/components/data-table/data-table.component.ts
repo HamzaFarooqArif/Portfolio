@@ -46,6 +46,20 @@ export class DataTableComponent implements OnInit, OnDestroy {
     }
   }
 
+  @HostListener('document:mousedown', ['$event'])
+  onMouseDown(event: MouseEvent) {
+    // Ignore keypress if a form control is focused
+    const target = event.target as HTMLElement;
+    if (['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(target.tagName)) {
+      return;
+    }
+    if (event.button === 2) {
+      if(!this.getButtonDisabledStatus('forward')) {
+        this.forwardClick();
+      }
+    }
+  }
+
   componentInitialized: boolean = false;
   private wakeLock: WakeLockSentinel | null = null;
   loading: boolean = false;
