@@ -35,7 +35,7 @@ export class SpeechService {
     });
   }
 
-  async speakAsync(text: string, voice: SpeechSynthesisVoice, vocalSpeed?: number): Promise<void> {
+  async speakAsync(text: string, voice: SpeechSynthesisVoice, vocalSpeed: number, volume: number): Promise<void> {
     return new Promise((resolve) => {
       
       let alreadyResolved: boolean = false;
@@ -55,7 +55,8 @@ export class SpeechService {
           EasySpeech.speak({
             text: text,
             voice: voice,
-            rate: vocalSpeed ?? 1,
+            rate: vocalSpeed,
+            volume: volume,
             boundary: event => console.debug('word boundary reached', event.charIndex),
           })
             .then(() => {

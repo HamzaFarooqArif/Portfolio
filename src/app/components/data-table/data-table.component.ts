@@ -152,6 +152,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       vocalSpeed: [1],
       inbetweenDelayColumn: [0],
       inbetweenDelayRow: [0],
+      volume: [1],
       repeat: [false],
       shuffle: [false],
       reversePlayback: [false],
@@ -668,6 +669,10 @@ export class DataTableComponent implements OnInit, OnDestroy {
     {
       this.playbackForm.get('inbetweenDelayRow')?.patchValue(Number(savedData['inbetweenDelayRow']));
     }
+    if(savedData['volume'] && Number(savedData['volume']) >= this.inbetweenDelayRange.min && Number(savedData['volume']) <= this.inbetweenDelayRange.max)
+    {
+      this.playbackForm.get('volume')?.patchValue(Number(savedData['volume']));
+    }
     this.playbackForm.get('reversePlayback')?.patchValue(this.checkForTruthy(savedData['reversePlayback']));
     this.playbackForm.get('repeat')?.patchValue(this.checkForTruthy(savedData['repeat']));
     this.playbackForm.get('shuffle')?.patchValue(this.checkForTruthy(savedData['shuffle']));
@@ -710,9 +715,11 @@ export class DataTableComponent implements OnInit, OnDestroy {
     let text = this.tableData[this.currentRow][this.currentColumn];
     let voice: SpeechSynthesisVoice | undefined = this.getSpeechSynthesisVoice(`lang${this.currentColumn + 1}Voice`);
     let vocalSpeed = Number(this.playbackForm?.get('vocalSpeed')?.value);
+    let volume = Number(this.playbackForm?.get('volume')?.value);
+    volume = volume * volume * volume;
     if(text && voice) {
       this.addToPlayed(this.currentRow);
-      await this.speechService.speakAsync(text, voice, vocalSpeed);
+      await this.speechService.speakAsync(text, voice, vocalSpeed, volume);
     }
   }
 
@@ -957,6 +964,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
     else if(controlName == "vocalSpeed") {
       this.playbackForm.get(controlName)?.setValue(1);
     }
+    else if(controlName == "volume") {
+      this.playbackForm.get(controlName)?.setValue(1);
+    }
   }
 
   async resetToDefaults() {
@@ -981,6 +991,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.playbackForm.get('endRow')?.setValue(this.tableData?.length - 1);
       this.refreshRowFieldsValidity();
     }
+    this.resetRangeSlider("volume");
     this.resetRangeSlider("inbetweenDelayRow");
     this.resetRangeSlider("inbetweenDelayColumn");
     this.resetRangeSlider("vocalSpeed");
