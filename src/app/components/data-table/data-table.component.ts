@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, signal } from '@angular/core';
 import { SpreadsheetService as SpreadsheetService } from '../../services/spreadsheet/spreadsheet.service';
 import { Papa } from 'ngx-papaparse';
 import { SpeechService } from '../../services/speech/speech.service';
@@ -18,6 +18,32 @@ import { debounceTime, Subject } from 'rxjs';
 })
 
 export class DataTableComponent implements OnInit, OnDestroy {
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+     // Ignore keypress if a form control is focused
+     const target = event.target as HTMLElement;
+     if (['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(target.tagName)) {
+       return;
+     }
+
+    if (event.key === 'ArrowLeft') {
+      if(!this.getButtonDisabledStatus('backward')) {
+        this.rewindClick();
+      }
+    } else if (event.key === 'ArrowRight') {
+      if(!this.getButtonDisabledStatus('forward')) {
+        this.forwardClick();
+      }
+    }
+    else if (event.key === ' ' || event.key === 'Spacebar') {
+      if(this.getButtonVisibility('play')) {
+        this.playClick();
+      } else if(this.getButtonVisibility('resume')) {
+        this.resumeClick();
+      }
+    }
+  }
+
   componentInitialized: boolean = false;
   private wakeLock: WakeLockSentinel | null = null;
   loading: boolean = false;
