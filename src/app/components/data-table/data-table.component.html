@@ -12,7 +12,7 @@
       <tbody>
         <tr *ngFor="let rowItem of tableData | slice: 1; let i = index">
             <td [id]="'index_' + (i + 1)">{{ i + 1 }}</td>
-            <td [id]="'cell_' + i + '_' + j" *ngFor="let cellItem of rowItem; let j = index" [ngClass]="{'highlight': isHighlighted(i, j)}">
+            <td [id]="'cell_' + i + '_' + j" *ngFor="let cellItem of rowItem; let j = index" [ngClass]="{'highlight': isHighlighted(i, j)}" style="min-width: 190px; overflow-wrap: anywhere;">
               {{ cellItem }}
             </td>
         </tr>

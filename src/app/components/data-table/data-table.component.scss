@@ -11,7 +11,7 @@
 .table-container {
   flex-grow: 1;
   overflow-y: auto;
-  min-height: 0; /* Prevent flex growth from breaking the layout */
+  min-height: 0;
 }
 
 table {
