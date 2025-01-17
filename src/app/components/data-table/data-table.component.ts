@@ -22,20 +22,20 @@ export class DataTableComponent implements OnInit, OnDestroy {
   handleKeyboardEvent(event: KeyboardEvent) {
      // Ignore keypress if a form control is focused
      const target = event.target as HTMLElement;
-     if (['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(target.tagName)) {
+     if (!['MediaTrackPrevious', 'MediaTrackNext', 'MediaPlayPause'].includes(event.key) && ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(target.tagName)) {
        return;
      }
 
-    if (event.key === 'ArrowLeft') {
+    if (event.key === 'ArrowLeft' || event.key === 'MediaTrackPrevious') {
       if(!this.getButtonDisabledStatus('backward')) {
         this.rewindClick();
       }
-    } else if (event.key === 'ArrowRight') {
+    } else if (event.key === 'ArrowRight' || event.key === 'MediaTrackNext') {
       if(!this.getButtonDisabledStatus('forward')) {
         this.forwardClick();
       }
     }
-    else if (event.key === ' ' || event.key === 'Spacebar') {
+    else if (event.key === ' ' || event.key === 'Spacebar' || event.key === 'MediaPlayPause') {
       if(this.getButtonVisibility('play')) {
         this.playClick();
       } else if(this.getButtonVisibility('resume')) {
@@ -44,8 +44,13 @@ export class DataTableComponent implements OnInit, OnDestroy {
         this.pauseClick();
       }
     }
+    else if (event.key === 'MediaStop') {
+      if(!this.getButtonDisabledStatus('stop')) {
+        this.stopClick();
+      }
+    }
   }
-
+  
   componentInitialized: boolean = false;
   private wakeLock: WakeLockSentinel | null = null;
   loading: boolean = false;
@@ -63,7 +68,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   isStopped: boolean = true;
   formQueryParams: Params | null | undefined;
   vocalSpeedRange: {min: number, max: number} = {min: 0.1, max: 2};
-  inbetweenDelayRange: {min: number, max: number} = {min: 0, max: 3};
+  inbetweenDelayRange: {min: number, max: number} = {min: 0, max: 10};
   playedIndices: number[] = [];
   jumpInterval: number = 200;
   private skipSubject = new Subject<void>();
