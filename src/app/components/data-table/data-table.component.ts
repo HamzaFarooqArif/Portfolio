@@ -359,6 +359,56 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.playbackForm.get('speakOnlyColumnVal')?.updateValueAndValidity();
   }
 
+  increaseSlider(controlName: string) {
+    if(controlName == "vocalSpeed" && this.playbackForm.get("vocalSpeed")?.value < this.vocalSpeedRange.max) {
+      this.playbackForm.get("vocalSpeed")?.setValue(Math.min(this.vocalSpeedRange.max, this.playbackForm.get("vocalSpeed")?.value + 0.1));
+    }
+    else if(controlName == "inbetweenDelayColumn" && this.playbackForm.get("inbetweenDelayColumn")?.value < this.inbetweenDelayRange.max) {
+      if (this.isInteger(this.playbackForm.get("inbetweenDelayColumn")?.value)) {
+        this.playbackForm.get("inbetweenDelayColumn")?.setValue(this.playbackForm.get("inbetweenDelayColumn")?.value + 1);
+      } else {
+        this.playbackForm.get("inbetweenDelayColumn")?.setValue(Math.ceil(this.playbackForm.get("inbetweenDelayColumn")?.value));
+      }
+    }
+    else if(controlName == "inbetweenDelayRow" && this.playbackForm.get("inbetweenDelayRow")?.value < this.inbetweenDelayRange.max) {
+      if (this.isInteger(this.playbackForm.get("inbetweenDelayRow")?.value)) {
+        this.playbackForm.get("inbetweenDelayRow")?.setValue(this.playbackForm.get("inbetweenDelayRow")?.value + 1);
+      } else {
+        this.playbackForm.get("inbetweenDelayRow")?.setValue(Math.ceil(this.playbackForm.get("inbetweenDelayRow")?.value));
+      }
+    }
+    else if(controlName == "volume" && this.playbackForm.get("volume")?.value < 1) {
+      this.playbackForm.get("volume")?.setValue(Math.min(1, this.playbackForm.get("volume")?.value + 0.1));
+    }
+  }
+
+  decreaseSlider(controlName: string) {
+    if(controlName == "vocalSpeed" && this.playbackForm.get("vocalSpeed")?.value > this.vocalSpeedRange.min) {
+      this.playbackForm.get("vocalSpeed")?.setValue(Math.max(this.vocalSpeedRange.min, this.playbackForm.get("vocalSpeed")?.value - 0.1));
+    }
+    else if(controlName == "inbetweenDelayColumn" && this.playbackForm.get("inbetweenDelayColumn")?.value > this.inbetweenDelayRange.min) {
+      if (this.isInteger(this.playbackForm.get("inbetweenDelayColumn")?.value)) {
+        this.playbackForm.get("inbetweenDelayColumn")?.setValue(this.playbackForm.get("inbetweenDelayColumn")?.value - 1);
+      } else {
+        this.playbackForm.get("inbetweenDelayColumn")?.setValue(Math.floor(this.playbackForm.get("inbetweenDelayColumn")?.value));
+      }
+    }
+    else if(controlName == "inbetweenDelayRow" && this.playbackForm.get("inbetweenDelayRow")?.value > this.inbetweenDelayRange.min) {
+      if (this.isInteger(this.playbackForm.get("inbetweenDelayRow")?.value)) {
+        this.playbackForm.get("inbetweenDelayRow")?.setValue(this.playbackForm.get("inbetweenDelayRow")?.value - 1);
+      } else {
+        this.playbackForm.get("inbetweenDelayRow")?.setValue(Math.floor(this.playbackForm.get("inbetweenDelayRow")?.value));
+      }
+    }
+    else if(controlName == "volume" && this.playbackForm.get("volume")?.value > 0) {
+      this.playbackForm.get("volume")?.setValue(Math.max(0, this.playbackForm.get("volume")?.value - 0.1));
+    }
+  }
+
+  private isInteger(value: number): boolean {
+    return value % 1 === 0;
+  }
+
   getRangeVal(controlName: string): {min: number, max: number} {
     let min: number = 0;
     let max: number = 0;
