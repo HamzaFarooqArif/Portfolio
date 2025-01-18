@@ -621,6 +621,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.playbackForm.get('startRow')?.disable();
     this.playbackForm.get('endRow')?.disable();
     this.playbackForm.get('sheetId')?.disable();
+    this.playbackForm.get('speakOnlyColumnVal')?.disable();
+    this.playbackForm.get('speakOnlyColumnCheck')?.disable();
     this.currentRow = Number(this.playbackForm.get('startRow')?.value);
     let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
     if(reverseSpeechOrder) {
@@ -640,6 +642,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.playbackForm.get('startRow')?.enable();
     this.playbackForm.get('endRow')?.enable();
     this.playbackForm.get('sheetId')?.enable();
+    this.playbackForm.get('speakOnlyColumnVal')?.enable();
+    this.playbackForm.get('speakOnlyColumnCheck')?.enable();
     this.highlightWord(-1, -1);
     this.speechService.stopSpeech();
     this.playedIndices = [];
@@ -817,6 +821,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.playbackForm.get('startRow')?.enable();
       this.playbackForm.get('endRow')?.enable();
       this.playbackForm.get('sheetId')?.enable();
+      this.playbackForm.get('speakOnlyColumnVal')?.enable();
+      this.playbackForm.get('speakOnlyColumnCheck')?.enable();
       this.playedIndices = [];
       return;
     }
@@ -875,6 +881,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
         this.playbackForm.get('startRow')?.enable();
         this.playbackForm.get('endRow')?.enable();
         this.playbackForm.get('sheetId')?.enable();
+        this.playbackForm.get('speakOnlyColumnVal')?.enable();
+        this.playbackForm.get('speakOnlyColumnCheck')?.enable();
         this.highlightWord(-1, -1);
         this.playedIndices = [];
         return;
