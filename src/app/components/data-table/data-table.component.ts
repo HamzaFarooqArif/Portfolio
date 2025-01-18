@@ -9,6 +9,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { isEmpty } from '../../Utilities/Utility';
 import { debounceTime, Subject } from 'rxjs';
+import { MediaControlService } from '../../services/media-control/media-control.service';
 
 
 @Component({
@@ -18,38 +19,38 @@ import { debounceTime, Subject } from 'rxjs';
 })
 
 export class DataTableComponent implements OnInit, OnDestroy {
-  @HostListener('document:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) {
-     // Ignore keypress if a form control is focused
-     const target = event.target as HTMLElement;
-     if (!['MediaTrackPrevious', 'MediaTrackNext', 'MediaPlayPause'].includes(event.key) && ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(target.tagName)) {
-       return;
-     }
+  // @HostListener('document:keydown', ['$event'])
+  // handleKeyboardEvent(event: KeyboardEvent) {
+  //    // Ignore keypress if a form control is focused
+  //    const target = event.target as HTMLElement;
+  //    if (!['MediaTrackPrevious', 'MediaTrackNext', 'MediaPlayPause'].includes(event.key) && ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(target.tagName)) {
+  //      return;
+  //    }
 
-    if (event.key === 'ArrowLeft' || event.key === 'MediaTrackPrevious') {
-      if(!this.getButtonDisabledStatus('backward')) {
-        this.rewindClick();
-      }
-    } else if (event.key === 'ArrowRight' || event.key === 'MediaTrackNext') {
-      if(!this.getButtonDisabledStatus('forward')) {
-        this.forwardClick();
-      }
-    }
-    else if (event.key === ' ' || event.key === 'Spacebar' || event.key === 'MediaPlayPause') {
-      if(this.getButtonVisibility('play')) {
-        this.playClick();
-      } else if(this.getButtonVisibility('resume')) {
-        this.resumeClick();
-      } else if(this.getButtonVisibility('pause')) {
-        this.pauseClick();
-      }
-    }
-    else if (event.key === 'MediaStop') {
-      if(!this.getButtonDisabledStatus('stop')) {
-        this.stopClick();
-      }
-    }
-  }
+  //   if (event.key === 'ArrowLeft' || event.key === 'MediaTrackPrevious') {
+  //     if(!this.getButtonDisabledStatus('backward')) {
+  //       this.rewindClick();
+  //     }
+  //   } else if (event.key === 'ArrowRight' || event.key === 'MediaTrackNext') {
+  //     if(!this.getButtonDisabledStatus('forward')) {
+  //       this.forwardClick();
+  //     }
+  //   }
+  //   else if (event.key === ' ' || event.key === 'Spacebar' || event.key === 'MediaPlayPause') {
+  //     if(this.getButtonVisibility('play')) {
+  //       this.playClick();
+  //     } else if(this.getButtonVisibility('resume')) {
+  //       this.resumeClick();
+  //     } else if(this.getButtonVisibility('pause')) {
+  //       this.pauseClick();
+  //     }
+  //   }
+  //   else if (event.key === 'MediaStop') {
+  //     if(!this.getButtonDisabledStatus('stop')) {
+  //       this.stopClick();
+  //     }
+  //   }
+  // }
   
   componentInitialized: boolean = false;
   private wakeLock: WakeLockSentinel | null = null;
@@ -76,6 +77,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   constructor(
     private spreadsheetService: SpreadsheetService,
     private configService: ConfigService,
+    private mediaControlService: MediaControlService,
     private papa: Papa,
     private speechService: SpeechService,
     private fb: FormBuilder,
@@ -97,6 +99,43 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.refreshPlaybackButtons();
       this.speakNow();
     });
+  }
+
+  setupMediaControls() {
+    this.mediaControlService.forwardCallback = () => {
+      if(!this.getButtonDisabledStatus('forward')) {
+        this.forwardClick();
+      }
+    };
+    this.mediaControlService.backwardCallback = () => {
+      if(!this.getButtonDisabledStatus('backward')) {
+        this.rewindClick();
+      }
+    };
+    this.mediaControlService.pauseCallback = () => {
+      if(this.getButtonVisibility('play')) {
+        this.playClick();
+      } else if(this.getButtonVisibility('resume')) {
+        this.resumeClick();
+      } else if(this.getButtonVisibility('pause')) {
+        this.pauseClick();
+      }
+    };
+    this.mediaControlService.playCallback = () => {
+      if(this.getButtonVisibility('play')) {
+        this.playClick();
+      } else if(this.getButtonVisibility('resume')) {
+        this.resumeClick();
+      } else if(this.getButtonVisibility('pause')) {
+        this.pauseClick();
+      }
+    };
+    this.mediaControlService.stopCallback = () => {
+      if(!this.getButtonDisabledStatus('stop')) {
+        this.stopClick();
+      }
+    };
+    this.mediaControlService.playDummyAudio();
   }
 
   async onInitAsync() {
@@ -584,6 +623,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.currentColumn = 0;
     }
     this.playAllTexts();
+    this.setupMediaControls();
   }
 
   stopClick() {
