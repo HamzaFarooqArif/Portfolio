@@ -28,7 +28,7 @@ export class MediaControlService {
   }
 
   getAwesomePlaylist() {
-    const BASE_URL = 'https://storage.googleapis.com/media-session/';
+    const BASE_URL = '../../../assets/audioTracks/';
 
     return [{
         src: BASE_URL + 'sintel/snow-fight.mp3',
@@ -55,32 +55,6 @@ export class MediaControlService {
           { src: BASE_URL + 'big-buck-bunny/artwork-256.png', sizes: '256x256', type: 'image/png' },
           { src: BASE_URL + 'big-buck-bunny/artwork-384.png', sizes: '384x384', type: 'image/png' },
           { src: BASE_URL + 'big-buck-bunny/artwork-512.png', sizes: '512x512', type: 'image/png' },
-        ]
-      }, {
-        src: BASE_URL + 'elephants-dream/the-wires.mp3',
-        title: 'The Wires',
-        artist: 'Jan Morgenstern',
-        album: 'Elephants Dream',
-        artwork: [
-          { src: BASE_URL + 'elephants-dream/artwork-96.png',  sizes: '96x96',   type: 'image/png' },
-          { src: BASE_URL + 'elephants-dream/artwork-128.png', sizes: '128x128', type: 'image/png' },
-          { src: BASE_URL + 'elephants-dream/artwork-192.png', sizes: '192x192', type: 'image/png' },
-          { src: BASE_URL + 'elephants-dream/artwork-256.png', sizes: '256x256', type: 'image/png' },
-          { src: BASE_URL + 'elephants-dream/artwork-384.png', sizes: '384x384', type: 'image/png' },
-          { src: BASE_URL + 'elephants-dream/artwork-512.png', sizes: '512x512', type: 'image/png' },
-        ]
-      }, {
-        src: BASE_URL + 'caminandes/original-score.mp3',
-        title: 'Original Score',
-        artist: 'Jan Morgenstern',
-        album: 'Caminandes 2: Gran Dillama',
-        artwork: [
-          { src: BASE_URL + 'caminandes/artwork-96.png',  sizes: '96x96',   type: 'image/png' },
-          { src: BASE_URL + 'caminandes/artwork-128.png', sizes: '128x128', type: 'image/png' },
-          { src: BASE_URL + 'caminandes/artwork-192.png', sizes: '192x192', type: 'image/png' },
-          { src: BASE_URL + 'caminandes/artwork-256.png', sizes: '256x256', type: 'image/png' },
-          { src: BASE_URL + 'caminandes/artwork-384.png', sizes: '384x384', type: 'image/png' },
-          { src: BASE_URL + 'caminandes/artwork-512.png', sizes: '512x512', type: 'image/png' },
         ]
       }];
   }
