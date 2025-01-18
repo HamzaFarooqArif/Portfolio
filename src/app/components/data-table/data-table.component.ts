@@ -955,11 +955,18 @@ export class DataTableComponent implements OnInit, OnDestroy {
   } 
 
   highlightWord(row: number, col: number) {
+    const prevElemnt = document.getElementById(`cell_${this.highlightedRow}_${this.highlightedCol}`);
+    if(prevElemnt) {
+      this.renderer.removeClass(prevElemnt, 'highlight');
+    }
+
     this.highlightedRow = row;
     this.highlightedCol = col;
 
     const container = document.getElementById('table-container');
     const element = document.getElementById(`cell_${row}_${col}`);
+
+    this.renderer.addClass(element, 'highlight');
 
     if (element && container) {
       const elementOffset = element.offsetTop;
