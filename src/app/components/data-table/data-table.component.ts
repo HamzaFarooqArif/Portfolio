@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, Renderer2, signal } from '@angular/core';
 import { SpreadsheetService as SpreadsheetService } from '../../services/spreadsheet/spreadsheet.service';
 import { Papa } from 'ngx-papaparse';
 import { SpeechService } from '../../services/speech/speech.service';
@@ -78,6 +78,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
+    private renderer: Renderer2,
     private toastr: ToastrService) {}
 
   tableData: string[][] = [];
@@ -145,6 +146,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.patchForm();
       this.refreshPlaybackButtons();
       this.loadSavedData();
+      this.assignTheme();
       this.keepScreenOn();
     } catch (error) {
       console.error('An error occurred during initialization:', error);
@@ -226,6 +228,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       shuffle: [false],
       reversePlayback: [false],
       reverseSpeechOrder: [false],
+      darkMode: [false],
     });
   }
 
@@ -407,6 +410,14 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   private isInteger(value: number): boolean {
     return value % 1 === 0;
+  }
+
+  assignTheme() {
+    if(this.playbackForm.get("darkMode")?.value) {
+      this.renderer.addClass(document.body, 'dark');
+    } else {
+      this.renderer.removeClass(document.body, 'dark');
+    }
   }
 
   getRangeVal(controlName: string): {min: number, max: number} {
@@ -812,6 +823,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.playbackForm.get('volume')?.patchValue(Number(savedData['volume']));
     }
     this.playbackForm.get('speakOnlyColumnCheck')?.patchValue(this.checkForTruthy(savedData['speakOnlyColumnCheck']));
+    this.playbackForm.get('darkMode')?.patchValue(this.checkForTruthy(savedData['darkMode']));
     this.playbackForm.get('reversePlayback')?.patchValue(this.checkForTruthy(savedData['reversePlayback']));
     this.playbackForm.get('repeat')?.patchValue(this.checkForTruthy(savedData['repeat']));
     this.playbackForm.get('shuffle')?.patchValue(this.checkForTruthy(savedData['shuffle']));
@@ -1140,6 +1152,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.refreshRowFieldsValidity();
     }
     this.resetRangeSlider("volume");
+    this.playbackForm.get('darkMode')?.setValue(false);
     this.resetRangeSlider("inbetweenDelayRow");
     this.resetRangeSlider("inbetweenDelayColumn");
     this.resetRangeSlider("vocalSpeed");

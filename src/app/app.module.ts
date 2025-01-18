@@ -21,6 +21,7 @@ import { NgxLoadingModule } from "ngx-loading";
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatButtonModule} from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 
 export function loadAppConfig(configService: ConfigService): () => Promise<void> {
   return () =>
@@ -51,6 +52,7 @@ export function loadAppConfig(configService: ConfigService): () => Promise<void>
     MatExpansionModule,
     MatButtonModule,
     MatTooltipModule,
+    MatSlideToggleModule,
     ToastrModule.forRoot(),
     NgxLoadingModule.forRoot({}),
   ],

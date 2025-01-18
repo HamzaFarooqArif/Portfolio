@@ -1,4 +1,142 @@
-/* You can add global styles to this file, and also import other style files */
+
+@use '@angular/material' as mat;
+
+$m2-primary: (
+    50 : #fff9e1,
+    100 : #fef1b3,
+    200 : #fde781,
+    300 : #fcdd4e,
+    400 : #fcd628,
+    500 : #fbcf02,
+    600 : #faca02,
+    700 : #fac301,
+    800 : #f9bd01,
+    900 : #f8b201,
+    A100 : #ffffff,
+    A200 : #ffffff,
+    A400 : #fffbf8,
+    A700 : #ffefde,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #000000,
+        600 : #000000,
+        700 : #000000,
+        800 : #000000,
+        900 : #000000,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+$m2-accent: (
+    50 : #f6fae8,
+    100 : #e7f2c6,
+    200 : #d8eaa1,
+    300 : #c8e17b,
+    400 : #bcda5e,
+    500 : #b0d442,
+    600 : #a9cf3c,
+    700 : #a0c933,
+    800 : #97c32b,
+    900 : #87b91d,
+    A100 : #ffffff,
+    A200 : #fac301,
+    A400 : #eeffa4,
+    A700 : #e9ff8a,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #000000,
+        600 : #000000,
+        700 : #000000,
+        800 : #000000,
+        900 : #000000,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+$m2-error: (
+    50 : #fff6f5,
+    100 : #ffe9e6,
+    200 : #ffdad5,
+    300 : #ffcbc4,
+    400 : #ffbfb8,
+    500 : #ffb4ab,
+    600 : #ffada4,
+    700 : #ffa49a,
+    800 : #ff9c91,
+    900 : #ff8c80,
+    A100 : #ffffff,
+    A200 : #ffffff,
+    A400 : #ffffff,
+    A700 : #ffffff,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #000000,
+        600 : #000000,
+        700 : #000000,
+        800 : #000000,
+        900 : #000000,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+$my-primary: mat.define-palette($m2-primary);
+$my-accent: mat.define-palette($m2-accent, A200, A100, A400);
+
+// The "warn" palette is optional and defaults to red if not specified.
+$my-warn: mat.define-palette($m2-error);
+
+$my-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: $my-primary,
+      accent: $my-accent,
+      warn: $my-warn,
+    ),
+    typography: mat.define-typography-config(),
+    density: 0,
+  )
+);
+
+$my-dark-theme: mat.define-dark-theme(
+  (
+    color: (
+      primary: $my-primary,
+      accent: $my-accent,
+      warn: $my-warn,
+    ),
+  )
+);
+
+@include mat.core();
+
+@include mat.all-component-themes($my-theme);
+
+.dark {
+  @include mat.all-component-colors($my-dark-theme);
+  background-color: #2e2e2e;
+  color: #e0e0e0;
+}
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
