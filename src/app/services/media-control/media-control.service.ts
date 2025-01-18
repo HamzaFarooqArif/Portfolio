@@ -87,14 +87,14 @@ export class MediaControlService {
       if (this.playCallback) {
         this.playCallback();
       }
-      await this.audio.play();
+      // await this.audio.play();
     });
 
     navigator.mediaSession.setActionHandler('pause', () => {
       if (this.pauseCallback) {
         this.pauseCallback();
       }
-      this.audio.pause();
+      // this.audio.pause();
     });
 
     try {
