@@ -81,3 +81,8 @@ td, th {
 :host ::ng-deep .mat-expansion-panel-body {
   padding: 0 0px 0px 24px;
 }
+
+:host ::ng-deep .errorClass .mat-mdc-form-field-error-wrapper {
+  padding: 0px;
+}
+

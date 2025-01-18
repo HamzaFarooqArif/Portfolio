@@ -88,7 +88,7 @@
                   <mat-error *ngIf="playbackForm.get('startRow')?.hasError('min')">
                     Invalid
                   </mat-error>
-                  <mat-error *ngIf="playbackForm.get('startRow')?.hasError('max')">
+                  <mat-error *ngIf="!playbackForm.get('startRow')?.hasError('min') && playbackForm.get('startRow')?.hasError('max')">
                     Invalid
                   </mat-error>
                 </mat-form-field>
@@ -107,7 +107,7 @@
                   <mat-error *ngIf="playbackForm.get('endRow')?.hasError('min')">
                     Invalid
                   </mat-error>
-                  <mat-error *ngIf="playbackForm.get('endRow')?.hasError('max')">
+                  <mat-error *ngIf="!playbackForm.get('endRow')?.hasError('min') && playbackForm.get('endRow')?.hasError('max')">
                     Invalid
                   </mat-error>
                 </mat-form-field>
@@ -134,7 +134,7 @@
             <div>
               <mat-checkbox formControlName="speakOnlyColumnCheck" (change)="refreshRowFieldsValidity()"></mat-checkbox>
               Speak Column
-              <mat-form-field style="width: 70px;">
+              <mat-form-field style="width: 70px;" class="errorClass">
                 <input
                   matInput
                   type="number"
@@ -148,7 +148,7 @@
                 <mat-error *ngIf="playbackForm.get('speakOnlyColumnVal')?.hasError('min')">
                   Invalid
                 </mat-error>
-                <mat-error *ngIf="playbackForm.get('speakOnlyColumnVal')?.hasError('max')">
+                <mat-error *ngIf="!playbackForm.get('speakOnlyColumnVal')?.hasError('min') && playbackForm.get('speakOnlyColumnVal')?.hasError('max')">
                   Invalid
                 </mat-error>
               </mat-form-field>
