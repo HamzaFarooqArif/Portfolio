@@ -216,6 +216,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
       sheetId: ['', Validators.required],
       startRow: ['', Validators.required],
       endRow: ['', Validators.required],
+      speakOnlyColumnVal: [1],
+      speakOnlyColumnCheck: [false],
       vocalSpeed: [1],
       inbetweenDelayColumn: [0],
       inbetweenDelayRow: [0],
@@ -343,8 +345,18 @@ export class DataTableComponent implements OnInit, OnDestroy {
       Validators.min(this.getRangeVal('endRow').min),
       Validators.max(this.getRangeVal('endRow').max)
     ]);
+    if(this.playbackForm.get('speakOnlyColumnCheck')?.value) {
+      this.playbackForm.get('speakOnlyColumnVal')?.setValidators([
+        Validators.required,
+        Validators.min(1),
+        Validators.max(this.tableData[0]?.length)
+      ]);
+    } else {
+      this.playbackForm.get('speakOnlyColumnVal')?.setValidators(null);
+    }
     this.playbackForm.get('startRow')?.updateValueAndValidity();
     this.playbackForm.get('endRow')?.updateValueAndValidity();
+    this.playbackForm.get('speakOnlyColumnVal')?.updateValueAndValidity();
   }
 
   getRangeVal(controlName: string): {min: number, max: number} {
@@ -725,6 +737,10 @@ export class DataTableComponent implements OnInit, OnDestroy {
     {
       this.playbackForm.get('endRow')?.patchValue(Number(savedData['endRow']));
     }
+    if(savedData['speakOnlyColumnVal'] && Number(savedData['speakOnlyColumnVal']) <= this.tableData[0]?.length)
+    {
+      this.playbackForm.get('speakOnlyColumnVal')?.patchValue(Number(savedData['speakOnlyColumnVal']));
+    }
     if(savedData['vocalSpeed'] && Number(savedData['vocalSpeed']) >= this.vocalSpeedRange.min && Number(savedData['vocalSpeed']) <= this.vocalSpeedRange.max)
     {
       this.playbackForm.get('vocalSpeed')?.patchValue(Number(savedData['vocalSpeed']));
@@ -741,6 +757,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     {
       this.playbackForm.get('volume')?.patchValue(Number(savedData['volume']));
     }
+    this.playbackForm.get('speakOnlyColumnCheck')?.patchValue(this.checkForTruthy(savedData['speakOnlyColumnCheck']));
     this.playbackForm.get('reversePlayback')?.patchValue(this.checkForTruthy(savedData['reversePlayback']));
     this.playbackForm.get('repeat')?.patchValue(this.checkForTruthy(savedData['repeat']));
     this.playbackForm.get('shuffle')?.patchValue(this.checkForTruthy(savedData['shuffle']));
@@ -780,6 +797,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
   async speakNow() {
+    if(this.playbackForm?.get("speakOnlyColumnCheck")?.value && this.playbackForm?.get("speakOnlyColumnVal")?.value != this.currentColumn + 1) {
+      return;
+    }
     let text = this.tableData[this.currentRow][this.currentColumn];
     let voice: SpeechSynthesisVoice | undefined = this.getSpeechSynthesisVoice(`lang${this.currentColumn + 1}Voice`);
     let vocalSpeed = Number(this.playbackForm?.get('vocalSpeed')?.value);
@@ -1054,6 +1074,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.playbackForm.get('shuffle')?.setValue(false);
     this.playbackForm.get('reversePlayback')?.setValue(false);
     this.playbackForm.get('reverseSpeechOrder')?.setValue(false);
+    this.playbackForm.get('speakOnlyColumnCheck')?.setValue(false);
+    this.playbackForm.get('speakOnlyColumnVal')?.setValue(1);
     if(this.tableData?.length) {
       this.playbackForm.get('startRow')?.setValue(1);
       this.playbackForm.get('endRow')?.setValue(this.tableData?.length - 1);

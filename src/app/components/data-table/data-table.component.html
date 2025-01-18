@@ -131,6 +131,29 @@
                 </div>
               </div>
             </div>
+            <div>
+              <mat-checkbox formControlName="speakOnlyColumnCheck" (change)="refreshRowFieldsValidity()"></mat-checkbox>
+              Speak Column
+              <mat-form-field style="width: 70px;">
+                <input
+                  matInput
+                  type="number"
+                  class="form-control"
+                  formControlName="speakOnlyColumnVal"
+                  (change)="refreshRowFieldsValidity();"
+                >
+                <mat-error *ngIf="playbackForm.get('speakOnlyColumnVal')?.hasError('required')">
+                  Required
+                </mat-error>
+                <mat-error *ngIf="playbackForm.get('speakOnlyColumnVal')?.hasError('min')">
+                  Invalid
+                </mat-error>
+                <mat-error *ngIf="playbackForm.get('speakOnlyColumnVal')?.hasError('max')">
+                  Invalid
+                </mat-error>
+              </mat-form-field>
+              only
+            </div>
             <div class="first-row-container">
               <div style="display: flex; flex-direction: row; margin-left: 5px;">
                 <mat-form-field style="width: 300px;">
