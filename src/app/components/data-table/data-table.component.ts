@@ -966,7 +966,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
     const container = document.getElementById('table-container');
     const element = document.getElementById(`cell_${row}_${col}`);
 
-    this.renderer.addClass(element, 'highlight');
+    if(element) {
+      this.renderer.addClass(element, 'highlight');
+    }
 
     if (element && container) {
       const elementOffset = element.offsetTop;
