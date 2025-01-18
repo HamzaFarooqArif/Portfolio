@@ -14,12 +14,17 @@ export class MediaControlService {
   private audio!: HTMLAudioElement;
   private playlist: any;
   private index: any;
+  public userActionInitiated: boolean = false;
 
   constructor() {
     this.init();
-   }
+  }
 
   playDummyAudio() {
+    if(!this.userActionInitiated) {
+      this.userActionInitiated = true;
+    }
+
     this.audio.src = this.playlist[this.index].src;
     this.audio.play()
     // .then(_ => this.updateMetadata())

@@ -45,6 +45,17 @@ export class DataTableComponent implements OnInit, OnDestroy {
         this.pauseClick();
       }
     }
+    else if (event.key === 'MediaPlayPause') {
+      if(!this.mediaControlService.userActionInitiated) {
+        if(this.getButtonVisibility('play')) {
+          this.playClick();
+        } else if(this.getButtonVisibility('resume')) {
+          this.resumeClick();
+        } else if(this.getButtonVisibility('pause')) {
+          this.pauseClick();
+        }
+      }
+    }
   }
   
   componentInitialized: boolean = false;
