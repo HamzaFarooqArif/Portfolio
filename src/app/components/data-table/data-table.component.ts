@@ -19,38 +19,33 @@ import { MediaControlService } from '../../services/media-control/media-control.
 })
 
 export class DataTableComponent implements OnInit, OnDestroy {
-  // @HostListener('document:keydown', ['$event'])
-  // handleKeyboardEvent(event: KeyboardEvent) {
-  //    // Ignore keypress if a form control is focused
-  //    const target = event.target as HTMLElement;
-  //    if (!['MediaTrackPrevious', 'MediaTrackNext', 'MediaPlayPause'].includes(event.key) && ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(target.tagName)) {
-  //      return;
-  //    }
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+     // Ignore keypress if a form control is focused
+     const target = event.target as HTMLElement;
+     if (['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(target.tagName)) {
+       return;
+     }
 
-  //   if (event.key === 'ArrowLeft' || event.key === 'MediaTrackPrevious') {
-  //     if(!this.getButtonDisabledStatus('backward')) {
-  //       this.rewindClick();
-  //     }
-  //   } else if (event.key === 'ArrowRight' || event.key === 'MediaTrackNext') {
-  //     if(!this.getButtonDisabledStatus('forward')) {
-  //       this.forwardClick();
-  //     }
-  //   }
-  //   else if (event.key === ' ' || event.key === 'Spacebar' || event.key === 'MediaPlayPause') {
-  //     if(this.getButtonVisibility('play')) {
-  //       this.playClick();
-  //     } else if(this.getButtonVisibility('resume')) {
-  //       this.resumeClick();
-  //     } else if(this.getButtonVisibility('pause')) {
-  //       this.pauseClick();
-  //     }
-  //   }
-  //   else if (event.key === 'MediaStop') {
-  //     if(!this.getButtonDisabledStatus('stop')) {
-  //       this.stopClick();
-  //     }
-  //   }
-  // }
+    if (event.key === 'ArrowLeft') {
+      if(!this.getButtonDisabledStatus('backward')) {
+        this.rewindClick();
+      }
+    } else if (event.key === 'ArrowRight') {
+      if(!this.getButtonDisabledStatus('forward')) {
+        this.forwardClick();
+      }
+    }
+    else if (event.key === ' ' || event.key === 'Spacebar') {
+      if(this.getButtonVisibility('play')) {
+        this.playClick();
+      } else if(this.getButtonVisibility('resume')) {
+        this.resumeClick();
+      } else if(this.getButtonVisibility('pause')) {
+        this.pauseClick();
+      }
+    }
+  }
   
   componentInitialized: boolean = false;
   private wakeLock: WakeLockSentinel | null = null;
