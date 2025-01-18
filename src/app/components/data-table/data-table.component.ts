@@ -23,7 +23,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   handleKeyboardEvent(event: KeyboardEvent) {
      // Ignore keypress if a form control is focused
      const target = event.target as HTMLElement;
-     if (['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(target.tagName)) {
+     if (event.key != 'MediaPlayPause' && ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(target.tagName)) {
        return;
      }
 
