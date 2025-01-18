@@ -30,20 +30,8 @@ export class MediaControlService {
   getAwesomePlaylist() {
     const BASE_URL = '../../../assets/audioTracks/';
 
-    return [{
-        src: BASE_URL + 'sintel/snow-fight.mp3',
-        title: 'Snow Fight',
-        artist: 'Jan Morgenstern',
-        album: 'Sintel',
-        artwork: [
-          { src: BASE_URL + 'sintel/artwork-96.png',  sizes: '96x96',   type: 'image/png' },
-          { src: BASE_URL + 'sintel/artwork-128.png', sizes: '128x128', type: 'image/png' },
-          { src: BASE_URL + 'sintel/artwork-192.png', sizes: '192x192', type: 'image/png' },
-          { src: BASE_URL + 'sintel/artwork-256.png', sizes: '256x256', type: 'image/png' },
-          { src: BASE_URL + 'sintel/artwork-384.png', sizes: '384x384', type: 'image/png' },
-          { src: BASE_URL + 'sintel/artwork-512.png', sizes: '512x512', type: 'image/png' },
-        ]
-      }, {
+    return [
+      {
         src: BASE_URL + 'big-buck-bunny/prelude.mp3',
         title: 'Prelude',
         artist: 'Jan Morgenstern',
@@ -55,6 +43,20 @@ export class MediaControlService {
           { src: BASE_URL + 'big-buck-bunny/artwork-256.png', sizes: '256x256', type: 'image/png' },
           { src: BASE_URL + 'big-buck-bunny/artwork-384.png', sizes: '384x384', type: 'image/png' },
           { src: BASE_URL + 'big-buck-bunny/artwork-512.png', sizes: '512x512', type: 'image/png' },
+        ]
+      },
+      {
+        src: BASE_URL + 'sintel/snow-fight.mp3',
+        title: 'Snow Fight',
+        artist: 'Jan Morgenstern',
+        album: 'Sintel',
+        artwork: [
+          { src: BASE_URL + 'sintel/artwork-96.png',  sizes: '96x96',   type: 'image/png' },
+          { src: BASE_URL + 'sintel/artwork-128.png', sizes: '128x128', type: 'image/png' },
+          { src: BASE_URL + 'sintel/artwork-192.png', sizes: '192x192', type: 'image/png' },
+          { src: BASE_URL + 'sintel/artwork-256.png', sizes: '256x256', type: 'image/png' },
+          { src: BASE_URL + 'sintel/artwork-384.png', sizes: '384x384', type: 'image/png' },
+          { src: BASE_URL + 'sintel/artwork-512.png', sizes: '512x512', type: 'image/png' },
         ]
       }];
   }
