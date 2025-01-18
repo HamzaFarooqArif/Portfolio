@@ -28,7 +28,7 @@ export class MediaControlService {
   }
 
   getAwesomePlaylist() {
-    const BASE_URL = '../../../assets/audioTracks/';
+    const BASE_URL = 'https://storage.googleapis.com/media-session/';
 
     return [
       {
