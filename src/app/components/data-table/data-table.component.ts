@@ -309,6 +309,10 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.setButtonDisabledStatus('pause', false);
       this.setButtonVisibility('stop', true);
       this.setButtonDisabledStatus('stop', false);
+      this.setButtonVisibility('forward', true);
+      this.setButtonDisabledStatus('forward', false);
+      this.setButtonVisibility('backward', true);
+      this.setButtonDisabledStatus('backward', false);
     }
     else if(this.isStopped) {
       this.setButtonVisibility('play', true);
@@ -328,6 +332,10 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.setButtonVisibility('pause', false);
       this.setButtonVisibility('stop', true);
       this.setButtonDisabledStatus('stop', false);
+      this.setButtonVisibility('forward', true);
+      this.setButtonDisabledStatus('forward', false);
+      this.setButtonVisibility('backward', true);
+      this.setButtonDisabledStatus('backward', false);
     }
   }
 
@@ -586,6 +594,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     let reverse: boolean = this.playbackForm?.get('reversePlayback')?.value;
     let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
     let startRow = Number(this.playbackForm.get('startRow')?.value);
+    let shuffle: boolean = this.playbackForm?.get('shuffle')?.value;
 
     if(reverse) {
       if(reverseSpeechOrder) {
@@ -597,7 +606,24 @@ export class DataTableComponent implements OnInit, OnDestroy {
       } else {
         if(this.currentColumn > 0) {
           this.currentColumn = 0;
-        } else if(this.currentRow < startRow){
+        } 
+        // ===========================
+        else if(shuffle) {
+          let prevNum: number = -1;
+          if(this.playedIndices?.length) {
+            let foundIndex = this.playedIndices.findIndex(num => num == this.currentRow);
+            if(foundIndex > 0) {
+              prevNum = this.playedIndices[foundIndex - 1];
+            }
+          }
+          if(prevNum > -1) {
+            this.currentRow = prevNum;
+          } else {
+            return;
+          }
+        }
+        // ===========================
+        else if(this.currentRow < startRow){
           this.currentRow++;
         }
       }
@@ -605,13 +631,47 @@ export class DataTableComponent implements OnInit, OnDestroy {
       if(reverseSpeechOrder) {
         if(this.currentColumn < this.tableData[0]?.length - 1) {
           this.currentColumn = this.tableData[0]?.length - 1;
-        } else if(this.currentRow > startRow){
+        }
+        // ===========================
+        else if(shuffle) {
+          let prevNum: number = -1;
+          if(this.playedIndices?.length) {
+            let foundIndex = this.playedIndices.findIndex(num => num == this.currentRow);
+            if(foundIndex > 0) {
+              prevNum = this.playedIndices[foundIndex - 1];
+            }
+          }
+          if(prevNum > -1) {
+            this.currentRow = prevNum;
+          } else {
+            return;
+          }
+        }
+        // ===========================
+        else if(this.currentRow > startRow){
           this.currentRow--;
         }
       } else {
         if(this.currentColumn > 0) {
           this.currentColumn = 0;
-        } else if(this.currentRow > startRow){
+        }
+        // ===========================
+        else if(shuffle) {
+          let prevNum: number = -1;
+          if(this.playedIndices?.length) {
+            let foundIndex = this.playedIndices.findIndex(num => num == this.currentRow);
+            if(foundIndex > 0) {
+              prevNum = this.playedIndices[foundIndex - 1];
+            }
+          }
+          if(prevNum > -1) {
+            this.currentRow = prevNum;
+          } else {
+            return;
+          }
+        }
+        // ===========================
+        else if(this.currentRow > startRow){
           this.currentRow--;
         }
       }
@@ -630,14 +690,53 @@ export class DataTableComponent implements OnInit, OnDestroy {
     let reverse: boolean = this.playbackForm?.get('reversePlayback')?.value;
     let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
     let endRow = Number(this.playbackForm.get('endRow')?.value);
+    let shuffle: boolean = this.playbackForm?.get('shuffle')?.value;
 
     if(reverse) {
-      if(this.currentRow > endRow) {
+      // ===========================
+      if(shuffle) {
+        let randNum: number = -1;
+        if(this.playedIndices?.length) {
+          let foundIndex = this.playedIndices.findIndex(num => num == this.currentRow);
+          if(foundIndex > -1 && foundIndex < this.playedIndices?.length - 1) {
+            randNum = this.playedIndices[foundIndex + 1];
+          }
+          else {
+            randNum = this.getRandomRow();
+          }
+        }
+        if(randNum > -1) {
+          this.currentRow = randNum;
+        } else {
+          return;
+        }
+      }
+      // ===========================
+      else if(this.currentRow > endRow) {
         this.currentRow--;
       }
     }
     else {
-      if(this.currentRow < endRow) {
+      // ===========================
+      if(shuffle) {
+        let randNum: number = -1;
+        if(this.playedIndices?.length) {
+          let foundIndex = this.playedIndices.findIndex(num => num == this.currentRow);
+          if(foundIndex > -1 && foundIndex < this.playedIndices?.length - 1) {
+            randNum = this.playedIndices[foundIndex + 1];
+          }
+          else {
+            randNum = this.getRandomRow();
+          }
+        }
+        if(randNum > -1) {
+          this.currentRow = randNum;
+        } else {
+          return;
+        }
+      }
+      // ===========================
+      else if(this.currentRow < endRow) {
         this.currentRow++;
       }
     }
@@ -1068,39 +1167,52 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
   getRandomRow(): number {
-    let min = this.playbackForm.get('startRow')?.value;
-    let max = this.playbackForm.get('endRow')?.value;
-    if(max < min) {
-      let temp = max;
-      max = min;
-      min = temp;
-    }
-
-    const possibleNumbers = [];
-    for (let i = min; i <= max; i++) {
-      if (!this.playedIndices.includes(i)) {
-        possibleNumbers.push(i);
+    let shuffle: boolean = this.playbackForm?.get('shuffle')?.value;
+    let nextIndex: number = -1;
+    if(shuffle) {
+      if(this.playedIndices?.length) {
+        let foundIndex = this.playedIndices.findIndex(num => num == this.currentRow);
+        if(foundIndex > -1 && foundIndex < this.playedIndices?.length - 1) {
+          nextIndex = this.playedIndices[foundIndex + 1];
+        }
       }
     }
+    if (nextIndex == -1) {
+      let min = this.playbackForm.get('startRow')?.value;
+      let max = this.playbackForm.get('endRow')?.value;
+      if(max < min) {
+        let temp = max;
+        max = min;
+        min = temp;
+      }
   
-    if (possibleNumbers.length === 0) {
-      return -1;
+      const possibleNumbers = [];
+      for (let i = min; i <= max; i++) {
+        if (!this.playedIndices.includes(i)) {
+          possibleNumbers.push(i);
+        }
+      }
+    
+      if (possibleNumbers.length === 0) {
+        return -1;
+      }
+    
+      const randomIndex = Math.floor(Math.random() * possibleNumbers.length);
+      return possibleNumbers[randomIndex];
     }
-  
-    const randomIndex = Math.floor(Math.random() * possibleNumbers.length);
-    return possibleNumbers[randomIndex];
+    return nextIndex;
   }
 
   refreshButtonsWithshuffle() {
     if(this.playbackForm.get('shuffle')?.value)
     {
-      this.setButtonDisabledStatus('forward', true);
-      this.setButtonDisabledStatus('backward', true);
+      // this.setButtonDisabledStatus('forward', true);
+      // this.setButtonDisabledStatus('backward', true);
       this.setButtonDisabledStatus('reverse', true);
     }
     else {
-      this.setButtonDisabledStatus('forward', false);
-      this.setButtonDisabledStatus('backward', false);
+      // this.setButtonDisabledStatus('forward', false);
+      // this.setButtonDisabledStatus('backward', false);
       this.setButtonDisabledStatus('reverse', false);
     }
   }
