@@ -6,6 +6,12 @@
     background-size: cover;
 }
 
+.highlighted {
+    color: #000;
+    font-weight: bold;
+    background-color: #D4B403;   
+}
+
 .circular-image {
     width: 600px; /* Adjust size as needed */
     height: 600px; /* Keep it same as width for a perfect circle */
