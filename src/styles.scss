@@ -154,6 +154,10 @@ body {
   background-size: cover;
 }
 
+.form-control {
+  background-color: inherit !important;
+}
+
 .form-control:disabled {
   background-color: inherit !important;
 }
