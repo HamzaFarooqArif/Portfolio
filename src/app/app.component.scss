@@ -1,4 +1,53 @@
-.app-container {
-    height: 100%;
-    overflow: hidden;
+.container {
+    padding: 0px;
+}
+
+.sidenav {
+    padding: 0px 20px;
+}
+
+.header-item{
+    cursor: pointer !important;
+}
+
+.header-item-collapsed {
+    cursor: pointer !important;
+    margin: 10px 0px;
+}
+
+.navCollapsedBtn {
+    display: none;
+}
+
+.navExpandedMenu {
+    display: flex; 
+    flex-direction: row;
+}
+
+.logo {
+    margin-left: 10px;
+}
+
+.active-link {
+color: #ffeb3b !important; /* Yellow color for active item */
+font-weight: bold;
+border-bottom: 2px solid #ffeb3b; /* Underline effect */
+}
+
+:host ::ng-deep .mat-mdc-list-item {
+    width: inherit;
+}
+
+:host ::ng-deep .mat-mdc-list-option {
+    width: inherit;
+}
+
+@media (max-width: 780px) {
+    .navCollapsedBtn {
+        display: inherit;
+    }
+
+    .navExpandedMenu {
+        display: none;
+    }
 }

@@ -9,6 +9,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfigService } from './read-aloud/services/config/config.service';
 import { ToastrModule } from 'ngx-toastr';
 import { NgxLoadingModule } from "ngx-loading";
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import {MatToolbarModule} from '@angular/material/toolbar';
+import {MatSidenavModule} from '@angular/material/sidenav';
+import {MatListModule} from '@angular/material/list';
+import { PortfolioComponent } from './components/portfolio/portfolio.component';
+
 
 export function loadAppConfig(configService: ConfigService): () => Promise<void> {
   return () =>
@@ -21,12 +28,18 @@ export function loadAppConfig(configService: ConfigService): () => Promise<void>
 @NgModule({
   declarations: [
     AppComponent,
+    PortfolioComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
     AppRoutingModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatButtonModule,
+    MatSidenavModule,
+    MatListModule,
     ToastrModule.forRoot(),
     NgxLoadingModule.forRoot({}),
   ],

@@ -3,11 +3,10 @@
     color: #000;
 }
 
-.container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 0px;
+.main-container {
+  display: flex; 
+  flex-direction: column; 
+  height: 92.5vh;
 }
 
 .table-container {
@@ -55,6 +54,10 @@ td, th {
 
   .menu-mini-fab {
     display: block;
+  }
+
+  .main-container {
+    height: 85vh;
   }
 }
 

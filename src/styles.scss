@@ -137,6 +137,10 @@ $my-dark-theme: mat.define-dark-theme(
   background-color: #2e2e2e;
   color: #e0e0e0;
   scrollbar-color: #888 #333;
+
+  .svg-logo {
+    filter: invert(100%);
+  }
 }
 
 html, body { height: 100%; }

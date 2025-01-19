@@ -1,3 +1,26 @@
-<div class="app-container">
-  <router-outlet></router-outlet>
+<div class="container">
+  <mat-toolbar style="display: flex; flex-direction: row; justify-content: space-between;">
+    <div style="display: flex;">
+      <button class="navCollapsedBtn" mat-icon-button (click)="toggleSidenav()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span class="logo"><a class="navbar-brand" routerLink="/"><img src="assets/svg/signature.svg" alt="SVG Image" height="50" class="svg-logo"></a></span>
+    </div>
+    <div class="navExpandedMenu">
+      <a class="header-item" mat-list-item routerLink="/home" routerLinkActive="active-link">Home</a>
+      <a class="header-item" mat-list-item routerLink="/readaloud" routerLinkActive="active-link">Read Aloud</a>
+    </div>
+  </mat-toolbar>
+  <!-- Side Navigation for Mobile View -->
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav #sidenav mode="over" class="sidenav" (click)="sidenav.close()">
+      <mat-nav-list>
+        <a class="header-item-collapsed" mat-list-item routerLink="/home" routerLinkActive="active-link">Home</a>
+        <a class="header-item-collapsed" mat-list-item routerLink="/readaloud" routerLinkActive="active-link">Read Aloud</a>
+      </mat-nav-list>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <router-outlet></router-outlet>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
 </div>
