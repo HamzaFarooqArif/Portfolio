@@ -18,10 +18,31 @@
 }
 
 .social-button {
-    margin: 0px 5px;
+    margin: 10px 5px;
 }
 
+.portfolio-content {
+    display: flex; 
+    flex-direction: row; 
+    justify-content: center;
+}
+
+.executive-summary {
+    display: flex; 
+    flex-direction: column; 
+    width: 600px; 
+    justify-content: center;
+}
+
+
 @media (max-width: 780px) {
+    .main-container {
+        padding-top: 20px;
+    }
+    .executive-summary {
+        width: 350px;
+    }
+
     .main-container {
         height: 85vh;
     }
@@ -29,5 +50,17 @@
     .circular-image {
         width: 150px; /* Adjust size as needed */
         height: 150px; /* Keep it same as width for a perfect circle */
+    }
+
+    .portfolio-content {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+@media (max-width: 1000px) {
+    .circular-image {
+        width: 300px; /* Adjust size as needed */
+        height: 300px; /* Keep it same as width for a perfect circle */
     }
 }
