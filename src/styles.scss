@@ -143,8 +143,16 @@ $my-dark-theme: mat.define-dark-theme(
   }
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body {
+  height: 100%;
+}
+
+body { 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background: url('assets/svg/background.svg') no-repeat center center fixed;
+  background-size: cover;
+}
 
 .form-control:disabled {
   background-color: inherit !important;

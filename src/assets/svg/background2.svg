@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1920 1080">
+  <!-- Dark Background -->
+  <rect width="100%" height="100%" fill="#121212" />
+
+  <!-- Top Yellow Circular Accents -->
+  <circle cx="200" cy="0" r="300" fill="#FFD700" opacity="0.7" />
+  <circle cx="1720" cy="0" r="250" fill="#FFD700" opacity="0.7" />
+
+  <!-- Bottom Yellow Circular Accents -->
+  <circle cx="300" cy="1080" r="200" fill="#FFD700" opacity="0.6" />
+  <circle cx="1600" cy="1080" r="300" fill="#FFD700" opacity="0.7" />
+
+  <!-- Optional Yellow Border Curve -->
+  <path d="M0 50 Q960 200 1920 50 V0 H0 Z" fill="#FFD700" opacity="0.4" />
+  <path d="M0 1030 Q960 880 1920 1030 V1080 H0 Z" fill="#FFD700" opacity="0.4" />
+</svg>
