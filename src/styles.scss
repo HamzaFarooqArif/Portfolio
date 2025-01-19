@@ -141,6 +141,10 @@ $my-dark-theme: mat.define-dark-theme(
   .svg-logo {
     filter: invert(100%);
   }
+
+  .dark-theme-text {
+    color: #FFF;
+  }
 }
 
 html, body {
