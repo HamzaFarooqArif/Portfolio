@@ -15,7 +15,6 @@ export class MediaControlService {
   private audio!: HTMLAudioElement;
   private playlist: any;
   private index: any;
-  private beepDuration: number = 100;
 
   constructor() {
     this.init();
@@ -34,23 +33,37 @@ export class MediaControlService {
   }
 
   getAwesomePlaylist() {
+    const BASE_URL = 'https://storage.googleapis.com/media-session/';
+
     return [
       {
-        src: '../../../assets/audio/tone1.mp3',
-        title: 'tone1'
-      }
-    ];
-  }
-
-  beep(iterations: number) {
-    if(iterations > 0) {
-      this.audio.volume = 1;
-      let timeout = setTimeout(() => {
-        clearTimeout(timeout);
-        this.audio.volume = 0;
-        this.beep(iterations - 1);
-      }, this.beepDuration);
-    }
+        src: BASE_URL + 'big-buck-bunny/prelude.mp3',
+        title: 'Prelude',
+        artist: 'Jan Morgenstern',
+        album: 'Big Buck Bunny',
+        artwork: [
+          { src: BASE_URL + 'big-buck-bunny/artwork-96.png',  sizes: '96x96',   type: 'image/png' },
+          { src: BASE_URL + 'big-buck-bunny/artwork-128.png', sizes: '128x128', type: 'image/png' },
+          { src: BASE_URL + 'big-buck-bunny/artwork-192.png', sizes: '192x192', type: 'image/png' },
+          { src: BASE_URL + 'big-buck-bunny/artwork-256.png', sizes: '256x256', type: 'image/png' },
+          { src: BASE_URL + 'big-buck-bunny/artwork-384.png', sizes: '384x384', type: 'image/png' },
+          { src: BASE_URL + 'big-buck-bunny/artwork-512.png', sizes: '512x512', type: 'image/png' },
+        ]
+      },
+      {
+        src: BASE_URL + 'sintel/snow-fight.mp3',
+        title: 'Snow Fight',
+        artist: 'Jan Morgenstern',
+        album: 'Sintel',
+        artwork: [
+          { src: BASE_URL + 'sintel/artwork-96.png',  sizes: '96x96',   type: 'image/png' },
+          { src: BASE_URL + 'sintel/artwork-128.png', sizes: '128x128', type: 'image/png' },
+          { src: BASE_URL + 'sintel/artwork-192.png', sizes: '192x192', type: 'image/png' },
+          { src: BASE_URL + 'sintel/artwork-256.png', sizes: '256x256', type: 'image/png' },
+          { src: BASE_URL + 'sintel/artwork-384.png', sizes: '384x384', type: 'image/png' },
+          { src: BASE_URL + 'sintel/artwork-512.png', sizes: '512x512', type: 'image/png' },
+        ]
+      }];
   }
 
   init() {
@@ -60,7 +73,6 @@ export class MediaControlService {
     this.index = 0;
 
     navigator.mediaSession.setActionHandler('previoustrack', () => {
-      this.beep(1);
       if (this.backwardCallback) {
         this.backwardCallback();
       }
@@ -69,7 +81,6 @@ export class MediaControlService {
     });
 
     navigator.mediaSession.setActionHandler('nexttrack', () => {
-      this.beep(1);
       if (this.forwardCallback) {
         this.forwardCallback();
       }
@@ -78,7 +89,6 @@ export class MediaControlService {
     });
 
     navigator.mediaSession.setActionHandler('play', async () => {
-      this.beep(1);
       if (this.playCallback) {
         this.playCallback();
       }
@@ -86,7 +96,6 @@ export class MediaControlService {
     });
 
     navigator.mediaSession.setActionHandler('pause', () => {
-      this.beep(1);
       if (this.pauseCallback) {
         this.pauseCallback();
       }
@@ -95,7 +104,6 @@ export class MediaControlService {
 
     try {
       navigator.mediaSession.setActionHandler('stop', () => {
-        this.beep(1);
         if (this.stopCallback) {
           this.stopCallback();
         }
