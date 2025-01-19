@@ -13,6 +13,14 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Optional: Adds a shadow */
 }
 
+.social-buttons {
+    margin-top: 20px;
+}
+
+.social-button {
+    margin: 0px 5px;
+}
+
 @media (max-width: 780px) {
     .main-container {
         height: 85vh;

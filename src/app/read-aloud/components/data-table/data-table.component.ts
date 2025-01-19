@@ -239,7 +239,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       shuffle: [false],
       reversePlayback: [false],
       reverseSpeechOrder: [false],
-      darkMode: [false],
+      darkMode: [true],
     });
   }
 
@@ -1284,7 +1284,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.refreshRowFieldsValidity();
     }
     this.resetRangeSlider("volume");
-    this.playbackForm.get('darkMode')?.setValue(false);
+    this.playbackForm.get('darkMode')?.setValue(true);
     this.resetRangeSlider("inbetweenDelayRow");
     this.resetRangeSlider("inbetweenDelayColumn");
     this.resetRangeSlider("vocalSpeed");
