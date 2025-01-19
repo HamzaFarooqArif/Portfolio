@@ -4,7 +4,6 @@ import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { DataTableComponent } from './components/data-table/data-table.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -15,13 +14,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSliderModule } from '@angular/material/slider';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
-import { ConfigService } from './services/config/config.service';
+import { ConfigService } from './read-aloud/services/config/config.service';
 import { ToastrModule } from 'ngx-toastr';
 import { NgxLoadingModule } from "ngx-loading";
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatButtonModule} from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import { DataTableComponent } from './read-aloud/components/data-table/data-table.component';
 
 export function loadAppConfig(configService: ConfigService): () => Promise<void> {
   return () =>
