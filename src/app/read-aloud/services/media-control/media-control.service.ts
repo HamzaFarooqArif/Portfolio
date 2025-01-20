@@ -62,70 +62,72 @@ export class MediaControlService {
   }
 
   init() {
-    this.audio = document.createElement('audio');
-
-    this.playlist = this.getAwesomePlaylist();
-    this.index = 0;
-
-    navigator.mediaSession.setActionHandler('previoustrack', () => {
-      this.beep(1);
-      if (this.backwardCallback) {
-        this.backwardCallback();
-      }
-      // this.index = (this.index - 1 + this.playlist.length) % this.playlist.length;
-      // this.playAudio();
-    });
-
-    navigator.mediaSession.setActionHandler('nexttrack', () => {
-      this.beep(1);
-      if (this.forwardCallback) {
-        this.forwardCallback();
-      }
-      // this.index = (this.index + 1) % this.playlist.length;
-      // this.playAudio();
-    });
-
-    navigator.mediaSession.setActionHandler('play', async () => {
-      this.beep(1);
-      if (this.playCallback) {
-        this.playCallback();
-      }
-      // await this.audio.play();
-    });
-
-    navigator.mediaSession.setActionHandler('pause', () => {
-      this.beep(1);
-      if (this.pauseCallback) {
-        this.pauseCallback();
-      }
-      // this.audio.pause();
-    });
-
-    try {
-      navigator.mediaSession.setActionHandler('stop', () => {
+    if(!this.isSafari()) {
+      this.audio = document.createElement('audio');
+  
+      this.playlist = this.getAwesomePlaylist();
+      this.index = 0;
+  
+      navigator.mediaSession.setActionHandler('previoustrack', () => {
         this.beep(1);
-        if (this.stopCallback) {
-          this.stopCallback();
+        if (this.backwardCallback) {
+          this.backwardCallback();
         }
-        setTimeout(() => {
-          this.playDummyAudio();
-        }, 10);
+        // this.index = (this.index - 1 + this.playlist.length) % this.playlist.length;
+        // this.playAudio();
       });
-    } catch(error) {
-      console.log('Warning! The "stop" media session action is not supported.');
+  
+      navigator.mediaSession.setActionHandler('nexttrack', () => {
+        this.beep(1);
+        if (this.forwardCallback) {
+          this.forwardCallback();
+        }
+        // this.index = (this.index + 1) % this.playlist.length;
+        // this.playAudio();
+      });
+  
+      navigator.mediaSession.setActionHandler('play', async () => {
+        this.beep(1);
+        if (this.playCallback) {
+          this.playCallback();
+        }
+        // await this.audio.play();
+      });
+  
+      navigator.mediaSession.setActionHandler('pause', () => {
+        this.beep(1);
+        if (this.pauseCallback) {
+          this.pauseCallback();
+        }
+        // this.audio.pause();
+      });
+  
+      try {
+        navigator.mediaSession.setActionHandler('stop', () => {
+          this.beep(1);
+          if (this.stopCallback) {
+            this.stopCallback();
+          }
+          setTimeout(() => {
+            this.playDummyAudio();
+          }, 10);
+        });
+      } catch(error) {
+        console.log('Warning! The "stop" media session action is not supported.');
+      }
+  
+      this.audio.addEventListener('ended', () => {
+        // this.index = (this.index - 1 + this.playlist.length) % this.playlist.length;
+        this.playDummyAudio();
+      });
+  
+      this.audio.addEventListener('play', function() {
+        navigator.mediaSession.playbackState = 'playing';
+      });
+  
+      this.audio.addEventListener('pause', function() {
+        navigator.mediaSession.playbackState = 'paused';
+      });
     }
-
-    this.audio.addEventListener('ended', () => {
-      // this.index = (this.index - 1 + this.playlist.length) % this.playlist.length;
-      this.playDummyAudio();
-    });
-
-    this.audio.addEventListener('play', function() {
-      navigator.mediaSession.playbackState = 'playing';
-    });
-
-    this.audio.addEventListener('pause', function() {
-      navigator.mediaSession.playbackState = 'paused';
-    });
   }
 }
