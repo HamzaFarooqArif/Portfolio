@@ -21,16 +21,24 @@ export class MediaControlService {
     this.init();
   }
 
+  isSafari(): boolean {
+    const ua = navigator.userAgent.toLowerCase();
+    let result = ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android');
+    return result;
+  }
+
   playDummyAudio() {
     if(!this.userActionInitiated) {
       this.userActionInitiated = true;
     }
 
-    this.audio.src = this.playlist[this.index].src;
-    this.audio.play()
-    // .then(_ => this.updateMetadata())
-    .catch(error => console.log(error));
-    this.audio.volume = 0;
+    if(!this.isSafari()) {
+      this.audio.src = this.playlist[this.index].src;
+      this.audio.play()
+      // .then(_ => this.updateMetadata())
+      .catch(error => console.log(error));
+      this.audio.volume = 0.001;
+    }
   }
 
   getAwesomePlaylist() {
@@ -47,7 +55,7 @@ export class MediaControlService {
       this.audio.volume = 1;
       let timeout = setTimeout(() => {
         clearTimeout(timeout);
-        this.audio.volume = 0;
+        this.audio.volume = 0.001;
         this.beep(iterations - 1);
       }, this.beepDuration);
     }
