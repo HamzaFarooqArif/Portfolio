@@ -239,7 +239,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       shuffle: [false],
       reversePlayback: [false],
       reverseSpeechOrder: [false],
-      darkMode: [true],
+      lightMode: [false],
     });
   }
 
@@ -432,10 +432,10 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
   assignTheme() {
-    if(this.playbackForm.get("darkMode")?.value) {
-      this.renderer.addClass(document.body, 'dark');
-    } else {
+    if(this.playbackForm.get("lightMode")?.value) {
       this.renderer.removeClass(document.body, 'dark');
+    } else {
+      this.renderer.addClass(document.body, 'dark');
     }
   }
 
@@ -933,7 +933,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.playbackForm.get('volume')?.patchValue(Number(savedData['volume']));
     }
     this.playbackForm.get('speakOnlyColumnCheck')?.patchValue(this.checkForTruthy(savedData['speakOnlyColumnCheck']));
-    this.playbackForm.get('darkMode')?.patchValue(this.checkForTruthy(savedData['darkMode']));
+    this.playbackForm.get('lightMode')?.patchValue(this.checkForTruthy(savedData['lightMode']));
     this.playbackForm.get('reversePlayback')?.patchValue(this.checkForTruthy(savedData['reversePlayback']));
     this.playbackForm.get('repeat')?.patchValue(this.checkForTruthy(savedData['repeat']));
     this.playbackForm.get('shuffle')?.patchValue(this.checkForTruthy(savedData['shuffle']));
@@ -1284,7 +1284,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.refreshRowFieldsValidity();
     }
     this.resetRangeSlider("volume");
-    this.playbackForm.get('darkMode')?.setValue(true);
+    this.playbackForm.get('lightMode')?.setValue(false);
     this.resetRangeSlider("inbetweenDelayRow");
     this.resetRangeSlider("inbetweenDelayColumn");
     this.resetRangeSlider("vocalSpeed");

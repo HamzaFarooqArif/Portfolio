@@ -299,10 +299,10 @@
                 </mat-error>
               </mat-form-field>
             </ng-container>
-            <mat-slide-toggle #themSwitch formControlName="darkMode" (change)="assignTheme()">
+            <mat-slide-toggle #themSwitch formControlName="lightMode" (change)="assignTheme()">
               Switch to
-              <span *ngIf="themSwitch.checked">Light Mode</span>
-              <span *ngIf="!themSwitch.checked">Dark Mode</span>
+              <span *ngIf="themSwitch.checked">Dark Mode</span>
+              <span *ngIf="!themSwitch.checked">Light Mode</span>
             </mat-slide-toggle>
           </div>
         </div>
