@@ -30,7 +30,7 @@ export class MediaControlService {
     this.audio.play()
     // .then(_ => this.updateMetadata())
     .catch(error => console.log(error));
-    this.audio.volume = 0.001;
+    this.audio.volume = 0;
   }
 
   getAwesomePlaylist() {
@@ -47,7 +47,7 @@ export class MediaControlService {
       this.audio.volume = 1;
       let timeout = setTimeout(() => {
         clearTimeout(timeout);
-        this.audio.volume = 0.001;
+        this.audio.volume = 0;
         this.beep(iterations - 1);
       }, this.beepDuration);
     }
