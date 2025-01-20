@@ -147,6 +147,10 @@ $my-dark-theme: mat.define-dark-theme(
   }
 }
 
+.dark-theme-text {
+  color: #FFF;
+}
+
 html, body {
   height: 100%;
 }
