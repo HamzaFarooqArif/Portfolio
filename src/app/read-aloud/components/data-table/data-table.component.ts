@@ -59,6 +59,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     }
   }
   
+  playAllTextsStackCount: number = 0;
   componentInitialized: boolean = false;
   private wakeLock: WakeLockSentinel | null = null;
   numberOfLanguages: number = 0; 
@@ -1020,6 +1021,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
   async playAllTexts(initialDelay: number, setNextCell: boolean): Promise<void> {
+    this.playAllTextsStackCount++;
     if(this.isStopped) {
       this.highlightWord(-1, -1);
       this.playbackForm.get('startRow')?.enable();
@@ -1028,11 +1030,18 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.playbackForm.get('speakOnlyColumnVal')?.enable();
       this.playbackForm.get('speakOnlyColumnCheck')?.enable();
       this.playedIndices = [];
+      this.playAllTextsStackCount--;
+      return;
+    }
+
+    if(this.playAllTextsStackCount > 1) {
+      this.playAllTextsStackCount--;
       return;
     }
 
     let shouldContinue = await this.delay(initialDelay);
     if(!shouldContinue) {
+      this.playAllTextsStackCount--;
       return;
     }
 
@@ -1047,20 +1056,24 @@ export class DataTableComponent implements OnInit, OnDestroy {
       if(reverseSpeechOrder) {
         if(this.currentColumn > 0) {
           let delay = Number(this.playbackForm.get('inbetweenDelayColumn')?.value);
+          this.playAllTextsStackCount--;
           return this.playAllTexts(delay*1000, true);
         }
         else {
           let delay = Number(this.playbackForm.get('inbetweenDelayRow')?.value);
+          this.playAllTextsStackCount--;
           return this.playAllTexts(delay*1000, true);
         }
       }
       else {
         if(this.currentColumn < this.tableData[0]?.length - 1) {
           let delay = Number(this.playbackForm.get('inbetweenDelayColumn')?.value);
+          this.playAllTextsStackCount--;
           return this.playAllTexts(delay*1000, true);
         }
         else {
           let delay = Number(this.playbackForm.get('inbetweenDelayRow')?.value);
+          this.playAllTextsStackCount--;
           return this.playAllTexts(delay*1000, true);
         }
       }
@@ -1082,6 +1095,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
         this.playbackForm.get('speakOnlyColumnCheck')?.enable();
         this.highlightWord(-1, -1);
         this.playedIndices = [];
+        this.playAllTextsStackCount--;
         return;
       }
     }
