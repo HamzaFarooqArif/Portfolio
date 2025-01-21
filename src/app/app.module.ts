@@ -50,7 +50,7 @@ export function loadAppConfig(configService: ConfigService): () => Promise<void>
       deps: [ConfigService],
       multi: true
     },
-    {provide: LocationStrategy, useClass: HashLocationStrategy},
+    {provide: LocationStrategy, useClass: PathLocationStrategy},
     provideAnimationsAsync(),
   ],
   bootstrap: [AppComponent]
