@@ -7,9 +7,10 @@ import { ALLLANGUAGES } from '../../constants/constants';
 import { ConfigService } from '../../services/config/config.service';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { isEmpty } from '../../Utilities/Utility';
+import { isEmpty } from '../../utilities/Utility';
 import { debounceTime, Subject } from 'rxjs';
 import { MediaControlService } from '../../services/media-control/media-control.service';
+import { LoadingUtil } from '../../../utilities/loading/LoadingUtil';
 
 
 @Component({
@@ -60,7 +61,6 @@ export class DataTableComponent implements OnInit, OnDestroy {
   
   componentInitialized: boolean = false;
   private wakeLock: WakeLockSentinel | null = null;
-  loading: boolean = false;
   numberOfLanguages: number = 0; 
   playbackForm!: FormGroup;
   allVoices: SpeechSynthesisVoice[] = [];
@@ -79,6 +79,10 @@ export class DataTableComponent implements OnInit, OnDestroy {
   playedIndices: number[] = [];
   jumpInterval: number = 200;
   private skipSubject = new Subject<void>();
+
+  get loading() {
+    return LoadingUtil.isLoading();
+  }
 
   constructor(
     private spreadsheetService: SpreadsheetService,
@@ -530,13 +534,13 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
   async fetchDataAndParseAsync(): Promise<string[][]> {
-    this.loading = true;
+    LoadingUtil.setStatus("app-data-table", true);
     let EligibleRowSymbol = this.configService.getConfigValue("EligibleRowSymbol");
     return new Promise((resolve, reject) => {
       this.spreadsheetService.fetchSheetData().subscribe((csvData: string) => {
         this.papa.parse(csvData, {
           complete: (result) => {
-            this.loading = false;
+            LoadingUtil.setStatus("app-data-table", false);
             let filteredData = (result.data as any[]).filter((row: any, index: number) => {
               return index == 0 || row[this.numberOfLanguages] == EligibleRowSymbol;
             });
@@ -550,24 +554,24 @@ export class DataTableComponent implements OnInit, OnDestroy {
           }
         });
       }, err => {
-        this.loading = false;
+        LoadingUtil.setStatus("app-data-table", false);
         reject(err);
       });
     });
   }
 
   async fetchData(): Promise<void> {
-    this.loading = true;
+    LoadingUtil.setStatus("app-data-table", true);
     return new Promise((resolve, reject) => {
       this.playbackForm.disable();
       this.playbackForm.get('sheetId')?.enable();
       this.fetchDataAndParseAsync().then((data: string[][]) => {
-        this.loading = false;
+        LoadingUtil.setStatus("app-data-table", false);
         this.playbackForm.enable();
         this.tableData = data;
         resolve();
       }, err => {
-        this.loading = false;
+        LoadingUtil.setStatus("app-data-table", false);
         this.toastr.error("Please check the 'Sheet ID' and make sure that the sheet has the public access", "Unable fetch sheet", {
           timeOut: 5000
         });
@@ -1153,7 +1157,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   keepScreenOn(){
     let interval = setInterval(() => {
       if(!this.wakeLock || this.wakeLock?.released == true) {
-        console.log('Retrying Wake Lock...');
+        // console.log('Retrying Wake Lock...');
         this.applyScreenOn();
       }
     }, 1000);
@@ -1163,7 +1167,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     try {
       if ('wakeLock' in navigator) {
         this.wakeLock = await navigator.wakeLock.request('screen');
-        console.log('Screen Wake Lock activated');
+        // console.log('Screen Wake Lock activated');
       } else {
         console.error('Screen Wake Lock API is not supported on this device.');
       }
@@ -1176,7 +1180,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     if (this.wakeLock) {
       await this.wakeLock.release();
       this.wakeLock = null;
-      console.log('Screen Wake Lock released');
+      // console.log('Screen Wake Lock released');
     }
   }
 
@@ -1265,7 +1269,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.playbackForm.disable();
     this.playbackForm.get('sheetId')?.enable();
     let data = await this.fetchDataAndParseAsync().catch(err => {
-      this.loading = false;
+      LoadingUtil.setStatus("app-data-table", false);
       this.toastr.error("Please check the 'Sheet ID' and make sure that the sheet has the public access", "Unable fetch sheet", {
         timeOut: 5000
       });

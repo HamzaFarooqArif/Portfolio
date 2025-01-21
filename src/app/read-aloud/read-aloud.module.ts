@@ -37,7 +37,6 @@ import { ReadAloudRoutingModule } from './read-aloud-routing.module';
       MatTooltipModule,
       MatSlideToggleModule,
       ToastrModule.forRoot(),
-      NgxLoadingModule.forRoot({}),
       ReadAloudRoutingModule,
     ],
   providers: [
