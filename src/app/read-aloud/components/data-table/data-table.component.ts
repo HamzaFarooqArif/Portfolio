@@ -1021,6 +1021,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
   async playAllTexts(initialDelay: number, setNextCell: boolean): Promise<void> {
+    await this.waitForPreviousPlayAllTextToFinish();
     this.playAllTextsStackCount++;
     if(this.isStopped) {
       this.highlightWord(-1, -1);
@@ -1135,6 +1136,17 @@ export class DataTableComponent implements OnInit, OnDestroy {
           }
         }, 10);
       }
+    });
+  }
+
+  waitForPreviousPlayAllTextToFinish(): Promise<void> {
+    return new Promise<void>(resolve => {
+      let interval = setInterval(() => {
+        if(this.playAllTextsStackCount <= 0) {
+          clearTimeout(interval);
+          resolve();
+        }
+      }, 10);
     });
   }
 
