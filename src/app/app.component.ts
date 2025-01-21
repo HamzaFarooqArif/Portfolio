@@ -8,7 +8,7 @@ import { LoadingUtil } from './utilities/loading/LoadingUtil';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'Portfolio';
+  title = 'Hamza Farooq';
 
   @ViewChild('sidenav') sidenav!: MatSidenav;
   
