@@ -79,6 +79,11 @@ export class DataTableComponent implements OnInit, OnDestroy {
   playedIndices: number[] = [];
   jumpInterval: number = 200;
   private skipSubject = new Subject<void>();
+  killPlayAllText: boolean = false;
+
+  get isPaused() {
+    return !this.isStopped && !this.isSpeaking;
+  }
 
   get loading() {
     return LoadingUtil.isLoading();
@@ -106,9 +111,10 @@ export class DataTableComponent implements OnInit, OnDestroy {
       debounceTime(this.jumpInterval)
     ).subscribe(() => {
       this.isSpeaking = true;
-      this.speechService.resumeSpeech();
+      // this.speechService.resumeSpeech();
       this.refreshPlaybackButtons();
-      this.speakNow();
+      this.killPlayAllText = false;
+      this.playAllTexts(0, false);
     });
 
     document.addEventListener('visibilitychange', this.visibilityChangeHandler);
@@ -351,7 +357,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.setButtonDisabledStatus('backward', true);
       this.setButtonVisibility('stop', false);
     }
-    else if(!this.isSpeaking && !this.isStopped) {
+    else if(this.isPaused) {
       this.setButtonVisibility('play', false);
       this.setButtonVisibility('resume', true);
       this.setButtonDisabledStatus('resume', false);
@@ -708,7 +714,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
     this.isSpeaking = false;
     this.speechService.stopSpeech();
-    this.speechService.pauseSpeech();
+    // this.speechService.pauseSpeech();
+    this.killPlayAllText = true;
     this.skipSubject.next();
   }
 
@@ -778,7 +785,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
     this.isSpeaking = false;
     this.speechService.stopSpeech();
-    this.speechService.pauseSpeech();
+    // this.speechService.pauseSpeech();
+    this.killPlayAllText = true;
     this.skipSubject.next();
   }
 
@@ -1023,8 +1031,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if(initialDelay) {
-      await this.delay(initialDelay);
+    let shouldContinue = await this.delay(initialDelay);
+    if(!shouldContinue) {
+      return;
     }
 
     if(setNextCell) {
@@ -1078,8 +1087,41 @@ export class DataTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  delay(val: number) {
-    return new Promise(resolve => setTimeout(resolve, val));
+  delay(val: number): Promise<boolean> {
+    return new Promise<boolean>(resolve => {
+      if(!val) {
+        if(this.killPlayAllText || this.isStopped) {
+          resolve(false);
+        } else if (this.isPaused) {
+          const interval = setInterval(() => {
+            if(!this.isPaused && !this.isStopped) {
+              clearInterval(interval);
+              resolve(true);
+            } else if (!this.isPaused && this.isStopped) {
+              resolve(false);
+            }
+          }, 10);
+        } 
+        else {
+          resolve(true);
+        }
+      } else {
+        let tillNow: number = 0;
+        const interval = setInterval(() => {
+          if(!this.isPaused) {
+            tillNow += 10;
+          }
+          if (tillNow >= val) {
+            clearInterval(interval);
+            resolve(true);
+          }
+          if(this.killPlayAllText || this.isStopped) {
+            clearInterval(interval);
+            resolve(false);
+          }
+        }, 10);
+      }
+    });
   }
 
   setNextCell() {
