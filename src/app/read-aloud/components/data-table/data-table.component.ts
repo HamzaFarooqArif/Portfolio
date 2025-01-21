@@ -1097,7 +1097,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
             if(!this.isPaused && !this.isStopped) {
               clearInterval(interval);
               resolve(true);
-            } else if (!this.isPaused && this.isStopped) {
+            } else if (this.isStopped) {
               resolve(false);
             }
           }, 10);

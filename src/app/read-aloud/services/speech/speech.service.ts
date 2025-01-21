@@ -11,10 +11,6 @@ export class SpeechService {
   
   private isPaused: boolean = false;
 
-  public get easySpeechSpeaking() {
-    return (EasySpeech.status() as any)?.speechSynthesis?.speaking;
-  }
-
   constructor() {
     this.init();
   }
