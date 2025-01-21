@@ -1083,6 +1083,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       let repeat = this.playbackForm?.get('repeat')?.value;
       if(repeat) {
         this.playedIndices = [];
+        this.playAllTextsStackCount--;
         this.playClick();
       }
       else {
