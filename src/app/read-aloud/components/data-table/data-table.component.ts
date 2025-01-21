@@ -20,6 +20,20 @@ import { Utils } from '../../utils/Utils';
 })
 
 export class DataTableComponent implements OnInit, OnDestroy {
+  @HostListener('window:focus')
+  onFocus(): void {
+    if(this.getButtonVisibility('resume')) {
+      this.resumeClick();
+    }
+  }
+
+  @HostListener('window:blur')
+  onBlur(): void {
+    if(this.getButtonVisibility('pause')) {
+      this.pauseClick();
+    }
+  }
+
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
      // Ignore keypress if a form control is focused
