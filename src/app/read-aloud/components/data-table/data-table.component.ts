@@ -79,6 +79,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   playedIndices: number[] = [];
   jumpInterval: number = 200;
   private skipSubject = new Subject<void>();
+  private isSkipping: boolean = false;
 
   get loading() {
     return LoadingUtil.isLoading();
@@ -106,6 +107,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       debounceTime(this.jumpInterval)
     ).subscribe(() => {
       this.isSpeaking = true;
+      this.isSkipping = false;
       this.speechService.resumeSpeech();
       this.refreshPlaybackButtons();
       this.speakNow();
@@ -709,6 +711,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.isSpeaking = false;
     this.speechService.stopSpeech();
     this.speechService.pauseSpeech();
+    this.isSkipping = true;
     this.skipSubject.next();
   }
 
@@ -779,6 +782,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.isSpeaking = false;
     this.speechService.stopSpeech();
     this.speechService.pauseSpeech();
+    this.isSkipping = true;
     this.skipSubject.next();
   }
 
@@ -1027,40 +1031,42 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.highlightWord(this.currentRow-1, this.currentColumn);
       let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
       await this.speakNow();
-      if(reverseSpeechOrder) {
-        if(this.currentColumn > 0) {
-          let delay = Number(this.playbackForm.get('inbetweenDelayColumn')?.value);
-          let timeout = setTimeout(() => {
-            clearTimeout(timeout);
-            this.setNextCell();
-            return this.playAllTexts();
-          }, delay*1000);
+      if(!this.isSkipping) {
+        if(reverseSpeechOrder) {
+          if(this.currentColumn > 0) {
+            let delay = Number(this.playbackForm.get('inbetweenDelayColumn')?.value);
+            let timeout = setTimeout(() => {
+              clearTimeout(timeout);
+              this.setNextCell();
+              return this.playAllTexts();
+            }, delay*1000);
+          }
+          else {
+            let delay = Number(this.playbackForm.get('inbetweenDelayRow')?.value);
+            let timeout = setTimeout(() => {
+              clearTimeout(timeout);
+              this.setNextCell();
+              return this.playAllTexts();
+            }, delay*1000);
+          }
         }
         else {
-          let delay = Number(this.playbackForm.get('inbetweenDelayRow')?.value);
-          let timeout = setTimeout(() => {
-            clearTimeout(timeout);
-            this.setNextCell();
-            return this.playAllTexts();
-          }, delay*1000);
-        }
-      }
-      else {
-        if(this.currentColumn < this.tableData[0]?.length - 1) {
-          let delay = Number(this.playbackForm.get('inbetweenDelayColumn')?.value);
-          let timeout = setTimeout(() => {
-            clearTimeout(timeout);
-            this.setNextCell();
-            return this.playAllTexts();
-          }, delay*1000);
-        }
-        else {
-          let delay = Number(this.playbackForm.get('inbetweenDelayRow')?.value);
-          let timeout = setTimeout(() => {
-            clearTimeout(timeout);
-            this.setNextCell();
-            return this.playAllTexts();
-          }, delay*1000);
+          if(this.currentColumn < this.tableData[0]?.length - 1) {
+            let delay = Number(this.playbackForm.get('inbetweenDelayColumn')?.value);
+            let timeout = setTimeout(() => {
+              clearTimeout(timeout);
+              this.setNextCell();
+              return this.playAllTexts();
+            }, delay*1000);
+          }
+          else {
+            let delay = Number(this.playbackForm.get('inbetweenDelayRow')?.value);
+            let timeout = setTimeout(() => {
+              clearTimeout(timeout);
+              this.setNextCell();
+              return this.playAllTexts();
+            }, delay*1000);
+          }
         }
       }
     }
