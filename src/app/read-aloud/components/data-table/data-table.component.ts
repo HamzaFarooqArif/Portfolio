@@ -1302,6 +1302,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
       this.releaseScreenOn();
+      if(!this.getButtonDisabledStatus('stop')) {
+        this.stopClick();
+      }
   }
 
 }
