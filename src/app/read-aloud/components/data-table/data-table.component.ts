@@ -116,11 +116,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   visibilityChangeHandler = () => {
     let isTabVisible = document.visibilityState === 'visible';
-    if(isTabVisible) {
-      if(this.getButtonVisibility('resume')) {
-        this.resumeClick();
-      }
-    } else {
+    if(!isTabVisible) {
       if(this.getButtonVisibility('pause')) {
         this.pauseClick();
       }
