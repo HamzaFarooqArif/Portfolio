@@ -10,7 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { debounceTime, Subject } from 'rxjs';
 import { MediaControlService } from '../../services/media-control/media-control.service';
 import { LoadingUtil } from '../../../utilities/loading/LoadingUtil';
-import { isEmpty } from '../../utilities/Utility';
+import { Utility } from '../../utilities/Utility';
 
 
 @Component({
@@ -181,7 +181,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     return new Promise((resolve, reject) => {
       let localStorageData = JSON.parse(localStorage.getItem('formData') || '{}');
       let savedData = JSON.parse(JSON.stringify(localStorageData));
-      if(!savedData || isEmpty(savedData)) {
+      if(!savedData || Utility.isEmpty(savedData)) {
         this.route.queryParams.subscribe(params => {
           savedData = params;
           this.patchSavedSheetId(savedData);
@@ -885,7 +885,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     return new Promise((resolve, reject) => {
       let localStorageData = JSON.parse(localStorage.getItem('formData') || '{}');
       let savedData = JSON.parse(JSON.stringify(localStorageData));
-      if(!savedData || isEmpty(savedData)) {
+      if(!savedData || Utility.isEmpty(savedData)) {
         this.route.queryParams.subscribe(params => {
           savedData = params;
           this.patchSavedData(savedData);
