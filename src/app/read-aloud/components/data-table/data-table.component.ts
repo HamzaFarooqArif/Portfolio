@@ -795,12 +795,14 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.isSpeaking = true;
     this.speechService.resumeSpeech();
     this.refreshPlaybackButtons();
+    this.mediaControlService.play();
   }
 
   pauseClick() {
     this.isSpeaking = false;
     this.speechService.pauseSpeech();
     this.refreshPlaybackButtons();
+    this.mediaControlService.pause();
   }
 
   playClick() {
@@ -828,6 +830,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     }
     this.playAllTexts(0, false);
     this.setupMediaControls();
+    this.mediaControlService.play();
   }
 
   stopClick() {
@@ -842,6 +845,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.highlightWord(-1, -1);
     this.speechService.stopSpeech();
     this.playedIndices = [];
+    this.mediaControlService.pause();
   }
 
   saveClick() {

@@ -16,6 +16,7 @@ export class MediaControlService {
   private playlist: any;
   private index: any;
   private beepDuration: number = 100;
+  private beepVolumeLOW: number = 0.001;
 
   constructor() {
     this.init();
@@ -37,7 +38,7 @@ export class MediaControlService {
       this.audio.play()
       // .then(_ => this.updateMetadata())
       .catch(error => console.log(error));
-      this.audio.volume = 0.001;
+      this.audio.volume = this.beepVolumeLOW;
     }
   }
 
@@ -55,9 +56,21 @@ export class MediaControlService {
       this.audio.volume = 1;
       let timeout = setTimeout(() => {
         clearTimeout(timeout);
-        this.audio.volume = 0.001;
+        this.audio.volume = this.beepVolumeLOW;
         this.beep(iterations - 1);
       }, this.beepDuration);
+    }
+  }
+
+  pause() {
+    if(!this.isSafari()) {
+      this.audio.pause();  
+    }
+  }
+
+  async play() {
+    if(!this.isSafari()) {
+      await this.audio.play();
     }
   }
 
@@ -74,7 +87,7 @@ export class MediaControlService {
           this.backwardCallback();
         }
         // this.index = (this.index - 1 + this.playlist.length) % this.playlist.length;
-        // this.playAudio();
+        // this.playDummyAudio();
       });
   
       navigator.mediaSession.setActionHandler('nexttrack', () => {
@@ -83,7 +96,7 @@ export class MediaControlService {
           this.forwardCallback();
         }
         // this.index = (this.index + 1) % this.playlist.length;
-        // this.playAudio();
+        // this.playDummyAudio();
       });
   
       navigator.mediaSession.setActionHandler('play', async () => {
@@ -92,9 +105,7 @@ export class MediaControlService {
           this.playCallback();
         }
 
-        if(!this.isSafari()) {
-          await this.audio.play();
-        }
+        await this.play();
       });
   
       navigator.mediaSession.setActionHandler('pause', () => {
@@ -103,9 +114,7 @@ export class MediaControlService {
           this.pauseCallback();
         }
         
-        if(!this.isSafari()) {
-          this.audio.pause();
-        }
+        this.pause();
       });
   
       try {
