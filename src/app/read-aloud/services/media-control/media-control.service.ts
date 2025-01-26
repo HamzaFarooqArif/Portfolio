@@ -91,7 +91,10 @@ export class MediaControlService {
         if (this.playCallback) {
           this.playCallback();
         }
-        // await this.audio.play();
+
+        if(!this.isSafari()) {
+          await this.audio.play();
+        }
       });
   
       navigator.mediaSession.setActionHandler('pause', () => {
@@ -99,7 +102,10 @@ export class MediaControlService {
         if (this.pauseCallback) {
           this.pauseCallback();
         }
-        // this.audio.pause();
+        
+        if(!this.isSafari()) {
+          this.audio.pause();
+        }
       });
   
       try {
