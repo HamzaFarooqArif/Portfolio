@@ -27,7 +27,7 @@
             <div style="display: flex; flex-direction: column; align-items: end;">
               <div style="width: 50%; display: flex; flex-direction: row; justify-content: end;">
                 <button matTooltip="Backward Jump" class="playback-btn" mat-fab *ngIf="getButtonVisibility('backward')" [disabled]="getButtonDisabledStatus('backward')" (click)="rewindClick(); $event.stopPropagation();">
-                  <mat-icon>fast_rewind</mat-icon>
+                  <mat-icon>skip_previous</mat-icon>
                 </button>
                 <button matTooltip="Play" class="playback-btn" mat-fab *ngIf="getButtonVisibility('play')" [disabled]="getButtonDisabledStatus('play')" (click)="playClick(); $event.stopPropagation();">
                   <mat-icon>play_arrow</mat-icon>
@@ -39,7 +39,7 @@
                   <mat-icon>pause</mat-icon>
                 </button>
                 <button matTooltip="Forward Jump" class="playback-btn" mat-fab *ngIf="getButtonVisibility('forward')" [disabled]="getButtonDisabledStatus('forward')" (click)="forwardClick(); $event.stopPropagation();">
-                  <mat-icon>fast_forward</mat-icon>
+                  <mat-icon>skip_next</mat-icon>
                 </button>
                 <button matTooltip="Stop" class="playback-btn" mat-fab *ngIf="getButtonVisibility('stop')" [disabled]="getButtonDisabledStatus('stop')" (click)="stopClick(); $event.stopPropagation();">
                   <mat-icon>stop</mat-icon>
