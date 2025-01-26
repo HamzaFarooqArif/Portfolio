@@ -4,11 +4,11 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class MediaControlService {
-  public playCallback?: () => void;
-  public pauseCallback?: () => void;
-  public stopCallback?: () => void;
-  public forwardCallback?: () => void;
-  public backwardCallback?: () => void;
+  public playCallback?: () => Promise<void>;
+  public pauseCallback?: () => Promise<void>;
+  public stopCallback?: () => Promise<void>;
+  public forwardCallback?: () => Promise<void>;
+  public backwardCallback?: () => Promise<void>;
 
 
   public userActionInitiated: boolean = false;
@@ -51,25 +51,28 @@ export class MediaControlService {
     ];
   }
 
-  beep(iterations: number) {
-    if(iterations > 0) {
-      this.audio.volume = 1;
-      let timeout = setTimeout(() => {
-        clearTimeout(timeout);
-        this.audio.volume = this.beepVolumeLOW;
-        this.beep(iterations - 1);
-      }, this.beepDuration);
-    }
+  async beep(iterations: number): Promise<void> {
+    return new Promise(resolve => {
+      if(iterations > 0) {
+        this.audio.volume = 1;
+        let timeout = setTimeout(() => {
+          clearTimeout(timeout);
+          this.audio.volume = this.beepVolumeLOW;
+          this.beep(iterations - 1);
+          resolve();
+        }, this.beepDuration);
+      }
+    });
   }
 
-  pause() {
+  async pause() {
     if(!this.isSafari()) {
-      this.audio.pause();  
+      this.audio.pause();
     }
   }
 
   async play() {
-    if(!this.isSafari()) {
+    if (!this.isSafari()) {
       await this.audio.play();
     }
   }
@@ -82,46 +85,47 @@ export class MediaControlService {
       this.index = 0;
   
       navigator.mediaSession.setActionHandler('previoustrack', () => {
-        this.beep(1);
         if (this.backwardCallback) {
-          this.backwardCallback();
+          this.backwardCallback()
+          .then(x => this.play()
+          .then(y => this.beep(1)));
         }
         // this.index = (this.index - 1 + this.playlist.length) % this.playlist.length;
         // this.playDummyAudio();
       });
   
       navigator.mediaSession.setActionHandler('nexttrack', () => {
-        this.beep(1);
         if (this.forwardCallback) {
-          this.forwardCallback();
+          this.forwardCallback()
+          .then(x => this.play()
+          .then(y => this.beep(1)));
         }
         // this.index = (this.index + 1) % this.playlist.length;
         // this.playDummyAudio();
       });
   
       navigator.mediaSession.setActionHandler('play', async () => {
-        this.beep(1);
         if (this.playCallback) {
-          this.playCallback();
+          this.playCallback()
+          .then(x => this.play()
+          .then(_ => this.beep(1)));
         }
-
-        await this.play();
       });
   
       navigator.mediaSession.setActionHandler('pause', () => {
-        this.beep(1);
         if (this.pauseCallback) {
-          this.pauseCallback();
+          this.pauseCallback()
+          .then(x => this.beep(1)
+          .then(_ => this.pause()));
         }
-        
-        this.pause();
       });
   
       try {
         navigator.mediaSession.setActionHandler('stop', () => {
-          this.beep(1);
           if (this.stopCallback) {
-            this.stopCallback();
+            this.stopCallback()
+            .then(x => this.beep(1)
+            .then(_ => this.pause()));
           }
           setTimeout(() => {
             this.playDummyAudio();

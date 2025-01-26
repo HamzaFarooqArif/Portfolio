@@ -125,45 +125,100 @@ export class DataTableComponent implements OnInit, OnDestroy {
     let isTabVisible = document.visibilityState === 'visible';
     if(!isTabVisible) {
       if(this.getButtonVisibility('pause')) {
-        this.pauseClick();
+        this.pause();
+        this.mediaControlService.pause();
       }
     }
   };
 
   setupMediaControls() {
     this.mediaControlService.forwardCallback = () => {
-      if(!this.getButtonDisabledStatus('forward')) {
-        this.forwardClick();
-      }
+      return new Promise((resolve, reject) => {
+        if(document.visibilityState != 'visible') {
+          reject();
+          return;
+        };
+        if(!this.getButtonDisabledStatus('forward')) {
+          this.forwardClick();
+          resolve();
+        } else {
+          reject();
+        }
+      });
     };
+
     this.mediaControlService.backwardCallback = () => {
-      if(!this.getButtonDisabledStatus('backward')) {
-        this.rewindClick();
-      }
+      return new Promise((resolve, reject) => {
+        if(document.visibilityState != 'visible') {
+          reject();
+          return;
+        };
+        if(!this.getButtonDisabledStatus('backward')) {
+          this.rewindClick();
+          resolve();
+        } else {
+          reject();
+        }
+      });
     };
+
     this.mediaControlService.pauseCallback = () => {
-      if(this.getButtonVisibility('play')) {
-        this.playClick();
-      } else if(this.getButtonVisibility('resume')) {
-        this.resumeClick();
-      } else if(this.getButtonVisibility('pause')) {
-        this.pauseClick();
-      }
+      return new Promise((resolve, reject) => {
+        if(document.visibilityState != 'visible') {
+          reject();
+          return;
+        };
+        if(this.getButtonVisibility('play')) {
+          this.play();
+          reject();
+        } else if(this.getButtonVisibility('resume')) {
+          this.resume();
+          reject();
+        } else if(this.getButtonVisibility('pause')) {
+          this.pause();
+          resolve();
+        } else {
+          reject();
+        }
+      });
     };
+
     this.mediaControlService.playCallback = () => {
-      if(this.getButtonVisibility('play')) {
-        this.playClick();
-      } else if(this.getButtonVisibility('resume')) {
-        this.resumeClick();
-      } else if(this.getButtonVisibility('pause')) {
-        this.pauseClick();
-      }
+      return new Promise((resolve, reject) => {
+        if(document.visibilityState != 'visible') {
+          reject();
+          return;
+        };
+        if(this.getButtonVisibility('play')) {
+          this.play();
+          resolve();
+        } else if(this.getButtonVisibility('resume')) {
+          this.resume();
+          resolve();
+        } else if(this.getButtonVisibility('pause')) {
+          this.pause();
+          reject();
+        } else {
+          reject();
+        }
+      });
     };
+
     this.mediaControlService.stopCallback = () => {
-      if(!this.getButtonDisabledStatus('stop')) {
-        this.stopClick();
-      }
+      return new Promise((resolve, reject) => {
+        if(document.visibilityState != 'visible') {
+          reject();
+          return;
+        };
+        if(!this.getButtonDisabledStatus('stop')) {
+          this.stop();
+          resolve();
+        } else {
+          reject();
+        }
+      });
     };
+    
     this.mediaControlService.playDummyAudio();
   }
 
@@ -623,7 +678,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     return this.highlightedRow === rowIndex && this.highlightedCol === colIndex;
   }
 
-  rewindClick() {
+  rewind() {
     let reverse: boolean = this.playbackForm?.get('reversePlayback')?.value;
     let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
     let startRow = Number(this.playbackForm.get('startRow')?.value);
@@ -720,7 +775,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.skipSubject.next();
   }
 
-  forwardClick() {
+  forward() {
     let reverse: boolean = this.playbackForm?.get('reversePlayback')?.value;
     let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
     let endRow = Number(this.playbackForm.get('endRow')?.value);
@@ -791,21 +846,19 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.skipSubject.next();
   }
 
-  resumeClick() {
+  resume() {
     this.isSpeaking = true;
     this.speechService.resumeSpeech();
     this.refreshPlaybackButtons();
-    this.mediaControlService.play();
   }
 
-  pauseClick() {
+  pause() {
     this.isSpeaking = false;
     this.speechService.pauseSpeech();
     this.refreshPlaybackButtons();
-    this.mediaControlService.pause();
   }
 
-  playClick() {
+  play() {
     if(this.playbackForm?.invalid) {
       this.toastr.warning('Check the input fields', '', {
         timeOut: 2000
@@ -830,10 +883,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
     }
     this.playAllTexts(0, false);
     this.setupMediaControls();
-    this.mediaControlService.play();
   }
 
-  stopClick() {
+  stop() {
     this.isSpeaking = false;
     this.isStopped = true;
     this.refreshPlaybackButtons();
@@ -845,6 +897,35 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.highlightWord(-1, -1);
     this.speechService.stopSpeech();
     this.playedIndices = [];
+  }
+
+  rewindClick() {
+    this.rewind();
+    this.mediaControlService.play();
+  }
+
+  forwardClick() {
+    this.forward();
+    this.mediaControlService.play();
+  }
+
+  resumeClick() {
+    this.resume();
+    this.mediaControlService.play();
+  }
+
+  pauseClick() {
+    this.pause();
+    this.mediaControlService.pause();
+  }
+
+  playClick() {
+    this.play();
+    this.mediaControlService.play();
+  }
+
+  stopClick() {
+    this.stop();
     this.mediaControlService.pause();
   }
 
