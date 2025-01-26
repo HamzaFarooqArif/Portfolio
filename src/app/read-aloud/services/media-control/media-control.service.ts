@@ -29,16 +29,21 @@ export class MediaControlService {
   }
 
   playDummyAudio() {
-    if(!this.userActionInitiated) {
-      this.userActionInitiated = true;
-    }
-
     if(!this.isSafari()) {
       this.audio.src = this.playlist[this.index].src;
-      this.audio.play()
+      this.audio.play().then(x => {
+        if(!this.userActionInitiated) {
+          this.beep(1);
+          this.userActionInitiated = true;
+        }
+      })
       // .then(_ => this.updateMetadata())
       .catch(error => console.log(error));
       this.audio.volume = this.beepVolumeLOW;
+    } else {
+      if(!this.userActionInitiated) {
+        this.userActionInitiated = true;
+      }
     }
   }
 
@@ -127,9 +132,10 @@ export class MediaControlService {
             .then(x => this.beep(1)
             .then(_ => this.pause()));
           }
-          setTimeout(() => {
-            this.playDummyAudio();
-          }, 10);
+          this.userActionInitiated = false;
+          // setTimeout(() => {
+          //   this.playDummyAudio();
+          // }, this.beepDuration);
         });
       } catch(error) {
         console.log('Warning! The "stop" media session action is not supported.');

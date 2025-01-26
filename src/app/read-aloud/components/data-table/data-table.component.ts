@@ -30,30 +30,30 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
     if (event.key === 'ArrowLeft') {
       if(!this.getButtonDisabledStatus('backward')) {
-        this.rewindClick();
+        this.rewind();
       }
     } else if (event.key === 'ArrowRight') {
       if(!this.getButtonDisabledStatus('forward')) {
-        this.forwardClick();
+        this.forward();
       }
     }
     else if (event.key === ' ' || event.key === 'Spacebar') {
       if(this.getButtonVisibility('play')) {
-        this.playClick();
+        this.play();
       } else if(this.getButtonVisibility('resume')) {
-        this.resumeClick();
+        this.resume();
       } else if(this.getButtonVisibility('pause')) {
-        this.pauseClick();
+        this.pause();
       }
     }
     else if (event.key === 'MediaPlayPause') {
       if(!this.mediaControlService.userActionInitiated) {
         if(this.getButtonVisibility('play')) {
-          this.playClick();
+          this.play();
         } else if(this.getButtonVisibility('resume')) {
-          this.resumeClick();
+          this.resume();
         } else if(this.getButtonVisibility('pause')) {
-          this.pauseClick();
+          this.pause();
         }
       }
     }
@@ -1169,7 +1169,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       if(repeat) {
         this.playedIndices = [];
         this.playAllTextsStackCount--;
-        this.playClick();
+        this.play();
       }
       else {
         this.isSpeaking = false;
@@ -1464,7 +1464,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
       this.releaseScreenOn();
       if(!this.getButtonDisabledStatus('stop')) {
-        this.stopClick();
+        this.stop();
       }
   }
 
