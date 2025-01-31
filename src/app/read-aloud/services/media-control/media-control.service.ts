@@ -70,6 +70,12 @@ export class MediaControlService {
     });
   }
 
+  delay(val: number): Promise<void> {
+    return new Promise<void>(resolve => {
+      setTimeout(resolve, val);
+    });
+  }
+
   async pause() {
     if(!this.isSafari()) {
       this.audio.pause();
@@ -129,10 +135,13 @@ export class MediaControlService {
         navigator.mediaSession.setActionHandler('stop', () => {
           if (this.stopCallback) {
             this.stopCallback()
+            .then(() => this.delay(100))
+            .then(_ => this.play())
             .then(x => this.beep(1)
-            .then(_ => this.pause()));
+            .then(_ => this.pause())
+          );
           }
-          this.userActionInitiated = false;
+          // this.userActionInitiated = false;
           // setTimeout(() => {
           //   this.playDummyAudio();
           // }, this.beepDuration);

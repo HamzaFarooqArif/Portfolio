@@ -210,7 +210,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
           reject();
           return;
         };
-        if(!this.getButtonDisabledStatus('stop')) {
+        if(this.getButtonVisibility('stop')) {
           this.stop();
           resolve();
         } else {
