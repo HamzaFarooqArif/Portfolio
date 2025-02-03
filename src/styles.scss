@@ -145,6 +145,22 @@ $my-dark-theme: mat.define-dark-theme(
   .dark-theme-text {
     color: #FFF;
   }
+
+  .mtx-popover-panel {
+    background-color: #2e2e2e;
+  }
+
+  .mtx-popover-panel div {
+    background-color: #2e2e2e;
+  }
+}
+
+.mtx-popover-panel {
+  background-color: #FFF;
+}
+
+.mtx-popover-panel div {
+  background-color: #FFF;
 }
 
 .dark-theme-text {

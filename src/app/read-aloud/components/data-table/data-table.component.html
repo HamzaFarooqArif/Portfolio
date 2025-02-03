@@ -21,7 +21,7 @@
   </div>
   <form [formGroup]="playbackForm">
     <mat-accordion>
-      <mat-expansion-panel [disabled]="true" #mep="matExpansionPanel" style="display: flex; flex-direction: column; box-shadow: 0px 5px 15px #AAA;">
+      <mat-expansion-panel [expanded]="true" [disabled]="true" #mep="matExpansionPanel" style="display: flex; flex-direction: column; box-shadow: 0px 5px 15px #AAA;">
         <mat-expansion-panel-header collapsedHeight="170px" expandedHeight="140px" style="display: flex; flex-direction: row; align-items: start; box-shadow: 0px -5px 20px #AAA;">
           <mat-panel-description style="height: 140px; display: flex; flex-direction: row; justify-content: end; flex-grow: 1; cursor: initial;">
             <div style="display: flex; flex-direction: column; align-items: end;">
@@ -167,7 +167,25 @@
                     Required
                   </mat-error>
                 </mat-form-field>
-                <button matTooltip="Reload Sheet" mat-fab extended [disabled]="isSpeaking || (!isSpeaking && !isStopped)" (click)="loadSheetClick()" style="margin-left: 15px; margin-top: 7px;">
+                <div class="infoBtnClass">
+                  <mat-icon
+                    #popoverTrigger="mtxPopoverTrigger"
+                    [mtxPopoverTriggerFor]="popover"
+                  >info</mat-icon>
+                  <mtx-popover #popover="mtxPopover" 
+                    [closeOnPanelClick]="true"
+                    [hideArrow]="true"
+                  >
+                    <div style="width: 300px;">
+                      - The sheet must be publicly accessible. <br/>
+                      - It should have the following structure <br/>
+                      &nbsp; • &nbsp; Column 1: words from language 1 <br/>
+                      &nbsp; • &nbsp; Column 2: words from language 2 <br/>
+                      &nbsp; • &nbsp; Column 3: lowercase 'y'
+                    </div>
+                  </mtx-popover>
+                </div>
+                <button matTooltip="Reload Sheet" mat-fab extended [disabled]="isSpeaking || (!isSpeaking && !isStopped)" (click)="loadSheetClick()" style="margin-left: 5px; margin-top: 7px;">
                   <mat-icon>autorenew</mat-icon>
                   Reload
                 </button>

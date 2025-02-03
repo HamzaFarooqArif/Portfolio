@@ -14,8 +14,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ToastrModule } from 'ngx-toastr';
-import { NgxLoadingModule } from 'ngx-loading';
 import { ReadAloudRoutingModule } from './read-aloud-routing.module';
+import { MtxPopoverModule } from '@ng-matero/extensions/popover';
 
 @NgModule({
   declarations: [
@@ -38,6 +38,7 @@ import { ReadAloudRoutingModule } from './read-aloud-routing.module';
       MatSlideToggleModule,
       ToastrModule.forRoot(),
       ReadAloudRoutingModule,
+      MtxPopoverModule,
     ],
   providers: [
     
