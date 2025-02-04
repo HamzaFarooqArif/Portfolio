@@ -193,11 +193,11 @@
               <div>
                 <button matTooltip="Save Your Changes" mat-fab extended (click)="saveClick(); $event.stopPropagation();" style="margin: 7px 10px 0px 10px;">
                   <mat-icon>save</mat-icon>
-                  Save Settings
+                  Save Changes
                 </button>
                 <button matTooltip="Clean Saved Changes" mat-fab extended (click)="deleteClick(); $event.stopPropagation();" style="margin: 7px 10px 0px 10px;">
                   <mat-icon>delete</mat-icon>
-                  Clean Settings
+                  Clear Changes
                 </button>
                 <button [disabled]="isSpeaking || (!isSpeaking && !isStopped)" matTooltip="Clean & Reset to Defaults" mat-fab extended (click)="resetToDefaults(); $event.stopPropagation();" style="margin: 7px 10px 0px 10px;">
                   <mat-icon>autorenew</mat-icon>
