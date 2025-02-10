@@ -615,10 +615,15 @@ export class DataTableComponent implements OnInit, OnDestroy {
           complete: (result) => {
             LoadingUtil.setStatus("app-data-table", false);
             let filteredData = (result.data as any[]).filter((row: any, index: number) => {
-              return index == 0 || row[this.numberOfLanguages] == EligibleRowSymbol;
+              let symbols = row[this.numberOfLanguages].split(",").map((item: any) => item.trim().toLowerCase());
+              let rowAllowedToRead = false;
+              if(symbols && symbols?.length) {
+                rowAllowedToRead = symbols.some((x: any) => x == EligibleRowSymbol);
+              }
+              return index == 0 || rowAllowedToRead;
             });
             let parsedRows = filteredData.map((row: any) => (
-              row.slice(0, this.numberOfLanguages)
+              row.slice(0, this.numberOfLanguages + 1)
               )).filter((row: string[]) => {
               return row.some(x => x != "");
             });
@@ -1094,6 +1099,17 @@ export class DataTableComponent implements OnInit, OnDestroy {
     if(this.playbackForm?.get("speakOnlyColumnCheck")?.value && this.playbackForm?.get("speakOnlyColumnVal")?.value != this.currentColumn + 1) {
       return;
     }
+    
+    let SilentRowSymbol = this.configService.getConfigValue("SilentRowSymbol");
+    let symbols = this.tableData[this.currentRow][this.numberOfLanguages].split(",").map((item: any) => item.trim().toLowerCase());
+    let isSilentRow = false;
+    if(symbols && symbols?.length) {
+      isSilentRow = symbols.some((x: any) => x == SilentRowSymbol);
+    }
+    if(isSilentRow) {
+      return;
+    }
+
     let text = this.tableData[this.currentRow][this.currentColumn];
     let voice: SpeechSynthesisVoice | undefined = this.getSpeechSynthesisVoice(`lang${this.currentColumn + 1}Voice`);
     let vocalSpeed = Number(this.playbackForm?.get('vocalSpeed')?.value);

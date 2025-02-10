@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ConfigService } from '../../read-aloud/services/config/config.service';
 
 @Component({
   selector: 'app-portfolio',
@@ -7,10 +8,29 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PortfolioComponent implements OnInit{
 
+  get yearsOfExperience() {
+    let birthDate = new Date(this.careerStartDate);
+    let today = new Date();
+    let experience = today.getFullYear() - birthDate.getFullYear();
+    let monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      experience--;
+    }
+
+    return experience;
+  }
+
+  constructor(private configService: ConfigService) {
+    this.careerStartDate = this.configService.getConfigValue("CareerStartDate");
+  }
+  
+  careerStartDate = "";
   profession: string = "";
   professions: string[] = [" Developer", "n Engineer"];
 
   ngOnInit(): void {
+    this.configService.getConfigValue("SilentRowSymbol");
       this.animateProfession();
   }
 
