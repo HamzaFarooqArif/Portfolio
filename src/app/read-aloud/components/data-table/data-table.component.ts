@@ -448,7 +448,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.playbackForm.get('speakOnlyColumnVal')?.setValidators([
         Validators.required,
         Validators.min(1),
-        Validators.max(this.tableData[0]?.length)
+        Validators.max(this.tableData[0]?.length - 1)
       ]);
     } else {
       this.playbackForm.get('speakOnlyColumnVal')?.setValidators(null);
@@ -691,8 +691,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
     if(reverse) {
       if(reverseSpeechOrder) {
-        if(this.currentColumn < this.tableData[0]?.length - 1) {
-          this.currentColumn = this.tableData[0]?.length - 1;
+        if(this.currentColumn < this.tableData[0]?.length - 2) {
+          this.currentColumn = this.tableData[0]?.length - 2;
         } else if(this.currentRow < startRow){
           this.currentRow++;
         }
@@ -722,8 +722,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
       }
     } else {
       if(reverseSpeechOrder) {
-        if(this.currentColumn < this.tableData[0]?.length - 1) {
-          this.currentColumn = this.tableData[0]?.length - 1;
+        if(this.currentColumn < this.tableData[0]?.length - 2) {
+          this.currentColumn = this.tableData[0]?.length - 2;
         }
         // ===========================
         else if(shuffle) {
@@ -835,7 +835,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       }
     }
     if(reverseSpeechOrder) {
-      this.currentColumn = this.tableData[0]?.length - 1;
+      this.currentColumn = this.tableData[0]?.length - 2;
     }
     else {
       this.currentColumn = 0;
@@ -881,7 +881,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.currentRow = Number(this.playbackForm.get('startRow')?.value);
     let reverseSpeechOrder: boolean = this.playbackForm?.get('reverseSpeechOrder')?.value;
     if(reverseSpeechOrder) {
-      this.currentColumn = this.tableData[0]?.length - 1;
+      this.currentColumn = this.tableData[0]?.length - 2;
     }
     else {
       this.currentColumn = 0;
@@ -1026,7 +1026,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     {
       this.playbackForm.get('endRow')?.patchValue(Number(savedData['endRow']));
     }
-    if(savedData['speakOnlyColumnVal'] && Number(savedData['speakOnlyColumnVal']) <= this.tableData[0]?.length)
+    if(savedData['speakOnlyColumnVal'] && Number(savedData['speakOnlyColumnVal']) <= this.tableData[0]?.length - 1)
     {
       this.playbackForm.get('speakOnlyColumnVal')?.patchValue(Number(savedData['speakOnlyColumnVal']));
     }
@@ -1168,7 +1168,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
         }
       }
       else {
-        if(this.currentColumn < this.tableData[0]?.length - 1) {
+        if(this.currentColumn < this.tableData[0]?.length - 2) {
           let delay = Number(this.playbackForm.get('inbetweenDelayColumn')?.value);
           this.playAllTextsStackCount--;
           return this.playAllTexts(delay*1000, true);
@@ -1260,7 +1260,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     if(reverse) {
       if(reverseSpeechOrder) {
         if(this.currentColumn == 0) {
-          this.currentColumn = this.tableData[0]?.length - 1;
+          this.currentColumn = this.tableData[0]?.length - 2;
           if(shuffle) {
             this.currentRow = this.getRandomRow();
           } else {
@@ -1272,7 +1272,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
         }
       }
       else {
-        if(this.currentColumn == this.tableData[0]?.length - 1) {
+        if(this.currentColumn == this.tableData[0]?.length - 2) {
           this.currentColumn = 0;
           if(shuffle) {
             this.currentRow = this.getRandomRow();
@@ -1288,7 +1288,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     else {
       if(reverseSpeechOrder) {
         if(this.currentColumn == 0) {
-          this.currentColumn = this.tableData[0]?.length - 1;
+          this.currentColumn = this.tableData[0]?.length - 2;
           if(shuffle) {
             this.currentRow = this.getRandomRow();
           } else {
@@ -1300,7 +1300,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
         }
       }
       else {
-        if(this.currentColumn == this.tableData[0]?.length - 1) {
+        if(this.currentColumn == this.tableData[0]?.length - 2) {
           this.currentColumn = 0;
           if(shuffle) {
             this.currentRow = this.getRandomRow();
