@@ -9,5 +9,6 @@
     "preferredVoice": "Google",
     "EligibleRowSymbol": "y",
     "SilentRowSymbol": "n",
+    "HighlightRowSymbol": "h",
     "CareerStartDate": "2020-05-20"
 }

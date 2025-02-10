@@ -178,6 +178,26 @@ body {
   background-size: cover;
 }
 
+.highlight {
+  background-color: yellow !important;
+  color: #000;
+}
+
+.header-item{
+  cursor: pointer !important;
+}
+
+.header-item-collapsed {
+  cursor: pointer !important;
+  margin: 10px 0px;
+}
+
+.active-link {
+  color: #ffeb3b !important; /* Yellow color for active item */
+  font-weight: bold;
+  border-bottom: 2px solid #ffeb3b; /* Underline effect */
+}
+
 .form-control {
   background-color: inherit !important;
 }

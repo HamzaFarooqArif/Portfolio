@@ -6,15 +6,6 @@
     padding: 0px 20px;
 }
 
-.header-item{
-    cursor: pointer !important;
-}
-
-.header-item-collapsed {
-    cursor: pointer !important;
-    margin: 10px 0px;
-}
-
 .navCollapsedBtn {
     display: none;
 }
@@ -26,12 +17,6 @@
 
 .logo {
     margin-left: 10px;
-}
-
-.active-link {
-color: #ffeb3b !important; /* Yellow color for active item */
-font-weight: bold;
-border-bottom: 2px solid #ffeb3b; /* Underline effect */
 }
 
 :host ::ng-deep .mat-mdc-list-item {

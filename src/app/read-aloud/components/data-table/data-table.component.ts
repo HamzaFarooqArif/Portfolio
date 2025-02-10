@@ -104,6 +104,16 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   tableData: string[][] = [];
 
+  symbolFound(symbolStr: string, row: any) {
+    let symbolVal = this.configService.getConfigValue(symbolStr);
+    let symbols = row[this.numberOfLanguages].split(",").map((item: any) => item.trim().toLowerCase());
+    let result = false;
+    if(symbols && symbols?.length) {
+      result = symbols.some((x: any) => x == symbolVal);
+    }
+    return result;
+  }
+
   ngOnInit(): void {
     this.numberOfLanguages = Number(this.configService.getConfigValue('numberOfLanguages'));
     this.onInitAsync();

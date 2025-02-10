@@ -12,9 +12,11 @@
       <tbody>
         <tr *ngFor="let rowItem of tableData | slice: 1; let i = index">
             <td [id]="'index_' + (i + 1)">{{ i + 1 }}</td>
-            <td [id]="'cell_' + i + '_' + j" *ngFor="let _ of [].constructor(numberOfLanguages); let j = index" style="min-width: 140px; overflow-wrap: anywhere;">
-              {{ rowItem[j] }}
-            </td>
+            <ng-container *ngFor="let _ of [].constructor(numberOfLanguages + 1); let j = index">
+              <td *ngIf="j < numberOfLanguages" [id]="'cell_' + i + '_' + j"  style="min-width: 140px; overflow-wrap: anywhere;" [ngClass]="{'yellow-bg': symbolFound('HighlightRowSymbol', rowItem)}">
+                {{ rowItem[j] }}
+              </td>
+            </ng-container>
         </tr>
       </tbody>
     </table>
