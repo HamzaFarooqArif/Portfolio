@@ -106,7 +106,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   symbolFound(symbolStr: string, row: any) {
     let symbolVal = this.configService.getConfigValue(symbolStr);
-    let symbols = row[this.numberOfLanguages].split(",").map((item: any) => item.trim().toLowerCase());
+    let symbols = row[this.numberOfLanguages].split(" ").map((item: any) => item.trim().toLowerCase());
     let result = false;
     if(symbols && symbols?.length) {
       result = symbols.some((x: any) => x == symbolVal);
@@ -618,18 +618,13 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   async fetchDataAndParseAsync(): Promise<string[][]> {
     LoadingUtil.setStatus("app-data-table", true);
-    let EligibleRowSymbol = this.configService.getConfigValue("EligibleRowSymbol");
     return new Promise((resolve, reject) => {
       this.spreadsheetService.fetchSheetData().subscribe((csvData: string) => {
         this.papa.parse(csvData, {
           complete: (result) => {
             LoadingUtil.setStatus("app-data-table", false);
             let filteredData = (result.data as any[]).filter((row: any, index: number) => {
-              let symbols = row[this.numberOfLanguages].split(",").map((item: any) => item.trim().toLowerCase());
-              let rowAllowedToRead = false;
-              if(symbols && symbols?.length) {
-                rowAllowedToRead = symbols.some((x: any) => x == EligibleRowSymbol);
-              }
+              let rowAllowedToRead = this.symbolFound("EligibleRowSymbol", row);
               return index == 0 || rowAllowedToRead;
             });
             let parsedRows = filteredData.map((row: any) => (
@@ -1110,12 +1105,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       return;
     }
     
-    let SilentRowSymbol = this.configService.getConfigValue("SilentRowSymbol");
-    let symbols = this.tableData[this.currentRow][this.numberOfLanguages].split(",").map((item: any) => item.trim().toLowerCase());
-    let isSilentRow = false;
-    if(symbols && symbols?.length) {
-      isSilentRow = symbols.some((x: any) => x == SilentRowSymbol);
-    }
+    let isSilentRow = this.symbolFound("SilentRowSymbol", this.tableData[this.currentRow]);
     if(isSilentRow) {
       return;
     }
