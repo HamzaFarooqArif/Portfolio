@@ -17,7 +17,7 @@
               </button>
             </td>
             <ng-container *ngFor="let _ of [].constructor(numberOfLanguages + 1); let j = index">
-              <td *ngIf="j < numberOfLanguages" [id]="'cell_' + i + '_' + j"  style="min-width: 140px; overflow-wrap: anywhere;" [ngClass]="{'yellow-bg': symbolFound('HighlightRowSymbol', rowItem)}">
+              <td *ngIf="j < numberOfLanguages" [id]="'cell_' + i + '_' + j"  style="min-width: 140px; overflow-wrap: anywhere;" [class]="{'yellow-bg': symbolFound('HighlightRowSymbol', rowItem)}">
                 {{ rowItem[j] }}
               </td>
             </ng-container>
