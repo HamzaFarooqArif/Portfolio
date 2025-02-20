@@ -1477,6 +1477,27 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.refreshPlaybackButtons();
   }
 
+  async speakSingle(row: number) {
+    if(this.getButtonVisibility('stop')) {
+      this.stopClick();
+    }
+    
+    if(!this.isSpeaking)
+    {
+      let text = this.tableData[row][0];
+      let voice: SpeechSynthesisVoice | undefined = this.getSpeechSynthesisVoice(`lang${1}Voice`);
+      let vocalSpeed = Number(this.playbackForm?.get('vocalSpeed')?.value);
+      let volume = Number(this.playbackForm?.get('volume')?.value);
+      volume = volume * volume * volume;
+      
+      if(text && voice) {
+        this.isSpeaking = true;
+        await this.speechService.speakAsync(text, voice, vocalSpeed, volume);
+        this.isSpeaking = false;
+      }
+    }
+  }
+
   ngOnDestroy(): void {
       this.releaseScreenOn();
       if(!this.getButtonDisabledStatus('stop')) {

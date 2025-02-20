@@ -153,6 +153,21 @@ $my-dark-theme: mat.define-dark-theme(
   .mtx-popover-panel div {
     background-color: #2e2e2e;
   }
+
+  .blended-btn {
+    color: #FFF;
+    background-color: #2e2e2e;
+    border: 2px outset #2e2e2e;
+  }
+}
+
+.blended-btn {
+  background-color: #FFF;
+  border: 2px outset #FFF;
+}
+
+.blended-btn:active {
+  border-style: inset;
 }
 
 .mtx-popover-panel {
