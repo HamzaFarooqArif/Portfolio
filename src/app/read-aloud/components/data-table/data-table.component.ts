@@ -1481,6 +1481,10 @@ export class DataTableComponent implements OnInit, OnDestroy {
     if(this.getButtonVisibility('stop')) {
       this.stopClick();
     }
+    else {
+      this.speechService.stopSpeech();
+      this.isSpeaking = false;
+    }
     
     if(!this.isSpeaking)
     {
