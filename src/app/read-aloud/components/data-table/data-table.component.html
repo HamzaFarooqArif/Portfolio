@@ -323,6 +323,38 @@
                 </mat-error>
               </mat-form-field>
             </ng-container>
+            <div style="width: 300px;">
+              <div style="display: flex; flex-direction: row;">
+                <mat-form-field style="width: 175px; margin: 7px 10px 0px 0px;">
+                  <mat-label>Language Columns</mat-label>
+                  <input
+                    readonly
+                    matInput
+                    type="number"
+                    class="form-control"
+                    formControlName="languageColumns"
+                    (change)="refreshRowFieldsValidity();"
+                    >
+                  <mat-error *ngIf="playbackForm.get('languageColumns')?.hasError('required')">
+                    Required
+                  </mat-error>
+                  <mat-error *ngIf="playbackForm.get('languageColumns')?.hasError('min')">
+                    Invalid
+                  </mat-error>
+                  <mat-error *ngIf="!playbackForm.get('languageColumns')?.hasError('min') && playbackForm.get('languageColumns')?.hasError('max')">
+                    Invalid
+                  </mat-error>
+                </mat-form-field>
+                <div style="display: flex; flex-direction: column;">
+                  <button mat-mini-fab (click)="tryChangeNumberOfLanguages(1); $event.stopPropagation();">
+                    <mat-icon>north</mat-icon>
+                  </button>
+                  <button mat-mini-fab (click)="tryChangeNumberOfLanguages(-1); $event.stopPropagation();">
+                    <mat-icon>south</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
             <mat-slide-toggle #themSwitch formControlName="lightMode" (change)="assignTheme()">
               Switch to
               <span *ngIf="themSwitch.checked">Dark Mode</span>

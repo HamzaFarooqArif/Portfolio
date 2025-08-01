@@ -1,7 +1,8 @@
 {
     "numberOfLanguages": "2",
+    "numberOfLanguagesMax": "10",
     "googleSheetsId": "1qS7yrrPvKIIJ_OvuYEyw1dNYq2nWCLU2k-IAIc4hTyU",
-    "googleSheetsUrl": "https://docs.google.com/spreadsheets/d/<googleSheetsId>/export?format=csv",
+    "googleSheetsUrl": "https://docs.google.com/spreadsheets/d/<googleSheetsId>/export?format=csv&id=<googleSheetsId>&gid=<googleSubSheetsId>",
     "preferredLangs": [
         ["de-DE", "de_DE"], 
         ["en-US", "en_US"]

@@ -105,9 +105,11 @@ export class DataTableComponent implements OnInit, OnDestroy {
   tableData: string[][] = [];
 
   symbolFound(symbolStr: string, row: any) {
+    let result = false;
+    if(row?.length <= this.numberOfLanguages) return result;
+
     let symbolVal = this.configService.getConfigValue(symbolStr);
     let symbols = row[this.numberOfLanguages].split(" ").map((item: any) => item.trim().toLowerCase());
-    let result = false;
     if(symbols && symbols?.length) {
       result = symbols.some((x: any) => x == symbolVal);
     }
@@ -115,7 +117,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.numberOfLanguages = Number(this.configService.getConfigValue('numberOfLanguages'));
+    this.setNumberOfLanguages();
     this.onInitAsync();
 
     this.skipSubject.pipe(
@@ -129,6 +131,17 @@ export class DataTableComponent implements OnInit, OnDestroy {
     });
 
     document.addEventListener('visibilitychange', this.visibilityChangeHandler);
+  }
+
+  setNumberOfLanguages() {
+    let localStorageData = JSON.parse(localStorage.getItem('formData') || '{}');
+    let savedData = JSON.parse(JSON.stringify(localStorageData));
+    if(savedData['languageColumns']) {
+      this.numberOfLanguages = Number(savedData['languageColumns']);
+    }
+    else {
+      this.numberOfLanguages = Number(this.configService.getConfigValue('numberOfLanguages'));
+    }
   }
 
   visibilityChangeHandler = () => {
@@ -255,9 +268,18 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   addLanguageControls() {
     for (let i = 0; i < this.numberOfLanguages; i++) {
-      this.playbackForm.addControl(`lang${i+1}`, this.fb.control('', Validators.required));
-      this.playbackForm.addControl(`lang${i+1}Voice`, this.fb.control('', Validators.required));
+      this.addLanguageControl(i);
     }
+  }
+
+  addLanguageControl(index: number) {
+    this.playbackForm.addControl(`lang${index+1}`, this.fb.control('', Validators.required));
+    this.playbackForm.addControl(`lang${index+1}Voice`, this.fb.control('', Validators.required));
+  }
+
+  removeLanguageControl(index: number) {
+    this.playbackForm.removeControl(`lang${index+1}`);
+    this.playbackForm.removeControl(`lang${index+1}Voice`);
   }
 
   async setGoogleSheetId(): Promise<void> {
@@ -287,7 +309,12 @@ export class DataTableComponent implements OnInit, OnDestroy {
     else {
       this.playbackForm.get('sheetId')?.patchValue(this.configService.getConfigValue("googleSheetsId"));
     }
+
+    if(savedData['subSheetId']) {
+      this.playbackForm.get('subSheetId')?.patchValue(savedData['subSheetId']);
+    }
     this.spreadsheetService.setSheetId(this.playbackForm.get('sheetId')?.value);
+    this.spreadsheetService.setSubSheetId(this.playbackForm.get('subSheetId')?.value);
   }
 
   async getLanguages(): Promise<void> {
@@ -314,6 +341,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   initForm() {
     this.playbackForm = this.fb.group({
       sheetId: ['', Validators.required],
+      subSheetId: [''],
       startRow: ['', Validators.required],
       endRow: ['', Validators.required],
       speakOnlyColumnVal: [1],
@@ -327,6 +355,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       reversePlayback: [false],
       reverseSpeechOrder: [false],
       lightMode: [false],
+      languageColumns: ['', Validators.required],
     });
   }
 
@@ -441,8 +470,28 @@ export class DataTableComponent implements OnInit, OnDestroy {
     if(this.tableData?.length) {
       this.playbackForm.get('startRow')?.setValue(1);
       this.playbackForm.get('endRow')?.setValue(this.tableData?.length - 1);
+      this.playbackForm?.get('languageColumns')?.setValue(this.numberOfLanguages);
       this.refreshRowFieldsValidity();
     }
+  }
+
+  tryChangeNumberOfLanguages(value: number) {
+      let languageColumnsMin = Number(this.configService.getConfigValue("numberOfLanguages"));
+      let languageColumnsMax = Number(this.configService.getConfigValue("numberOfLanguagesMax"));
+      let newValue = Number(this.playbackForm.get('languageColumns')?.value) + value;
+      if(newValue >= languageColumnsMin && newValue <= languageColumnsMax) {
+        this.playbackForm.get('languageColumns')?.setValue(newValue);
+        this.numberOfLanguages = newValue;
+        if(value == 1) {
+          this.addLanguageControl(newValue-1);
+          this.playbackForm.get(`lang${newValue}`)?.setValue(this.masterLanguages[0].value);
+          this.refreshVoiceDropdown(newValue);
+        }
+        if(value == -1) {
+          this.removeLanguageControl(newValue-1);
+          this.playbackForm.get(`lang${newValue}`)?.setValue(this.masterLanguages[0].value);
+        }
+      }
   }
 
   refreshRowFieldsValidity() {
@@ -463,9 +512,20 @@ export class DataTableComponent implements OnInit, OnDestroy {
     } else {
       this.playbackForm.get('speakOnlyColumnVal')?.setValidators(null);
     }
+    let languageColumnsMin = Number(this.configService.getConfigValue("numberOfLanguages"));
+    let languageColumnsMax = Number(this.configService.getConfigValue("numberOfLanguagesMax"));
+    this.playbackForm.get('languageColumns')?.setValidators([
+      Validators.min(languageColumnsMin),
+      Validators.max(languageColumnsMax)
+    ]);
     this.playbackForm.get('startRow')?.updateValueAndValidity();
     this.playbackForm.get('endRow')?.updateValueAndValidity();
     this.playbackForm.get('speakOnlyColumnVal')?.updateValueAndValidity();
+    this.playbackForm.get('languageColumns')?.updateValueAndValidity();
+
+    if(this.playbackForm.get('languageColumns')?.valid) {
+      this.numberOfLanguages = Number(this.playbackForm.get('languageColumns')?.value);
+    }
   }
 
   increaseSlider(controlName: string) {
@@ -648,6 +708,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     return new Promise((resolve, reject) => {
       this.playbackForm.disable();
       this.playbackForm.get('sheetId')?.enable();
+      this.playbackForm.get('languageColumns')?.enable();
       this.fetchDataAndParseAsync().then((data: string[][]) => {
         LoadingUtil.setStatus("app-data-table", false);
         this.playbackForm.enable();
@@ -881,6 +942,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.playbackForm.get('startRow')?.disable();
     this.playbackForm.get('endRow')?.disable();
     this.playbackForm.get('sheetId')?.disable();
+    this.playbackForm.get('languageColumns')?.disable();
     this.playbackForm.get('speakOnlyColumnVal')?.disable();
     this.playbackForm.get('speakOnlyColumnCheck')?.disable();
     this.currentRow = Number(this.playbackForm.get('startRow')?.value);
@@ -902,6 +964,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.playbackForm.get('startRow')?.enable();
     this.playbackForm.get('endRow')?.enable();
     this.playbackForm.get('sheetId')?.enable();
+    this.playbackForm.get('languageColumns')?.enable();
     this.playbackForm.get('speakOnlyColumnVal')?.enable();
     this.playbackForm.get('speakOnlyColumnCheck')?.enable();
     this.highlightWord(-1, -1);
@@ -987,12 +1050,18 @@ export class DataTableComponent implements OnInit, OnDestroy {
         if(match) {
           this.playbackForm.get('sheetId')?.setValue(match[1]);
         }
+        const subSheetMatch = input.match(/gid=([a-zA-Z0-9-_]+)/);
+        if(subSheetMatch) {
+          this.playbackForm.get('subSheetId')?.setValue(subSheetMatch[1]);
+          this.spreadsheetService.setSubSheetId(this.playbackForm.get('subSheetId')?.value);
+        }
       }
       this.spreadsheetService.setSheetId(this.playbackForm.get('sheetId')?.value);
+      this.numberOfLanguages = Number(this.playbackForm.get('languageColumns')?.value);
       await this.fetchData();
       this.patchForm();
       this.refreshPlaybackButtons();
-      this.loadSavedData();
+      // this.loadSavedData();
     }
   }
 
@@ -1066,6 +1135,13 @@ export class DataTableComponent implements OnInit, OnDestroy {
         this.playbackForm.get(`lang${i+1}Voice`)?.setValue(savedData[`lang${i+1}Voice`]);
       }
     }
+
+    if(savedData['languageColumns'] && 
+      Number(savedData['languageColumns']) <= this.configService.getConfigValue("numberOfLanguagesMax") && 
+      Number(savedData['languageColumns']) >= this.configService.getConfigValue("numberOfLanguages"))
+    {
+      this.playbackForm.get('languageColumns')?.patchValue(Number(savedData['languageColumns']));
+    }
   }
 
   checkForTruthy(val: any) {
@@ -1129,6 +1205,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.playbackForm.get('startRow')?.enable();
       this.playbackForm.get('endRow')?.enable();
       this.playbackForm.get('sheetId')?.enable();
+      this.playbackForm.get('languageColumns')?.enable();
       this.playbackForm.get('speakOnlyColumnVal')?.enable();
       this.playbackForm.get('speakOnlyColumnCheck')?.enable();
       this.playedIndices = [];
@@ -1194,6 +1271,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
         this.playbackForm.get('startRow')?.enable();
         this.playbackForm.get('endRow')?.enable();
         this.playbackForm.get('sheetId')?.enable();
+        this.playbackForm.get('languageColumns')?.enable();
         this.playbackForm.get('speakOnlyColumnVal')?.enable();
         this.playbackForm.get('speakOnlyColumnCheck')?.enable();
         this.highlightWord(-1, -1);
@@ -1443,8 +1521,12 @@ export class DataTableComponent implements OnInit, OnDestroy {
   async resetToDefaults() {
     this.playbackForm.get('sheetId')?.patchValue(this.configService.getConfigValue("googleSheetsId"));
     this.spreadsheetService.setSheetId(this.playbackForm.get('sheetId')?.value);
+    this.spreadsheetService.setSubSheetId('');
+    this.playbackForm.get('languageColumns')?.patchValue(this.configService.getConfigValue("numberOfLanguages"));
+    this.numberOfLanguages = Number(this.playbackForm.get('languageColumns')?.value);
     this.playbackForm.disable();
     this.playbackForm.get('sheetId')?.enable();
+    this.playbackForm.get('languageColumns')?.enable();
     let data = await this.fetchDataAndParseAsync().catch(err => {
       LoadingUtil.setStatus("app-data-table", false);
       this.toastr.error("Please check the 'Sheet ID' and make sure that the sheet has the public access", "Unable fetch sheet", {
@@ -1469,9 +1551,11 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.resetRangeSlider("inbetweenDelayRow");
     this.resetRangeSlider("inbetweenDelayColumn");
     this.resetRangeSlider("vocalSpeed");
+    for(let i = 0; i < Number(this.configService.getConfigValue("numberOfLanguagesMax")); i++) {
+      this.removeLanguageControl(i);
+    }
     for(let i = 0; i < this.numberOfLanguages; i++) {
-      this.playbackForm.get(`lang${i+1}`)?.setValue("");
-      this.playbackForm.get(`lang${i+1}Voice`)?.setValue("");
+      this.addLanguageControl(i);
     }
     this.initializeDropdowns();
     this.refreshPlaybackButtons();

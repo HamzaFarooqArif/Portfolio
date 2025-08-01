@@ -9,6 +9,7 @@ import { ConfigService } from '../config/config.service';
 export class SpreadsheetService {
 
   private sheetId: string = "";
+  private subSheetId: string = "";
 
   constructor(private http: HttpClient, private config: ConfigService) { }
 
@@ -16,11 +17,18 @@ export class SpreadsheetService {
     this.sheetId = value;
   }
 
+  setSubSheetId(value: string) {
+    this.subSheetId = value ? value : '0';
+  }
+
   fetchSheetData(): Observable<string> {
     if(!this.sheetId) {
       this.sheetId = this.config.getConfigValue("googleSheetsId");
     }
-    const csvUrl = this.config.getConfigValue("googleSheetsUrl").replace("<googleSheetsId>", this.sheetId);
+    const csvUrl = this.config.getConfigValue("googleSheetsUrl")
+                    .replace("<googleSheetsId>", this.sheetId)
+                    .replace("<googleSheetsId>", this.sheetId)
+                    .replace("<googleSubSheetsId>", this.subSheetId);
     return this.http.get(csvUrl, { responseType: 'text' });
   }
 }
