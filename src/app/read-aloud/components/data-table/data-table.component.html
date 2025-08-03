@@ -346,10 +346,10 @@
                   </mat-error>
                 </mat-form-field>
                 <div style="display: flex; flex-direction: column;">
-                  <button mat-mini-fab (click)="tryChangeNumberOfLanguages(1); $event.stopPropagation();">
+                  <button [disabled]="isSpeaking || (!isSpeaking && !isStopped)" mat-mini-fab (click)="tryChangeNumberOfLanguages(1); $event.stopPropagation();">
                     <mat-icon>north</mat-icon>
                   </button>
-                  <button mat-mini-fab (click)="tryChangeNumberOfLanguages(-1); $event.stopPropagation();">
+                  <button [disabled]="isSpeaking || (!isSpeaking && !isStopped)" mat-mini-fab (click)="tryChangeNumberOfLanguages(-1); $event.stopPropagation();">
                     <mat-icon>south</mat-icon>
                   </button>
                 </div>
