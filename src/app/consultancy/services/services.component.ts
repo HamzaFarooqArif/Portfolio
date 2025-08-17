@@ -22,7 +22,15 @@ export class ServicesComponent {
 
       // Assuming your sheet has "Email" and "Status" columns
       const match = rows.find(r => r['Email Address']?.toLowerCase() === this.email.toLowerCase());
-      this.status = match ? match['Status'] : 'No record found';
+      if(match) {
+        if(match['Status']) {
+          this.status = match['Status'];
+        } else {
+          this.status = 'Under Review';
+        }
+      } else {
+        this.status =  'No record found';
+      }
     });
   }
 
