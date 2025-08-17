@@ -16,6 +16,7 @@ const routes: Routes = [
       });
     }
   },
+  { path: 'consultancy', loadChildren: () => import('./consultancy/consultancy.module').then(m => m.ConsultancyModule) },
 ];
 
 @NgModule({

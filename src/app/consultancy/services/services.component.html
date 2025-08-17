@@ -1,0 +1,119 @@
+<h2 style="text-align:center; margin: 30px 0;">Our Services</h2>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px;">
+
+  <!-- Masters Programs -->
+  <mat-card>
+    <mat-card-header>
+      <mat-icon mat-card-avatar color="warn">school</mat-icon>
+      <mat-card-title>Masters Programs</mat-card-title>
+      <mat-card-subtitle>Most Popular</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <ul>
+        <li>University Selection</li>
+        <li>Application Assistance</li>
+        <li>Scholarship Guidance</li>
+        <li>Visa Support</li>
+      </ul>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Bachelor Programs -->
+  <mat-card>
+    <mat-card-header>
+      <mat-icon mat-card-avatar color="accent">menu_book</mat-icon>
+      <mat-card-title>Bachelor Programs</mat-card-title>
+      <mat-card-subtitle>High Demand</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <ul>
+        <li>Course Selection</li>
+        <li>Document Preparation</li>
+        <li>Interview Preparation</li>
+        <li>Pre-departure Guidance</li>
+      </ul>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Free German A1 Course -->
+  <mat-card>
+    <mat-card-header>
+      <mat-icon mat-card-avatar color="primary">card_giftcard</mat-icon>
+      <mat-card-title>Free German A1 Course</mat-card-title>
+      <mat-card-subtitle>Complimentary</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <ul>
+        <li>Basic German Skills</li>
+        <li>Cultural Introduction</li>
+        <li>Study Materials</li>
+        <li>Practice Sessions</li>
+      </ul>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Visa Assistance -->
+  <mat-card>
+    <mat-card-header>
+      <mat-icon mat-card-avatar color="primary">assignment</mat-icon>
+      <mat-card-title>Visa Assistance</mat-card-title>
+      <mat-card-subtitle>100% Success</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p>Complete visa application support with expert guidance.</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Career Counseling -->
+  <mat-card>
+    <mat-card-header>
+      <mat-icon mat-card-avatar color="accent">work</mat-icon>
+      <mat-card-title>Career Counseling</mat-card-title>
+      <mat-card-subtitle>Expert Advice</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p>Guidance to choose the right program based on your career goals.</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Student Network -->
+  <mat-card>
+    <mat-card-header>
+      <mat-icon mat-card-avatar color="warn">group</mat-icon>
+      <mat-card-title>Student Network</mat-card-title>
+      <mat-card-subtitle>700+ Members</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p>Join our exclusive network of 700+ Pakistani students studying across Germany.</p>
+    </mat-card-content>
+  </mat-card>
+
+</div>
+
+<div style="text-align:center; margin-top: 30px; margin-bottom: 30px;">
+  <button mat-raised-button color="primary" routerLink="/consultancy/apply">
+    Apply Now
+  </button>
+</div>
+
+<div style="margin-top:40px;">
+  <h3 style="text-align:center; margin-bottom:20px;">Check Application Status</h3>
+
+  <mat-card>
+    <mat-card-content>
+      <form (ngSubmit)="checkStatus()">
+        <mat-form-field appearance="outline" style="width:100%;">
+          <mat-label>Email</mat-label>
+          <input matInput [(ngModel)]="email" name="email" required />
+        </mat-form-field>
+        <button mat-raised-button color="primary" type="submit">Check Status</button>
+      </form>
+
+      <div *ngIf="status" style="margin-top:20px;">
+        <h4>Status: {{ status }}</h4>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
