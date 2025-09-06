@@ -34,6 +34,7 @@ export class SpeechService {
 
   async speakAsync(text: string, voice: SpeechSynthesisVoice, vocalSpeed: number, wordDelay: number = 0): Promise<void> {
     if(wordDelay > 0) {
+      if(this.cancelOngoingSpeech) this.cancelOngoingSpeech = false;
       const words = text.split(" ");
       for (let i = 0; i < words.length; i++) {
         if(!this.cancelOngoingSpeech) {
@@ -44,7 +45,6 @@ export class SpeechService {
       if(!this.cancelOngoingSpeech) {
         await this.speakInternalAsync(text, voice, vocalSpeed);
       }
-      if(this.cancelOngoingSpeech) this.cancelOngoingSpeech = false;
     }
     else {
       await this.speakInternalAsync(text, voice, vocalSpeed);
