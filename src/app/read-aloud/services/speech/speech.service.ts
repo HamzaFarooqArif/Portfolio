@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import EasySpeech from 'easy-speech'
-import { Observable } from 'rxjs';
+import { Utils } from '../../utils/Utils';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +10,7 @@ export class SpeechService {
   private _interval: number = 250;
   
   private isPaused: boolean = false;
+  private cancelOngoingSpeech: boolean = false;
 
   constructor() {
     this.init();
@@ -31,7 +32,26 @@ export class SpeechService {
     });
   }
 
-  async speakAsync(text: string, voice: SpeechSynthesisVoice, vocalSpeed: number, volume: number): Promise<void> {
+  async speakAsync(text: string, voice: SpeechSynthesisVoice, vocalSpeed: number, wordDelay: number = 0): Promise<void> {
+    if(wordDelay > 0) {
+      const words = text.split(" ");
+      for (let i = 0; i < words.length; i++) {
+        if(!this.cancelOngoingSpeech) {
+          await this.speakInternalAsync(words[i], voice, vocalSpeed);
+          await Utils.delay(wordDelay); 
+        }
+      }
+      if(!this.cancelOngoingSpeech) {
+        await this.speakInternalAsync(text, voice, vocalSpeed);
+      }
+      if(this.cancelOngoingSpeech) this.cancelOngoingSpeech = false;
+    }
+    else {
+      await this.speakInternalAsync(text, voice, vocalSpeed);
+    }
+  }
+
+  private async speakInternalAsync(text: string, voice: SpeechSynthesisVoice, vocalSpeed: number): Promise<void> {
     return new Promise((resolve) => {
       
       let alreadyResolved: boolean = false;
@@ -52,7 +72,6 @@ export class SpeechService {
             text: text,
             voice: voice,
             rate: vocalSpeed,
-            volume: volume,
             boundary: event => console.debug('word boundary reached', event.charIndex),
           })
             .then(() => {
@@ -80,6 +99,7 @@ export class SpeechService {
 
   stopSpeech() {
     this.isPaused = false;
+    this.cancelOngoingSpeech = true;
     EasySpeech.cancel();
   }
 

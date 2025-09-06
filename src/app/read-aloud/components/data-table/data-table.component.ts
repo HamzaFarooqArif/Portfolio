@@ -77,6 +77,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   formQueryParams: Params | null | undefined;
   vocalSpeedRange: {min: number, max: number} = {min: 0.1, max: 2};
   inbetweenDelayRange: {min: number, max: number} = {min: 0, max: 10};
+  wordPausesRange: {min: number, max: number} = {min: 0, max: 2};
   playedIndices: number[] = [];
   jumpInterval: number = 200;
   private skipSubject = new Subject<void>();
@@ -349,7 +350,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       vocalSpeed: [1],
       inbetweenDelayColumn: [0],
       inbetweenDelayRow: [0],
-      volume: [1],
+      wordPauses: [0],
       repeat: [false],
       shuffle: [false],
       reversePlayback: [false],
@@ -546,8 +547,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
         this.playbackForm.get("inbetweenDelayRow")?.setValue(Math.ceil(this.playbackForm.get("inbetweenDelayRow")?.value));
       }
     }
-    else if(controlName == "volume" && this.playbackForm.get("volume")?.value < 1) {
-      this.playbackForm.get("volume")?.setValue(Math.min(1, this.playbackForm.get("volume")?.value + 0.1));
+    else if(controlName == "wordPauses" && this.playbackForm.get("wordPauses")?.value < this.wordPausesRange.max) {
+      this.playbackForm.get("wordPauses")?.setValue(Math.min(this.wordPausesRange.max, this.playbackForm.get("wordPauses")?.value + 0.1));
     }
   }
 
@@ -569,8 +570,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
         this.playbackForm.get("inbetweenDelayRow")?.setValue(Math.floor(this.playbackForm.get("inbetweenDelayRow")?.value));
       }
     }
-    else if(controlName == "volume" && this.playbackForm.get("volume")?.value > 0) {
-      this.playbackForm.get("volume")?.setValue(Math.max(0, this.playbackForm.get("volume")?.value - 0.1));
+    else if(controlName == "wordPauses" && this.playbackForm.get("wordPauses")?.value > this.wordPausesRange.min) {
+      this.playbackForm.get("wordPauses")?.setValue(Math.max(0, this.playbackForm.get("wordPauses")?.value - 0.1));
     }
   }
 
@@ -1116,9 +1117,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
     {
       this.playbackForm.get('inbetweenDelayRow')?.patchValue(Number(savedData['inbetweenDelayRow']));
     }
-    if(savedData['volume'] && Number(savedData['volume']) >= this.inbetweenDelayRange.min && Number(savedData['volume']) <= this.inbetweenDelayRange.max)
+    if(savedData['wordPauses'] && Number(savedData['wordPauses']) >= this.wordPausesRange.min && Number(savedData['wordPauses']) <= this.wordPausesRange.max)
     {
-      this.playbackForm.get('volume')?.patchValue(Number(savedData['volume']));
+      this.playbackForm.get('wordPauses')?.patchValue(Number(savedData['wordPauses']));
     }
     this.playbackForm.get('speakOnlyColumnCheck')?.patchValue(this.checkForTruthy(savedData['speakOnlyColumnCheck']));
     this.playbackForm.get('lightMode')?.patchValue(this.checkForTruthy(savedData['lightMode']));
@@ -1189,11 +1190,11 @@ export class DataTableComponent implements OnInit, OnDestroy {
     let text = this.tableData[this.currentRow][this.currentColumn];
     let voice: SpeechSynthesisVoice | undefined = this.getSpeechSynthesisVoice(`lang${this.currentColumn + 1}Voice`);
     let vocalSpeed = Number(this.playbackForm?.get('vocalSpeed')?.value);
-    let volume = Number(this.playbackForm?.get('volume')?.value);
-    volume = volume * volume * volume;
+    let wordPauses = Number(this.playbackForm?.get('wordPauses')?.value);
+
     if(text && voice) {
       this.addToPlayed(this.currentRow);
-      await this.speechService.speakAsync(text, voice, vocalSpeed, volume);
+      await this.speechService.speakAsync(text, voice, vocalSpeed, wordPauses*1000);
     }
   }
 
@@ -1513,8 +1514,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
     else if(controlName == "vocalSpeed") {
       this.playbackForm.get(controlName)?.setValue(1);
     }
-    else if(controlName == "volume") {
-      this.playbackForm.get(controlName)?.setValue(1);
+    else if(controlName == "wordPauses") {
+      this.playbackForm.get(controlName)?.setValue(this.wordPausesRange.min);
     }
   }
 
@@ -1546,7 +1547,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       this.playbackForm.get('endRow')?.setValue(this.tableData?.length - 1);
       this.refreshRowFieldsValidity();
     }
-    this.resetRangeSlider("volume");
+    this.resetRangeSlider("wordPauses");
     this.playbackForm.get('lightMode')?.setValue(false);
     this.resetRangeSlider("inbetweenDelayRow");
     this.resetRangeSlider("inbetweenDelayColumn");
@@ -1575,12 +1576,10 @@ export class DataTableComponent implements OnInit, OnDestroy {
       let text = this.tableData[row][0];
       let voice: SpeechSynthesisVoice | undefined = this.getSpeechSynthesisVoice(`lang${1}Voice`);
       let vocalSpeed = Number(this.playbackForm?.get('vocalSpeed')?.value);
-      let volume = Number(this.playbackForm?.get('volume')?.value);
-      volume = volume * volume * volume;
       
       if(text && voice) {
         this.isSpeaking = true;
-        await this.speechService.speakAsync(text, voice, vocalSpeed, volume);
+        await this.speechService.speakAsync(text, voice, vocalSpeed);
         this.isSpeaking = false;
       }
     }

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfigService } from '../../read-aloud/services/config/config.service';
+import { Utils } from '../../read-aloud/utils/Utils';
 
 @Component({
   selector: 'app-portfolio',
@@ -38,19 +39,15 @@ export class PortfolioComponent implements OnInit{
     for(let i = 0; i < this.professions.length; i++) {
       for(let j = 0; j < this.professions[i].length; j++) {
         this.profession += this.professions[i][j];
-        await this.delay(150);
+        await Utils.delay(150);
       }
-      await this.delay(1000);
+      await Utils.delay(1000);
       for(let j = 0; j < this.professions[i].length; j++) {
         this.profession = this.profession.substring(0, this.profession.length - 1);
-        await this.delay(150);
+        await Utils.delay(150);
       }
     }
     this.animateProfession();
-  }
-
-  delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
 }
