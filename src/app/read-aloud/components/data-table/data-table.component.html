@@ -187,7 +187,7 @@
                       - It should have the following structure <br/>
                       &nbsp; • &nbsp; Column 1: words from language 1 <br/>
                       &nbsp; • &nbsp; Column 2: words from language 2 <br/>
-                      &nbsp; • &nbsp; Column 3: lowercase 'y'
+                      &nbsp; • &nbsp; Column 3 (metadata-column): lowercase 'y'
                     </div>
                   </mtx-popover>
                 </div>
@@ -278,7 +278,23 @@
               </div>
             </div>
             <div style="max-width: 300px; box-shadow: 2px 0px 10px #CCC; margin: 10px 0px 25px 5px; padding-top: 10px;">
-              <mat-label style="margin-left: 10px;">Word Pauses</mat-label>
+              <div style="display: flex; flex-direction: row; justify-content:left;">
+                <mat-label style="margin-left: 10px;">Word Pauses</mat-label>
+                <mat-icon
+                  style="margin-left: 5px;"
+                  #popoverTrigger="mtxPopoverTrigger"
+                  [mtxPopoverTriggerFor]="popover2"
+                >info</mat-icon>
+                <mtx-popover #popover2="mtxPopover" 
+                  [closeOnPanelClick]="true"
+                  [hideArrow]="true"
+                >
+                  <div style="width: 300px;">
+                    The metadata-column should have the column number of the effective column. <br/>
+                    e.g., '1' for column 1<br/>
+                  </div>
+                </mtx-popover>
+              </div>
               <br>
               <div style="display: flex; flex-direction: row; justify-content: space-between;">
                 <div style="display: flex; align-items: center;">

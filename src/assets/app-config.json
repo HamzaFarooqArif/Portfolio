@@ -11,5 +11,9 @@
     "EligibleRowSymbol": "y",
     "SilentRowSymbol": "n",
     "HighlightRowSymbol": "h",
+    "Column1WordPausesEnabledSymbol": "1",
+    "Column2WordPausesEnabledSymbol": "2",
+    "Column3WordPausesEnabledSymbol": "3",
+    "Column4WordPausesEnabledSymbol": "4",
     "CareerStartDate": "2020-05-20"
 }

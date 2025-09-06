@@ -1194,7 +1194,21 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
     if(text && voice) {
       this.addToPlayed(this.currentRow);
-      await this.speechService.speakAsync(text, voice, vocalSpeed, wordPauses*1000);
+      if(wordPauses <= 0) {
+        await this.speechService.speakAsync(text, voice, vocalSpeed);
+      }
+      else {
+        await this.speakWithPauses(text, voice, vocalSpeed, wordPauses);
+      }
+    }
+  }
+
+  async speakWithPauses(text: string, voice: SpeechSynthesisVoice, vocalSpeed: number, wordDelay: number) {
+    let isWordPausesEnabled = this.symbolFound(`Column${this.currentColumn+1}WordPausesEnabledSymbol`, this.tableData[this.currentRow]);
+    if(isWordPausesEnabled){
+      await this.speechService.speakAsync(text, voice, vocalSpeed, wordDelay*1000);
+    } else {
+      await this.speechService.speakAsync(text, voice, vocalSpeed);
     }
   }
 
