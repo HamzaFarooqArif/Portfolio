@@ -42,7 +42,7 @@ export class SpeechService {
           await Utils.delay(wordDelay); 
         }
       }
-      if(!this.cancelOngoingSpeech) {
+      if(!this.cancelOngoingSpeech && words.length > 1) {
         await this.speakInternalAsync(text, voice, vocalSpeed);
       }
     }
